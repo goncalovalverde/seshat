@@ -1,0 +1,21 @@
+jira:
+  username: goncalo.valverde@vakt.io
+  password: EXkmWMfZm28Dore9BklL9AD9
+  url: https://vaktglobal.atlassian.net
+  customfield:
+    storypoints: customfield_10043
+  view: 34
+output:
+        filename: "nominations_bug_data.xlsx"
+jql_query: PROJECT ='VD'
+            AND
+            issuetype=BUG
+            AND priority in (high,highest)
+            AND
+            (
+                  created>startOfDay(-6M)
+                  OR
+                  status changed to done after startOfDay(-6M)
+                )
+              AND status!=redundant
+              AND Workstream='Barge Nominations'
