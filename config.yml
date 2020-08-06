@@ -10,7 +10,7 @@ jql_query: PROJECT ='FUBAR'
             AND
             issuetype="story"
 input:
-  mode: csv #select either csv or jira
+  mode: jira #select either csv or jira
   csv_file: my_raw_data.csv
 
 Workflow:
