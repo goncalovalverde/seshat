@@ -5,7 +5,19 @@ jira:
   customfield:
     storypoints: customfield_10043
 output:
-        filename: "nominations_bug_data.xlsx"
+  filename: "nominations_bug_data.xlsx"
 jql_query: PROJECT ='FUBAR'
             AND
             issuetype="story"
+input:
+  mode: csv #select either csv or jira
+  csv_file: my_raw_data.csv
+
+Workflow:
+  In Analysis: In Analysis,
+  Ready for Dev: Ready for Dev,
+  In Dev: In Dev,
+  Ready for QA: Ready for QA,
+  In QA: In QA,
+  Ready for Signoff: Ready for Signoff,
+  Done: Done
