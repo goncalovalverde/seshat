@@ -10,7 +10,6 @@ config=yaml.load(config_file,Loader=yaml.FullLoader)
 mode=config["input"]["mode"]
 csv_file=config["input"]["csv_file"]
 
-
 def get_issue_data(issue,issue_data):
 
     issue_data["Key"].append(issue.key)
@@ -20,7 +19,6 @@ def get_issue_data(issue,issue_data):
     history_item={}
     for workflow_step in config["Workflow"]:
         history_item[workflow_step]="0"
-
 
     for history in issue.changelog.histories:
         for item in history.items:
@@ -43,11 +41,7 @@ def get_issues():
     issues = jira.search_issues(config["jql_query"],expand="changelog")
     return issues
 
-
-if mode == "csv":
-    cycle=pd.read_csv(csv_file)
-elif mode == "jira":
-
+def get_jira_data():
     issue_data={
         "Key": [],
         "Type": [], 
@@ -62,6 +56,11 @@ elif mode == "jira":
     for issue in issues:
         get_issue_data(issue,issue_data)
 
-    cycle=pd.DataFrame(issue_data)
+    return issue_data
+
+if mode == "csv":
+    cycle=pd.read_csv(csv_file)
+elif mode == "jira":
+    cycle=pd.DataFrame(get_jira_data())
 
 print(cycle)
