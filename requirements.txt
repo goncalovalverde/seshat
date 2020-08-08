@@ -1,0 +1,4 @@
+openpyxl
+pandas
+jira
+dateutil.parser

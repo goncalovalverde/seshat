@@ -15,3 +15,6 @@ elif mode == "jira":
     cycle=pd.DataFrame(reader.jira.get_jira_data(config))
 
 print(cycle)
+
+with pd.ExcelWriter(config["output"]["filename"]) as writer:
+    cycle.to_excel(writer)

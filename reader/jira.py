@@ -4,7 +4,7 @@ import dateutil.parser
 def get_issue_data(issue,issue_data,config):
     issue_data["Key"].append(issue.key)
     issue_data["Type"].append(issue.fields.issuetype.name)
-    issue_data["Created"].append(dateutil.parser.parse(issue.fields.created))
+    issue_data["Created"].append(dateutil.parser.parse(issue.fields.created).replace(tzinfo=None))
 
     history_item={}
     for workflow_step in config["Workflow"]:
@@ -13,7 +13,7 @@ def get_issue_data(issue,issue_data,config):
     for history in issue.changelog.histories:
         for item in history.items:
             if item.field == 'status':
-                history_item[item.toString]=dateutil.parser.parse(history.created)
+                history_item[item.toString]=dateutil.parser.parse(history.created).replace(tzinfo=None)
     
     for workflow_step in config["Workflow"]:
         issue_data[workflow_step].append(history_item[workflow_step])
