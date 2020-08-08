@@ -1,6 +1,5 @@
 #!/usr/bin/python
 import yaml
-import pprint
 import pandas as pd
 import reader.jira
 

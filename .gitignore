@@ -35,3 +35,5 @@
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
 config.yml
 my_raw_data.csv
+__pycache__/
+*.pyc

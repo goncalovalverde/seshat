@@ -23,12 +23,10 @@ def get_issues(config):
         config["jira"]["url"],
         basic_auth=(config["jira"]["username"],config["jira"]["password"])
     )
+    
+    startAt=0
 
-    query_options = {
-        "expand": 'changelog',
-        "max_results": 100
-    }
-    issues = jira.search_issues(config["jql_query"],expand="changelog")
+    issues = jira.search_issues(config["jql_query"],expand="changelog",maxResults=100,startAt=startAt)
     return issues
 
 def get_jira_data(config):
