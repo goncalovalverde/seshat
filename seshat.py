@@ -8,10 +8,8 @@ import dateutil.parser
 config_file=open("config.yml")
 config=yaml.load(config_file,Loader=yaml.FullLoader)
 mode=config["input"]["mode"]
-csv_file=config["input"]["csv_file"]
 
 def get_issue_data(issue,issue_data):
-
     issue_data["Key"].append(issue.key)
     issue_data["Type"].append(issue.fields.issuetype.name)
     issue_data["Created"].append(dateutil.parser.parse(issue.fields.created))
@@ -59,6 +57,7 @@ def get_jira_data():
     return issue_data
 
 if mode == "csv":
+    csv_file=config["input"]["csv_file"]
     cycle=pd.read_csv(csv_file)
 elif mode == "jira":
     cycle=pd.DataFrame(get_jira_data())
