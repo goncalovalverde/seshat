@@ -16,5 +16,6 @@ elif mode == "jira":
 
 print(cycle)
 
-with pd.ExcelWriter(config["output"]["filename"]) as writer:
-    cycle.to_excel(writer)
+if config["output"]["format"]=="xslx":
+    with pd.ExcelWriter(config["output"]["filename"]) as writer:
+        cycle.to_excel(writer)
