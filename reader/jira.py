@@ -1,5 +1,6 @@
 from jira import JIRA
 import dateutil.parser
+import pprint
 
 def get_issue_data(issue,issue_data,config):
     issue_data["Key"].append(issue.key)
@@ -24,9 +25,16 @@ def get_issues(config):
         basic_auth=(config["jira"]["username"],config["jira"]["password"])
     )
     
-    startAt=0
+    issues =[]
+    i = 0
+    chunk_size = 100
+    while True:
+        chunk = jira.search_issues(config["jql_query"],expand="changelog",maxResults=chunk_size,startAt=i)
+        i += chunk_size
+        issues += chunk.iterable
+        if i >= chunk.total:
+            break
 
-    issues = jira.search_issues(config["jql_query"],expand="changelog",maxResults=100,startAt=startAt)
     return issues
 
 def get_jira_data(config):
