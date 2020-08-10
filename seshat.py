@@ -12,7 +12,8 @@ if mode == "csv":
     csv_file=config["input"]["csv_file"]
     cycle=pd.read_csv(csv_file)
 elif mode == "jira":
-    cycle=pd.DataFrame(reader.jira.get_jira_data(config))
+    jira=reader.jira.Jira(config["jira"],config["Workflow"])
+    cycle=pd.DataFrame(jira.get_jira_data())
 
 print(cycle)
 
