@@ -2,6 +2,7 @@
 import yaml
 import pandas as pd
 import reader.jira
+import calculator.flow
 
 config_file=open("config.yml")
 config=yaml.load(config_file,Loader=yaml.FullLoader)
@@ -20,3 +21,5 @@ print(cycle)
 if config["output"]["format"]=="xslx":
     with pd.ExcelWriter(config["output"]["filename"]) as writer:
         cycle.to_excel(writer)
+
+print(calculator.flow.throughput(cycle))
