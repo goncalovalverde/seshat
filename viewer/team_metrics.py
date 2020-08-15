@@ -4,6 +4,12 @@ import numpy as np
 
 def show_throughput(cycle_data):
     pd.options.plotting.backend = "plotly"
-    fig=cycle_data.plot.line()
+    fig = cycle_data.plot.line()
     fig.show()
-    results = px.get_trendline_results(fig)
+
+
+def show_lead_time(cycle_data):
+    pd.options.plotting.backend = "plotly"
+    fig = cycle_data.plot.scatter(
+        x=cycle_data["Done"], y=cycle_data["Lead Time"])
+    fig.show()
