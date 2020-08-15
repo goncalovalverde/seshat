@@ -14,7 +14,7 @@ class Jira:
 
         history_item={}
         for workflow_step in self.workflow:
-            history_item[workflow_step]="0"
+            history_item[workflow_step]=""
 
         for history in issue.changelog.histories:
             for item in history.items:
