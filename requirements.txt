@@ -3,3 +3,4 @@ pandas
 jira
 dateutil.parser
 numpy
+plotly
