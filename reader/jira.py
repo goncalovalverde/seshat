@@ -1,6 +1,7 @@
 from jira import JIRA
 import dateutil.parser
 import pprint
+from math import nan
 
 class Jira:
     def __init__(self,jira_config,workflow):
@@ -14,7 +15,7 @@ class Jira:
 
         history_item={}
         for workflow_step in self.workflow:
-            history_item[workflow_step]=""
+            history_item[workflow_step]=nan
 
         for history in issue.changelog.histories:
             for item in history.items:
