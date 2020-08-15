@@ -4,6 +4,7 @@ import pandas as pd
 import reader.jira
 import reader.csv
 import calculator.flow
+import viewer.team_metrics
 
 config_file=open("config.yml")
 config=yaml.load(config_file,Loader=yaml.FullLoader)
@@ -23,3 +24,5 @@ if config["output"]["format"]=="xslx":
         cycle_data.to_excel(writer)
 
 print(calculator.flow.throughput(cycle_data))
+throughput=calculator.flow.throughput(cycle_data)
+viewer.team_metrics.show_throughput(throughput)
