@@ -37,3 +37,4 @@ config.yml
 my_raw_data.csv
 __pycache__/
 *.pyc
+.vscode/
