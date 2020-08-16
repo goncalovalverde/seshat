@@ -1,13 +1,9 @@
 import pandas as pd
 
+
 # Productivity - How Much - "Do Lots"
 def throughput(cycle_data):
-    # Pivot data since several values in the Done column will be nil or 0
-    table = pd.pivot_table(cycle_data, values="Key", index=['Done'], columns="Type",aggfunc='count')
-    throughput = pd.DataFrame(table.to_records())
-    throughput["Week"] = throughput["Done"].dt.strftime('%Y-%U')
-    throughput = throughput.rename({"Done": "Total"}, axis=1)
-    throughput = throughput.groupby("Week").count()
+    throughput = count_items_in_week(cycle_data, "Done")
     return throughput
 
 
@@ -19,21 +15,12 @@ def lead_time(cycle_data):
 
 # Predictability - How Repeatable - "Do it Predicably"
 def net_flow(cycle_data):
-    table_created = pd.pivot_table(
-        cycle_data, values="Key",
-        index=['Created'],
-        columns="Type", aggfunc='count')
-    table_done = pd.pivot_table(
-        cycle_data, values="Key",
-        index=['Done'],
-        columns="Type", aggfunc='count')
-
-    table = pd.merge(table_created,table_done,how="outer")
-    print(table_created)
-    print(table_done)
-    print(table)
-    net_flow = ''
-    return net_flow
+    print(cycle_data)
+    created = count_items_in_week(cycle_data, "Created")
+    done = count_items_in_week(cycle_data, "Done")
+    table = pd.merge(created, done, left_index=True, right_index=True)
+    table["Net Flow"] = table["Total_y"] - table["Total_x"]
+    return table
 
 
 # Quality - How Well - "Do it Right"
@@ -41,3 +28,12 @@ def defect_percentage(throughput):
     throughput["Defect Percentage"] = round((throughput["Bug"]/(throughput["Total"]))*100,2)
     return throughput
 
+
+# Auxiliary function to simplify counting total per week
+def count_items_in_week(cycle_data, index):
+    table = pd.pivot_table(cycle_data, values="Key", index=[index], columns="Type", aggfunc='count')
+    item_count_in_week = pd.DataFrame(table.to_records())
+    item_count_in_week["Week"] = item_count_in_week[index].dt.strftime('%Y-%U')
+    item_count_in_week = item_count_in_week.rename({index: "Total"}, axis=1)
+    item_count_in_week = item_count_in_week.groupby("Week").count()
+    return item_count_in_week
