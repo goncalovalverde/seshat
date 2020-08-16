@@ -1,0 +1,23 @@
+jira:
+  username: YOUR_EMAIL
+  password: YOURPASSWORD
+  url: https://yoururl.atlassian.net
+  jql_query: PROJECT ='FUBAR'
+          AND
+          issuetype in ("story","task","bug")
+output:
+  format: none #use xlsx to output to excel
+  filename: "/tmp/my_data.xlsx"
+
+input:
+  mode: csv #select either csv or jira
+  csv_file: my_raw_data.csv
+
+Workflow:
+  In Analysis: In Analysis,
+  Ready for Dev: Ready for Dev,
+  In Dev: In Dev,
+  Ready for QA: Ready for QA,
+  In QA: In QA,
+  Ready for Signoff: Ready for Signoff,
+  Done: Done
