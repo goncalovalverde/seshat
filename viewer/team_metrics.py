@@ -13,3 +13,8 @@ def show_lead_time(cycle_data):
     fig = cycle_data.plot.scatter(
         x=cycle_data["Done"], y=cycle_data["Lead Time"])
     fig.show()
+
+def show_defect_percentage(throughput):
+    pd.options.plotting.backend = "plotly"
+    fig = throughput["Defect Percentage"].plot()
+    fig.show()
