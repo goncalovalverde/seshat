@@ -12,7 +12,7 @@ mode = config["input"]["mode"]
 
 
 if mode == "csv":
-    cycle_data = reader.csv.read_csv(
+    cycle_data = reader.csv.read(
         config["input"]["csv_file"], config["Workflow"])
 elif mode == "jira":
     jira = reader.jira.Jira(config["jira"],config["Workflow"])
@@ -24,14 +24,10 @@ if config["output"]["format"] == "xslx":
     with pd.ExcelWriter(config["output"]["filename"]) as writer:
         cycle_data.to_excel(writer)
 
-#throughput = calculator.flow.throughput(cycle_data)
-# throughput = calculator.flow.defect_percentage(throughput)
-#print(throughput)
-# viewer.team_metrics.show_defect_percentage(throughput)
-# print(throughput)
-net_flow=calculator.flow.net_flow(cycle_data)
-viewer.team_metrics.show_net_flow(net_flow)
-# calculator.flow.lead_time(cycle_data)
-# viewer.team_metrics.show_lead_time(cycle_data)
+throughput = calculator.flow.throughput(cycle_data)
+throughput = calculator.flow.defect_percentage(throughput)
+cycle_data = calculator.flow.lead_time(cycle_data)
+net_flow = calculator.flow.net_flow(cycle_data)
 
-# viewer.team_metrics.show_throughput(throughput)
+team_metrics = viewer.team_metrics.Team_Metrics(cycle_data, throughput, net_flow)
+team_metrics.show_dash()

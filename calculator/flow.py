@@ -18,9 +18,9 @@ def net_flow(cycle_data):
     print(cycle_data)
     created = count_items_in_week(cycle_data, "Created")
     done = count_items_in_week(cycle_data, "Done")
-    table = pd.merge(created, done, left_index=True, right_index=True)
-    table["Net Flow"] = table["Total_y"] - table["Total_x"]
-    return table
+    net_flow = pd.merge(created, done, left_index=True, right_index=True)
+    net_flow["Net Flow"] = net_flow["Total_y"] - net_flow["Total_x"]
+    return net_flow
 
 
 # Quality - How Well - "Do it Right"
