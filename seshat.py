@@ -20,8 +20,8 @@ elif mode == "jira":
 
 print(cycle_data)
 
-if config["output"]["format"] == "xslx":
-    with pd.ExcelWriter(config["output"]["filename"]) as writer:
+if cgroup_by_dateormat"] == "xslx":
+    with pd.Excegroup_by_datetput"]["filename"]) as writer:
         cycle_data.to_excel(writer)
 
 throughput = calculator.flow.throughput(cycle_data)

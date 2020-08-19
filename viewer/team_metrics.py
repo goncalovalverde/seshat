@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 class Team_Metrics:
     def __init__(self, cycle_data, throughput, net_flow):
         self.cycle_data = cycle_data
@@ -8,20 +9,41 @@ class Team_Metrics:
         pd.options.plotting.backend = "plotly"
 
     def draw_throughput(self, throughput):
-        fig = throughput["Total"].plot.line()
+        fig = throughput.plot.line(x=throughput["Done"],y=throughput["Total"])
+        fig.update_xaxes(
+            rangeslider_visible=False,
+            rangeselector=dict(
+                buttons=list([
+                    dict(count=1, label="1m", step="month", stepmode="backward"),
+                    dict(count=6, label="6m", step="month", stepmode="backward"),
+                    dict(count=1, label="YTD", step="year", stepmode="todate"),
+                    dict(count=1, label="1y", step="year", stepmode="backward"),
+                    dict(step="all")
+                ])
+            )
+        )
+        fig.update_layout(title='Productivity - How Much - "Do Lots"')
         return fig
 
     def draw_lead_time(self, cycle_data):
-        fig = cycle_data.plot.scatter(
+        fig = cycle_data.plot.line(
             x=cycle_data["Done"], y=cycle_data["Lead Time"])
+        fig.update_layout(title='Responsivness - How Fast - "Do it Fast"')
         return fig
 
     def draw_defect_percentage(self, throughput):
-        fig = throughput["Defect Percentage"].plot()
+        fig = throughput.plot(
+            x=throughput["Done"],
+            y=throughput["Defect Percentage"])
+        fig.update_layout(title='Quality - How Well - "Do it Right"')
         return fig
 
     def draw_net_flow(self, cycle_data):
-        fig = cycle_data["Net Flow"].plot.bar()
+        fig = cycle_data.plot.bar(
+            x=cycle_data["Done"],
+            y=cycle_data["Net Flow"]
+        )
+        fig.update_layout(title=    'Predictability - How Repeatable - "Do it Predicably"')
         return fig
 
     def show_all(self):
@@ -51,14 +73,16 @@ class Team_Metrics:
         app.layout = html.Div(children=[
             html.H1(children='Team Metrics'),
 
-            html.Div(children='''How Much (Do lots).'''), ç 
+            html.Div(children=[
+                dcc.Graph(id='throughput-graph', figure=fig_throughput),
+                dcc.Graph(id='defect-percentage-graph', figure=fig_defect_percentage)],
+                style={'columnCount': 2}),
 
-            dcc.Graph(id='throughput-graph',figure=fig_throughput),
+            html.Div(children=[
+                dcc.Graph(id='defect-lead_time-graph', figure=fig_lead_time),
+                dcc.Graph(id='defect-net_flow', figure=fig_net_flow)
+            ], style={'columnCount': 2})
 
-            html.Div(children='''How Well (Do lots).'''),
-
-            dcc.Graph(id='defect-percentage-graph',figure=fig_defect_percentage)
-           
         ])
 
-        app.run_server(debug=True)
+        app.run_server(debug=False)
