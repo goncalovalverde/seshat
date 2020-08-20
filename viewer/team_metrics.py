@@ -65,7 +65,6 @@ class Team_Metrics:
         import statsmodels.api as sm
         df['serialtime'] = [(d-datetime.datetime(1970,1,1)).days for d in df.index]
         df['bestfit'] = sm.OLS(df[column],sm.add_constant(df["serialtime"])).fit().fittedvalues
-        print(df)
         fig = fig.add_trace(go.Scatter(x=df.index,y=df["bestfit"],mode='lines'))
         return fig
 
