@@ -21,6 +21,7 @@ def avg_lead_time(cycle_data):
     lead_time = lead_time.groupby("Done").mean()
     # TODO: check if using mean here is correct
     lead_time = lead_time.resample("W").mean()
+    lead_time = lead_time.fillna(0)
     return lead_time
 
 # Predictability - How Repeatable - "Do it Predicably"
@@ -31,6 +32,7 @@ def net_flow(cycle_data):
     net_flow["Net Flow"] = net_flow["Total_y"] - net_flow["Total_x"]
     net_flow = net_flow.set_index("Done")
     net_flow = net_flow.resample("W").sum()
+    net_flow = net_flow.fillna(0)
     return net_flow
 
 
@@ -38,6 +40,7 @@ def net_flow(cycle_data):
 def defect_percentage(throughput):
     throughput = throughput.resample("W").sum()
     throughput["Defect Percentage"] = round((throughput["Bug"]/(throughput["Total"]))*100,2)
+    throughput = throughput.fillna(0)
     return throughput
 
 

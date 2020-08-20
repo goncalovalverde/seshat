@@ -4,3 +4,4 @@ jira
 dateutil.parser
 numpy
 plotly
+statsmodels

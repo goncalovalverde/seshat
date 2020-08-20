@@ -1,4 +1,5 @@
 import pandas as pd
+import plotly.graph_objects as go
 
 
 class Team_Metrics:
@@ -10,24 +11,13 @@ class Team_Metrics:
 
     def draw_throughput(self, throughput):
         throughput = throughput.resample("W").sum()
-        #fig = throughput.plot.line(x=throughput["Done"],y=throughput["Total"])
         fig = throughput["Total"].plot.line()
-        fig.update_xaxes(
-            rangeslider_visible=False,
-            rangeselector=dict(
-                buttons=list([
-                    dict(count=1, label="1m", step="month", stepmode="backward"),
-                    dict(count=6, label="6m", step="month", stepmode="backward"),
-                    dict(count=1, label="YTD", step="year", stepmode="todate"),
-                    dict(count=1, label="1y", step="year", stepmode="backward"),
-                    dict(step="all")
-                ])
-            )
-        )
         fig.update_layout(
             title='Productivity - How Much - "Do Lots"',
             showlegend=False,
             yaxis={'title': 'Throughput'})
+
+        fig = self.add_trendline(throughput, fig,"Total")     
         return fig
 
     def draw_lead_time(self, cycle_data):
@@ -38,14 +28,16 @@ class Team_Metrics:
             title='Responsivness - How Fast - "Do it Fast"',
             showlegend=False,
             yaxis={'title': 'Lead Time Avg'})
+        fig = self.add_trendline(lead_time, fig,"Lead Time")     
         return fig
 
     def draw_defect_percentage(self, throughput):
-        fig = throughput["Defect Percentage"].plot()
+        fig = throughput["Defect Percentage"].plot.line()
         fig.update_layout(
             title='Quality - How Well - "Do it Right"',
             showlegend=False,
             yaxis={'title': 'Defect Percentage'})
+        fig = self.add_trendline(throughput, fig, 'Defect Percentage')
         return fig
 
     def draw_net_flow(self, net_flow):
@@ -54,6 +46,7 @@ class Team_Metrics:
             title='Predictability - How Repeatable - "Do it Predictably"',
             showlegend=False,
             yaxis={'title': 'Net Flow'})
+        fig = self.add_trendline(net_flow, fig, 'Net Flow')
         return fig
 
     def show_all(self):
@@ -66,6 +59,30 @@ class Team_Metrics:
         fig_defect_percentage.show()
         fig_lead_time.show()
         fig_net_flow.show()
+
+    def add_trendline(self, df, fig, column):
+        import datetime
+        import statsmodels.api as sm
+        df['serialtime'] = [(d-datetime.datetime(1970,1,1)).days for d in df.index]
+        df['bestfit'] = sm.OLS(df[column],sm.add_constant(df["serialtime"])).fit().fittedvalues
+        print(df)
+        fig = fig.add_trace(go.Scatter(x=df.index,y=df["bestfit"],mode='lines'))
+        return fig
+
+    def add_range_buttons(self,fig):
+        fig.update_xaxes(
+            rangeslider_visible=False,
+            rangeselector=dict(
+                buttons=list([
+                    dict(count=1, label="1m", step="month", stepmode="backward"),
+                    dict(count=6, label="6m", step="month", stepmode="backward"),
+                    dict(count=1, label="YTD", step="year", stepmode="todate"),
+                    dict(count=1, label="1y", step="year", stepmode="backward"),
+                    dict(step="all")
+                ])
+            )
+        )
+        return fig
 
     def show_dash(self):
         import dash
@@ -94,11 +111,11 @@ class Team_Metrics:
                 dcc.Graph(id='defect-net_flow', figure=fig_net_flow)],
                 style={'columnCount': 2}),
 
-            html.Div(children=[
-                 dash_table.DataTable(
-                    id='table',
-                    columns=[{"name": i, "id": i} for i in self.net_flow.columns],
-                    data=self.net_flow.to_dict('records'))])
+#            html.Div(children=[
+#                 dash_table.DataTable(
+#                    id='table',
+#                    columns=[{"name": i, "id": i} for i in self.net_flow.columns],
+#                    data=self.net_flow.to_dict('records'))])
 
         ])
 
