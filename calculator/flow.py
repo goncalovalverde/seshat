@@ -39,7 +39,10 @@ def net_flow(cycle_data):
 # Quality - How Well - "Do it Right"
 def defect_percentage(throughput):
     throughput = throughput.resample("W").sum()
-    throughput["Defect Percentage"] = round((throughput["Bug"]/(throughput["Total"]))*100,2)
+    if "Bug" in throughput:
+        throughput["Defect Percentage"] = round((throughput["Bug"]/(throughput["Total"]))*100,2)
+    else:
+        throughput["Defect Percentage"] = throughput["Total"]*0
     throughput = throughput.fillna(0)
     return throughput
 
