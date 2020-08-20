@@ -9,7 +9,9 @@ class Team_Metrics:
         pd.options.plotting.backend = "plotly"
 
     def draw_throughput(self, throughput):
-        fig = throughput.plot.line(x=throughput["Done"],y=throughput["Total"])
+        throughput = throughput.resample("W").sum()
+        #fig = throughput.plot.line(x=throughput["Done"],y=throughput["Total"])
+        fig = throughput["Total"].plot.line()
         fig.update_xaxes(
             rangeslider_visible=False,
             rangeselector=dict(
@@ -22,28 +24,36 @@ class Team_Metrics:
                 ])
             )
         )
-        fig.update_layout(title='Productivity - How Much - "Do Lots"')
+        fig.update_layout(
+            title='Productivity - How Much - "Do Lots"',
+            showlegend=False,
+            yaxis={'title': 'Throughput'})
         return fig
 
     def draw_lead_time(self, cycle_data):
-        fig = cycle_data.plot.line(
-            x=cycle_data["Done"], y=cycle_data["Lead Time"])
-        fig.update_layout(title='Responsivness - How Fast - "Do it Fast"')
+        import calculator.flow
+        lead_time = calculator.flow.avg_lead_time(cycle_data)
+        fig = lead_time.plot.line()
+        fig.update_layout(
+            title='Responsivness - How Fast - "Do it Fast"',
+            showlegend=False,
+            yaxis={'title': 'Lead Time Avg'})
         return fig
 
     def draw_defect_percentage(self, throughput):
-        fig = throughput.plot(
-            x=throughput["Done"],
-            y=throughput["Defect Percentage"])
-        fig.update_layout(title='Quality - How Well - "Do it Right"')
+        fig = throughput["Defect Percentage"].plot()
+        fig.update_layout(
+            title='Quality - How Well - "Do it Right"',
+            showlegend=False,
+            yaxis={'title': 'Defect Percentage'})
         return fig
 
-    def draw_net_flow(self, cycle_data):
-        fig = cycle_data.plot.bar(
-            x=cycle_data["Done"],
-            y=cycle_data["Net Flow"]
-        )
-        fig.update_layout(title=    'Predictability - How Repeatable - "Do it Predicably"')
+    def draw_net_flow(self, net_flow):
+        fig = net_flow["Net Flow"].plot.bar()
+        fig.update_layout(
+            title='Predictability - How Repeatable - "Do it Predictably"',
+            showlegend=False,
+            yaxis={'title': 'Net Flow'})
         return fig
 
     def show_all(self):
@@ -61,6 +71,7 @@ class Team_Metrics:
         import dash
         import dash_core_components as dcc
         import dash_html_components as html
+        import dash_table
 
         fig_throughput = self.draw_throughput(self.throughput)
         fig_defect_percentage = self.draw_defect_percentage(self.throughput)
@@ -80,9 +91,16 @@ class Team_Metrics:
 
             html.Div(children=[
                 dcc.Graph(id='defect-lead_time-graph', figure=fig_lead_time),
-                dcc.Graph(id='defect-net_flow', figure=fig_net_flow)
-            ], style={'columnCount': 2})
+                dcc.Graph(id='defect-net_flow', figure=fig_net_flow)],
+                style={'columnCount': 2}),
+
+            html.Div(children=[
+                 dash_table.DataTable(
+                    id='table',
+                    columns=[{"name": i, "id": i} for i in self.net_flow.columns],
+                    data=self.net_flow.to_dict('records'))])
 
         ])
 
+        app.title = "Seshat - A Team Metrics app"
         app.run_server(debug=False)
