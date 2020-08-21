@@ -2,6 +2,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import datetime
 import statsmodels.api as sm
+import numpy as np
 
 
 class Team_Metrics:
@@ -13,11 +14,12 @@ class Team_Metrics:
 
     def draw_throughput(self, throughput):
         throughput = throughput.resample("W").sum()
-        fig = throughput["Total"].plot.line()
+        fig = throughput["Total"].plot.line(text=throughput["Total"])
         fig.update_layout(
             title='Productivity - How Much - "Do Lots"',
             showlegend=False,
-            yaxis={'title': 'Throughput'})
+            yaxis={'title': 'Throughput'}
+            )
 
         fig = self.add_trendline(throughput, fig,"Total")     
         return fig
@@ -34,7 +36,7 @@ class Team_Metrics:
         return fig
 
     def draw_defect_percentage(self, throughput):
-        fig = throughput["Defect Percentage"].plot.line()
+        fig = throughput["Defect Percentage"].plot.line(text=throughput["Defect Percentage"])
         fig.update_layout(
             title='Quality - How Well - "Do it Right"',
             showlegend=False,
@@ -43,7 +45,8 @@ class Team_Metrics:
         return fig
 
     def draw_net_flow(self, net_flow):
-        fig = net_flow["Net Flow"].plot.bar()
+        net_flow["Color"] = np.where(net_flow["Net Flow"]<0,'red','blue') 
+        fig = net_flow["Net Flow"].plot.bar(color=net_flow["Color"])
         fig.update_layout(
             title='Predictability - How Repeatable - "Do it Predictably"',
             showlegend=False,
@@ -69,7 +72,9 @@ class Team_Metrics:
         fig = fig.add_trace(go.Scatter(
             x=df.index,
             y=df["bestfit"],
-            mode='lines'))
+            mode='lines',
+            line={'dash': 'dash'},
+            marker_color="red"))
         return fig
 
     def add_range_buttons(self,fig):
