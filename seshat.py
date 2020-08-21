@@ -5,11 +5,21 @@ import reader.jira
 import reader.csv
 import calculator.flow
 import viewer.team_metrics
+import logging
+import logging.config
 
-config_file = open("config.yml")
-config = yaml.load(config_file, Loader=yaml.FullLoader)
+
+with open('log_config.yaml', 'r') as f:
+    log_config = yaml.safe_load(f.read())
+    logging.config.dictConfig(log_config)
+
+logger = logging.getLogger(__name__)
+logger.info("Starting seshat. Let's do team magic!")
+
+with open("config.yml",'r') as f:
+    config = yaml.load(f.read(), Loader=yaml.FullLoader)
+
 mode = config["input"]["mode"]
-
 
 if mode == "csv":
     cycle_data = reader.csv.read(

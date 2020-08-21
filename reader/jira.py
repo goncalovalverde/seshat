@@ -1,6 +1,6 @@
 from jira import JIRA
 import dateutil.parser
-import pprint
+import logging
 from math import nan
 
 class Jira:
@@ -26,8 +26,10 @@ class Jira:
             issue_data[workflow_step].append(history_item[workflow_step])
 
     def get_issues(self):
+        jira_url = self.jira_config["url"]
+        logging.debug("connecting to jira " + jira_url)
         jira = JIRA(
-            self.jira_config["url"],
+            jira_url,
             basic_auth=(self.jira_config["username"], self.jira_config["password"])
         )
         
@@ -47,6 +49,7 @@ class Jira:
         return issues
 
     def get_jira_data(self):
+        logging.debug("Getting info from jira")
         issue_data = {
             "Key": [],
             "Type": [],

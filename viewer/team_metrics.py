@@ -1,5 +1,7 @@
 import pandas as pd
 import plotly.graph_objects as go
+import datetime
+import statsmodels.api as sm
 
 
 class Team_Metrics:
@@ -61,11 +63,13 @@ class Team_Metrics:
         fig_net_flow.show()
 
     def add_trendline(self, df, fig, column):
-        import datetime
-        import statsmodels.api as sm
+        # This is needed because we can't use DateTimeIndex as input for OLS
         df['serialtime'] = [(d-datetime.datetime(1970,1,1)).days for d in df.index]
         df['bestfit'] = sm.OLS(df[column],sm.add_constant(df["serialtime"])).fit().fittedvalues
-        fig = fig.add_trace(go.Scatter(x=df.index,y=df["bestfit"],mode='lines'))
+        fig = fig.add_trace(go.Scatter(
+            x=df.index,
+            y=df["bestfit"],
+            mode='lines'))
         return fig
 
     def add_range_buttons(self,fig):
