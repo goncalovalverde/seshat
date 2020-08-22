@@ -21,7 +21,7 @@ class Team_Metrics:
             yaxis={'title': 'Throughput'}
             )
 
-        fig = self.add_trendline(throughput, fig,"Total")     
+        fig = self.add_trendline(throughput, fig, "Total")
         return fig
 
     def draw_lead_time(self, cycle_data):
@@ -32,7 +32,7 @@ class Team_Metrics:
             title='Responsivness - How Fast - "Do it Fast"',
             showlegend=False,
             yaxis={'title': 'Lead Time Avg'})
-        fig = self.add_trendline(lead_time, fig,"Lead Time")     
+        fig = self.add_trendline(lead_time, fig, "Lead Time")
         return fig
 
     def draw_defect_percentage(self, throughput):
@@ -45,7 +45,7 @@ class Team_Metrics:
         return fig
 
     def draw_net_flow(self, net_flow):
-        net_flow["Color"] = np.where(net_flow["Net Flow"]<0,'red','blue') 
+        net_flow["Color"] = np.where(net_flow["Net Flow"] < 0, 'red', 'blue')
         fig = net_flow["Net Flow"].plot.bar(color=net_flow["Color"])
         fig.update_layout(
             title='Predictability - How Repeatable - "Do it Predictably"',
@@ -67,8 +67,8 @@ class Team_Metrics:
 
     def add_trendline(self, df, fig, column):
         # This is needed because we can't use DateTimeIndex as input for OLS
-        df['serialtime'] = [(d-datetime.datetime(1970,1,1)).days for d in df.index]
-        df['bestfit'] = sm.OLS(df[column],sm.add_constant(df["serialtime"])).fit().fittedvalues
+        df['serialtime'] = [(d-datetime.datetime(1970, 1, 1)).days for d in df.index]
+        df['bestfit'] = sm.OLS(df[column], sm.add_constant(df["serialtime"])).fit().fittedvalues
         fig = fig.add_trace(go.Scatter(
             x=df.index,
             y=df["bestfit"],
@@ -77,7 +77,7 @@ class Team_Metrics:
             marker_color="red"))
         return fig
 
-    def add_range_buttons(self,fig):
+    def add_range_buttons(self, fig):
         fig.update_xaxes(
             rangeslider_visible=False,
             rangeselector=dict(
@@ -96,13 +96,13 @@ class Team_Metrics:
         import dash
         import dash_core_components as dcc
         import dash_html_components as html
-        import dash_table
+#       import dash_table
 
         fig_throughput = self.draw_throughput(self.throughput)
         fig_defect_percentage = self.draw_defect_percentage(self.throughput)
         fig_lead_time = self.draw_lead_time(self.cycle_data)
         fig_net_flow = self.draw_net_flow(self.net_flow)
-        
+
         external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
         app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
