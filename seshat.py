@@ -33,11 +33,10 @@ if config["output"]["format"] == "xslx":
         cycle_data.to_excel(writer)
 
 throughput = calculator.flow.throughput(cycle_data)
-throughput = calculator.flow.defect_percentage(throughput)
 cycle_data = calculator.flow.lead_time(cycle_data)
-net_flow = calculator.flow.net_flow(cycle_data)
+net_flow = calculator.flow.net_flow(cycle_data, "Total")
 
 print(cycle_data)
 
-team_metrics = viewer.team_metrics.Team_Metrics(cycle_data, throughput, net_flow)
+team_metrics = viewer.team_metrics.Team_Metrics(cycle_data, throughput, config)
 team_metrics.show_dash()

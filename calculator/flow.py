@@ -16,20 +16,27 @@ def lead_time(cycle_data):
     return cycle_data
 
 
-def avg_lead_time(cycle_data):
-    lead_time = cycle_data[["Done","Lead Time"]].copy()
+def avg_lead_time(cycle_data, type):
+    lead_time = cycle_data[["Done", "Type", "Lead Time"]].copy()
+    
+    if type != "Total":
+        print("inside loop for type " + type)
+        lead_time = lead_time.loc[lead_time["Type"] == type]
+    
     lead_time = lead_time.groupby("Done").mean()
+
     # TODO: check if using mean here is correct
     lead_time = lead_time.resample("W").mean()
     lead_time = lead_time.fillna(0)
     return lead_time
 
+
 # Predictability - How Repeatable - "Do it Predicably"
-def net_flow(cycle_data):
+def net_flow(cycle_data, type):
     created = group_by_date(cycle_data, "Created")
     done = group_by_date(cycle_data, "Done")
     net_flow = pd.merge(created, done, left_index=True, right_index=True)
-    net_flow["Net Flow"] = net_flow["Total_y"] - net_flow["Total_x"]
+    net_flow["Net Flow"] = net_flow[type + "_y"] - net_flow[type + "_x"]
     net_flow = net_flow.set_index("Done")
     net_flow = net_flow.resample("W").sum()
     net_flow = net_flow.fillna(0)
@@ -37,10 +44,18 @@ def net_flow(cycle_data):
 
 
 # Quality - How Well - "Do it Right"
-def defect_percentage(throughput):
+def defect_percentage(throughput, type):
     throughput = throughput.resample("W").sum()
+
+    if type == "Total":
+        total = throughput["Total"]
+    elif type == "Bug":
+        total = throughput["Bug"]
+    else:
+        total = throughput["Bug"] + throughput[type]
+   
     if "Bug" in throughput:
-        throughput["Defect Percentage"] = round((throughput["Bug"]/(throughput["Total"]))*100,2)
+        throughput["Defect Percentage"] = round((throughput["Bug"]/(total))*100,2)
     else:
         throughput["Defect Percentage"] = throughput["Total"]*0
     throughput = throughput.fillna(0)
@@ -63,3 +78,5 @@ def group_by_date(cycle_data, index):
     df = df.fillna(0)
     df["Total"] = df.sum(axis=1)
     return df
+
+# %%
