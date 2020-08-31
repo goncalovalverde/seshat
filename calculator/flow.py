@@ -10,8 +10,8 @@ def throughput(cycle_data):
 
 
 # Responsivness - How Fast - "Do it Fast"
-def lead_time(cycle_data):
-    cycle_data["Lead Time"] = cycle_data["Done"]-cycle_data["Created"]
+def lead_time(cycle_data, start):
+    cycle_data["Lead Time"] = cycle_data["Done"]-cycle_data[start]
     cycle_data["Lead Time"] = pd.to_numeric(cycle_data["Lead Time"].dt.days, downcast='integer')
     return cycle_data
 

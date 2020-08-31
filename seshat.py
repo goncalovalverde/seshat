@@ -5,6 +5,7 @@ import reader.jira
 import reader.csv
 import calculator.flow
 import viewer.team_metrics
+import viewer.dash
 import logging
 import logging.config
 
@@ -33,10 +34,17 @@ if config["output"]["format"] == "xslx":
         cycle_data.to_excel(writer)
 
 throughput = calculator.flow.throughput(cycle_data)
-cycle_data = calculator.flow.lead_time(cycle_data)
+
+start=list(config["Workflow"].keys())[0]
+
+cycle_data = calculator.flow.lead_time(cycle_data, start)
 net_flow = calculator.flow.net_flow(cycle_data, "Total")
 
 print(cycle_data)
 
 team_metrics = viewer.team_metrics.Team_Metrics(cycle_data, throughput, config)
-team_metrics.show_dash()
+dash = viewer.dash.Dash(team_metrics, config)
+dash.show_main_dash()
+dash.run()
+team_metrics.draw_lead_time_hist(cycle_data,"Total").show()
+#team_metrics.show_dash()

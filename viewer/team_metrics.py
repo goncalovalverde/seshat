@@ -3,11 +3,8 @@ import plotly.graph_objects as go
 import datetime
 import statsmodels.api as sm
 import numpy as np
-import dash
 import calculator.flow
-import dash_core_components as dcc
-import dash_html_components as html
-from dash.dependencies import Input, Output
+
 
 class Team_Metrics:
     def __init__(self, cycle_data, throughput, config):
@@ -60,6 +57,10 @@ class Team_Metrics:
         fig = self.add_trendline(net_flow, fig, 'Net Flow')
         return fig
 
+    def draw_lead_time_hist(self, cycle_data, type):
+        fig = cycle_data["Lead Time"].plot.hist()
+        return fig
+
     def show_all(self):
         fig_throughput = self.draw_throughput(self.throughput, "Total")
         fig_defect_percentage = self.draw_defect_percentage(self.throughput)
@@ -99,50 +100,4 @@ class Team_Metrics:
         return fig
 
     # TODO: [SES-20] Migrate to a separate file (need to refactor the dashboard part)
-    def show_dash(self):
-        fig_throughput = self.draw_throughput(self.throughput, "Total")
-        fig_defect_percentage = self.draw_defect_percentage(self.throughput, "Total")
-        fig_lead_time = self.draw_lead_time(self.cycle_data, "Total")
-        fig_net_flow = self.draw_net_flow(self.cycle_data, "Total")
-
-        app = dash.Dash(__name__)
-        app.layout = html.Div(children=[
-            html.H1(children='Team Metrics'),
-
-            html.Div([
-                dcc.Dropdown(
-                    id='issue-type-sel',
-                    options=[{'label': i, 'value': i} for i in self.config["issue_type"]],
-                    value='Total',
-                    clearable=False
-                    )], style={'width': '18%', 'left': 'right', 'display': 'inline-block'}),
-
-            html.Div(children=[
-                dcc.Graph(id='throughput-graph', figure=fig_throughput),
-                dcc.Graph(id='defect-percentage-graph', figure=fig_defect_percentage)],
-                style={'columnCount': 2}),
-
-            html.Div(children=[
-                dcc.Graph(id='defect-lead_time-graph', figure=fig_lead_time),
-                dcc.Graph(id='net_flow', figure=fig_net_flow)],
-                style={'columnCount': 2}),
-        ])
-
-        app.callback(
-            [Output('throughput-graph', 'figure'),
-             Output('defect-percentage-graph', 'figure'),
-             Output('defect-lead_time-graph', 'figure'),
-             Output('net_flow', 'figure')],
-            [Input('issue-type-sel', 'value')]
-        )(self.update_dashboard)
-
-        app.title = "Seshat - A Team Metrics app"
-        app.run_server(debug=True)
-
-    def update_dashboard(self,type):
-        fig_throughput = self.draw_throughput(self.throughput, type)
-        fig_defect_percentage = self.draw_defect_percentage(self.throughput, type)
-        fig_lead_time = self.draw_lead_time(self.cycle_data, type)
-        fig_net_flow = self.draw_net_flow(self.cycle_data, type)
-        return fig_throughput, fig_defect_percentage, fig_lead_time, fig_net_flow
 
