@@ -46,5 +46,4 @@ team_metrics = viewer.team_metrics.Team_Metrics(cycle_data, throughput, config)
 dash = viewer.dash.Dash(team_metrics, config)
 dash.show_main_dash()
 dash.run()
-team_metrics.draw_lead_time_hist(cycle_data,"Total").show()
-#team_metrics.show_dash()
+

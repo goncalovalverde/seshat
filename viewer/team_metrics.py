@@ -58,7 +58,19 @@ class Team_Metrics:
         return fig
 
     def draw_lead_time_hist(self, cycle_data, type):
-        fig = cycle_data["Lead Time"].plot.hist()
+        lead_time = cycle_data[["Done", "Type", "Lead Time"]].copy()
+        if type != "Total":
+            print("inside loop for type " + type)
+            lead_time = lead_time.loc[lead_time["Type"] == type]
+
+        print(lead_time)
+        fig = lead_time["Lead Time"].plot.hist()
+        fig.update_layout(
+            title='Lead Time ' + type,
+            showlegend=False,
+            yaxis={'title': 'Lead time'},
+            xaxis={'title': 'days'}            
+            )
         return fig
 
     def show_all(self):
@@ -98,6 +110,4 @@ class Team_Metrics:
             )
         )
         return fig
-
-    # TODO: [SES-20] Migrate to a separate file (need to refactor the dashboard part)
 

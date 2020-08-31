@@ -20,7 +20,6 @@ def avg_lead_time(cycle_data, type):
     lead_time = cycle_data[["Done", "Type", "Lead Time"]].copy()
     
     if type != "Total":
-        print("inside loop for type " + type)
         lead_time = lead_time.loc[lead_time["Type"] == type]
     
     lead_time = lead_time.groupby("Done").mean()
