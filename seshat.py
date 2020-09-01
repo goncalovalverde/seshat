@@ -35,7 +35,9 @@ if config["output"]["format"] == "xslx":
 
 throughput = calculator.flow.throughput(cycle_data)
 
-start=list(config["Workflow"].keys())[0]
+# get the first element of the workflow
+# to know where to start calculating the lead time
+start = list(config["Workflow"].keys())[0]
 
 cycle_data = calculator.flow.lead_time(cycle_data, start)
 net_flow = calculator.flow.net_flow(cycle_data, "Total")
