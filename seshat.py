@@ -37,15 +37,22 @@ throughput = calculator.flow.throughput(cycle_data)
 
 # get the first element of the workflow
 # to know where to start calculating the lead time
-start = list(config["Workflow"].keys())[0]
+workflow_keys = list(config["Workflow"].keys())
+start = workflow_keys[0]
 
 cycle_data = calculator.flow.lead_time(cycle_data, start)
+
+for i in range(len(workflow_keys)-1):
+    start = workflow_keys[i]
+    end = workflow_keys[i+1]   
+    calculator.flow.cycle_time(cycle_data, start, end)
+
 net_flow = calculator.flow.net_flow(cycle_data, "Total")
 
-print(cycle_data)
+#print(cycle_data)
 
 team_metrics = viewer.team_metrics.Team_Metrics(cycle_data, throughput, config)
 dash = viewer.dash.Dash(team_metrics, config)
-dash.show_main_dash()
+dash.show_hist_dash()
 dash.run()
 

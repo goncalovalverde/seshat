@@ -16,6 +16,13 @@ def lead_time(cycle_data, start):
     return cycle_data
 
 
+# TODO: migrate this to multi header df (and apply it to all dataframe )
+def cycle_time(cycle_data, start, end):
+    cycle_data["Cycle Time " + start] = cycle_data[end]-cycle_data[start]
+    cycle_data["Cycle Time " + start] = pd.to_numeric(cycle_data["Cycle Time " + start].dt.days, downcast='integer')
+    return cycle_data    
+
+
 def avg_lead_time(cycle_data, type):
     lead_time = cycle_data[["Done", "Type", "Lead Time"]].copy()
     
