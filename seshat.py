@@ -49,10 +49,7 @@ for i in range(len(workflow_keys)-1):
 
 net_flow = calculator.flow.net_flow(cycle_data, "Total")
 
-#print(cycle_data)
-
 team_metrics = viewer.team_metrics.Team_Metrics(cycle_data, throughput, config)
 dash = viewer.dash.Dash(team_metrics, config)
-dash.show_hist_dash()
-dash.run()
-
+if __name__ == '__main__':
+    dash.run()

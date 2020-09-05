@@ -1,16 +1,44 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
+import logging
 
 class Dash:
     def __init__(self, team_metrics, config):
         super().__init__()
         self.config = config
         self.team_metrics = team_metrics
+        external_stylesheets = [dbc.themes.LUX]
 
-        self.app = dash.Dash(__name__)
+        self.app = dash.Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
         self.app.title = "Seshat - A Team Metrics app"
+
+        self.app.layout = html.Div([
+            dcc.Location(id='url', refresh=False),
+            self.navbar(),
+            html.Div(id='page-content')
+        ])
+
+        self.app.callback(
+              Output('page-content', 'children'),
+              [Input('url', 'pathname')])(self.display_page)
+
+        self.app.callback(
+            [Output('lead-time-graph', 'figure'),
+             Output('cycle-time-graphs','children')],
+            [Input('issue-type-sel-hist', 'value')]
+        )(self.update_hist_dash)
+
+        self.app.callback(
+            [Output('throughput-graph', 'figure'),
+             Output('defect-percentage-graph', 'figure'),
+             Output('defect-lead_time-graph', 'figure'),
+             Output('net_flow', 'figure')],
+            [Input('issue-type-sel-main', 'value')]
+        )(self.update_main_dash)
+        
 
     def show_main_dash(self):
         tm = self.team_metrics
@@ -20,12 +48,12 @@ class Dash:
         fig_net_flow = tm.draw_net_flow("Total")
 
         app = self.app
-        app.layout = html.Div(children=[
+        layout = html.Div(children=[
             html.H1(children='Team Metrics Main Dashoard'),
 
             html.Div([
                 dcc.Dropdown(
-                    id='issue-type-sel',
+                    id='issue-type-sel-main',
                     options=[{'label': i, 'value': i} for i in self.config["issue_type"]],
                     value='Total',
                     clearable=False
@@ -39,13 +67,9 @@ class Dash:
                 style={'columnCount': 2}),
         ])
 
-        app.callback(
-            [Output('throughput-graph', 'figure'),
-             Output('defect-percentage-graph', 'figure'),
-             Output('defect-lead_time-graph', 'figure'),
-             Output('net_flow', 'figure')],
-            [Input('issue-type-sel', 'value')]
-        )(self.update_main_dash)
+
+
+        return layout
 
     def show_hist_dash(self):
         tm = self.team_metrics
@@ -53,20 +77,18 @@ class Dash:
 
         figures = tm.draw_all_cycle_time_hist("Total")
         cycle_time_fig = []
-
         i = 0
         for fig in figures:
             i += 1
             cycle_time_fig.append(dcc.Graph(id="cycle-time-graph"+str(i),figure=fig))
 
-
         app = self.app
-        app.layout = html.Div(children=[
+        layout = html.Div(children=[
             html.H1(children='Team Metrics Lead & Cicle Time'),
 
             html.Div([
                 dcc.Dropdown(
-                    id='issue-type-sel',
+                    id='issue-type-sel-hist',
                     options=[{'label': i, 'value': i} for i in self.config["issue_type"]],
                     value='Total',
                     clearable=False
@@ -80,13 +102,10 @@ class Dash:
             html.Div(id='cycle-time-graphs', children=cycle_time_fig, style={'columnCount': 3})
         ])
 
-        app.callback(
-            [Output('lead-time-graph', 'figure'),
-            Output('cycle-time-graphs','children')],
-            [Input('issue-type-sel', 'value')]
-        )(self.update_hist_dash)
+        return layout
 
     def update_main_dash(self, type):
+        logging.debug("Updating main dashboard for type " + type)
         tm = self.team_metrics
         fig_throughput = tm.draw_throughput(type)
         fig_defect_percentage = tm.draw_defect_percentage(type)
@@ -95,18 +114,65 @@ class Dash:
         return fig_throughput, fig_defect_percentage, fig_lead_time, fig_net_flow
     
     def update_hist_dash(self, type):
+        logging.debug("Updating Histograms to type " + type)
         tm = self.team_metrics
         fig_lead_time_hist = tm.draw_lead_time_hist(type)
 
         figures = tm.draw_all_cycle_time_hist(type)
         cycle_time_fig = []
-
         i = 0
         for fig in figures:
             i += 1
             cycle_time_fig.append(dcc.Graph(id="cycle-time-graph"+str(i),figure=fig))
 
         return fig_lead_time_hist, cycle_time_fig
+
+    def navbar(self):
+        dropdown = dbc.DropdownMenu(
+            children=[
+                dbc.DropdownMenuItem("Main Dashboard", href="/main_dashboard"),
+                dbc.DropdownMenuItem("Lead & Cycle Time", href="/lead_cycle_time"),
+            ],
+            nav=True, in_navbar=True, label="Explore",
+        )
+
+        navbar = dbc.Navbar(
+            dbc.Container(
+            [
+                html.A(
+                    # Use row and col to control vertical alignment of logo / brand
+                    dbc.Row(
+                        [
+                            dbc.Col(html.Img(src="/assets/metrics_icon.svg", height="30px")),
+                            dbc.Col(dbc.NavbarBrand("Seshat - Team Metrics Analysis", className="ml-2")),
+                        ],
+                        align="center", no_gutters=True,
+                    ),
+                    href="/home",
+                ),
+                dbc.NavbarToggler(id="navbar-toggler2"),
+                dbc.Collapse(
+                    dbc.Nav(
+                        # right align dropdown menu with ml-auto className
+                        [dropdown], className="ml-auto", navbar=True
+                    ),
+                    id="navbar-collapse2", navbar=True,
+                ),
+            ]
+            ),
+            color="dark", dark=True, className="mb-4",
+        )
+
+        return navbar
+
+    def display_page(self, pathname):
+        logging.debug("Changing page to " + pathname)
+        if pathname == '/lead_cycle_time':
+            return self.show_hist_dash()
+        elif pathname == '/singapore':
+            return singapore.layout
+        else:
+            return self.show_main_dash()
 
     def run(self):
         self.app.run_server(debug=True)

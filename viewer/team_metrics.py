@@ -4,6 +4,7 @@ import datetime
 import statsmodels.api as sm
 import numpy as np
 import calculator.flow
+import logging
 
 
 # TODO: refactor to remove cycle_data and throughput to invocation of internal 
