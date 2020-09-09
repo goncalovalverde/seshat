@@ -1,7 +1,12 @@
+pyyaml
 openpyxl
 pandas
 jira
-dateutil.parser
+python-dateutil
 numpy
 plotly
 statsmodels
+dash
+setuptools
+wheel
+dash_bootstrap_components
