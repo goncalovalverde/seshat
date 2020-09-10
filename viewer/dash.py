@@ -1,6 +1,7 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_table
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 import logging
@@ -104,6 +105,15 @@ class Dash:
 
         return layout
 
+    def show_raw_data(self):
+        df = self.team_metrics.cycle_data
+        layout = dash_table.DataTable(
+            id='table',
+            columns=[{"name": i, "id": i} for i in df.columns],
+            data=df.to_dict('records'),
+        )
+        return layout
+
     def update_main_dash(self, type):
         logging.debug("Updating main dashboard for type " + type)
         tm = self.team_metrics
@@ -132,6 +142,7 @@ class Dash:
             children=[
                 dbc.DropdownMenuItem("Main Dashboard", href="/main_dashboard"),
                 dbc.DropdownMenuItem("Lead & Cycle Time", href="/lead_cycle_time"),
+                dbc.DropdownMenuItem("Raw Data",href="/raw_data")
             ],
             nav=True, in_navbar=True, label="Explore",
         )
@@ -140,7 +151,6 @@ class Dash:
             dbc.Container(
             [
                 html.A(
-                    # Use row and col to control vertical alignment of logo / brand
                     dbc.Row(
                         [
                             dbc.Col(html.Img(src="/assets/metrics_icon.svg", height="30px")),
@@ -153,7 +163,6 @@ class Dash:
                 dbc.NavbarToggler(id="navbar-toggler2"),
                 dbc.Collapse(
                     dbc.Nav(
-                        # right align dropdown menu with ml-auto className
                         [dropdown], className="ml-auto", navbar=True
                     ),
                     id="navbar-collapse2", navbar=True,
@@ -169,8 +178,8 @@ class Dash:
         logging.debug("Changing page to " + pathname)
         if pathname == '/lead_cycle_time':
             return self.show_hist_dash()
-        elif pathname == '/singapore':
-            return singapore.layout
+        elif pathname == '/raw_data':
+            return self.show_raw_data()
         else:
             return self.show_main_dash()
 

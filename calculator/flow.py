@@ -84,5 +84,3 @@ def group_by_date(cycle_data, index):
     df = df.fillna(0)
     df["Total"] = df.sum(axis=1)
     return df
-
-# %%
