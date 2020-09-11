@@ -28,3 +28,11 @@ https://confluence.atlassian.com/cloud/api-tokens-938839638.html
 ## Usage
 ### Starting
 To run the application just type ./seshat.py and after starting access http://localhost:8050/ using your browser of choice
+
+## Trivia
+### Why Seshat?
+I'm not great with names in one hand and in another I would prefer to have something more interesting than "python agile metrics" or similar. So I looked for a name of a god that would make sense and found this in wikipedia:
+
+     Seshat, under various spellings, was the ancient Egyptian goddess of wisdom, knowledge, and writing. 
+     She was seen as a scribe and record keeper, and her name means she who scrivens (i.e. she who is the scribe), 
+     and is credited with inventing writing.

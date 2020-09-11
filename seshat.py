@@ -29,10 +29,6 @@ elif mode == "jira":
     jira = reader.jira.Jira(config["jira"], config["Workflow"])
     cycle_data = pd.DataFrame(jira.get_jira_data())
 
-if config["output"]["format"] == "xslx":
-    with pd.ExcelWriter(config["output"]["filename"]) as writer:
-        cycle_data.to_excel(writer)
-
 throughput = calculator.flow.throughput(cycle_data)
 
 # get the first element of the workflow
@@ -51,5 +47,11 @@ net_flow = calculator.flow.net_flow(cycle_data, "Total")
 
 team_metrics = viewer.team_metrics.Team_Metrics(cycle_data, throughput, config)
 dash = viewer.dash.Dash(team_metrics, config)
+
+if config["output"]["format"] == "xlsx":
+    with pd.ExcelWriter(config["output"]["filename"]) as writer:
+        logging.debug("Writing cycle_data to " + config["output"]["filename"])
+        cycle_data.to_excel(writer)
+
 if __name__ == '__main__':
     dash.run()
