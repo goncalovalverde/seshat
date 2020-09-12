@@ -44,10 +44,9 @@ def net_flow(cycle_data, type):
     net_flow = pd.merge(created, done, left_index=True, right_index=True)
     net_flow["Net Flow"] = net_flow[type + "_y"] - net_flow[type + "_x"]
     net_flow = net_flow.set_index("Done")
-    net_flow = net_flow.resample("W").sum()
+    net_flow["WIP"] = net_flow[type + "_y"].cumsum() - net_flow[type + "_x"].cumsum()
     net_flow = net_flow.fillna(0)
     return net_flow
-
 
 # Quality - How Well - "Do it Right"
 def defect_percentage(throughput, type):

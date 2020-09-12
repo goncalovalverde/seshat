@@ -39,6 +39,11 @@ class Dash:
              Output('net_flow', 'figure')],
             [Input('issue-type-sel-main', 'value')]
         )(self.update_main_dash)
+
+        self.app.callback(
+            Output('wip-graph', 'figure'),
+            [Input('issue-type-sel-wip', 'value')]
+        )(self.update_wip_dash)
         
 
     def show_main_dash(self):
@@ -48,7 +53,6 @@ class Dash:
         fig_lead_time = tm.draw_lead_time("Total")
         fig_net_flow = tm.draw_net_flow("Total")
 
-        app = self.app
         layout = html.Div(children=[
             html.H1(children='Team Metrics Main Dashoard'),
 
@@ -68,8 +72,6 @@ class Dash:
                 style={'columnCount': 2}),
         ])
 
-
-
         return layout
 
     def show_hist_dash(self):
@@ -83,7 +85,6 @@ class Dash:
             i += 1
             cycle_time_fig.append(dcc.Graph(id="cycle-time-graph"+str(i),figure=fig))
 
-        app = self.app
         layout = html.Div(children=[
             html.H1(children='Team Metrics Lead & Cicle Time'),
 
@@ -114,6 +115,27 @@ class Dash:
         )
         return layout
 
+    def show_wip_dash(self):
+        tm = self.team_metrics
+        fig_wip = tm.draw_wip("Total")
+
+        layout = html.Div(children=[
+            html.H1(children='Team Metrics WIP'),
+
+            html.Div([
+                dcc.Dropdown(
+                    id='issue-type-sel-wip',
+                    options=[{'label': i, 'value': i} for i in self.config["issue_type"]],
+                    value='Total',
+                    clearable=False
+                    )], style={'width': '18%', 'left': 'right', 'display': 'inline-block'}),
+
+            html.Div(children=[
+                dcc.Graph(id='wip-graph', figure=fig_wip)],
+                style={'columnCount': 1}),
+        ])
+        return layout
+
     def update_main_dash(self, type):
         logging.debug("Updating main dashboard for type " + type)
         tm = self.team_metrics
@@ -122,7 +144,7 @@ class Dash:
         fig_lead_time = tm.draw_lead_time(type)
         fig_net_flow = tm.draw_net_flow(type)
         return fig_throughput, fig_defect_percentage, fig_lead_time, fig_net_flow
-    
+
     def update_hist_dash(self, type):
         logging.debug("Updating Histograms to type " + type)
         tm = self.team_metrics
@@ -137,11 +159,18 @@ class Dash:
 
         return fig_lead_time_hist, cycle_time_fig
 
+    def update_wip_dash(self, type):
+        logging.debug("Updating wip dashboard for type " + type)
+        tm = self.team_metrics
+        fig_wip = tm.draw_wip(type)
+        return fig_wip
+
     def navbar(self):
         dropdown = dbc.DropdownMenu(
             children=[
                 dbc.DropdownMenuItem("Main Dashboard", href="/main_dashboard"),
                 dbc.DropdownMenuItem("Lead & Cycle Time", href="/lead_cycle_time"),
+                dbc.DropdownMenuItem("WIP", href="/wip"),
                 dbc.DropdownMenuItem("Raw Data",href="/raw_data")
             ],
             nav=True, in_navbar=True, label="Explore",
@@ -180,6 +209,8 @@ class Dash:
             return self.show_hist_dash()
         elif pathname == '/raw_data':
             return self.show_raw_data()
+        elif pathname == '/wip':
+            return self.show_wip_dash()
         else:
             return self.show_main_dash()
 

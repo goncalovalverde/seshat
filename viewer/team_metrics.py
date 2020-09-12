@@ -52,6 +52,7 @@ class Team_Metrics:
 
     def draw_net_flow(self, type):
         net_flow = calculator.flow.net_flow(self.cycle_data, type)
+        net_flow = net_flow.resample("W").sum()
         net_flow["Color"] = np.where(net_flow["Net Flow"] < 0, 'red', 'blue')
         fig = net_flow["Net Flow"].plot.bar(color=net_flow["Color"])
         fig.update_layout(
@@ -59,6 +60,11 @@ class Team_Metrics:
             showlegend=False,
             yaxis={'title': 'Net Flow'})
         fig = self.add_trendline(net_flow, fig, 'Net Flow')
+        return fig
+
+    def draw_wip(self, type):
+        wip = calculator.flow.net_flow(self.cycle_data, type)
+        fig = wip["WIP"].plot.bar()
         return fig
 
     def draw_lead_time_hist(self, type):
