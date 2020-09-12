@@ -47,6 +47,7 @@ class Dash:
         
 
     def show_main_dash(self):
+        logging.debug("Showing Main Team Metrics Dashboard")
         tm = self.team_metrics
         fig_throughput = tm.draw_throughput("Total")
         fig_defect_percentage = tm.draw_defect_percentage("Total")
@@ -75,6 +76,7 @@ class Dash:
         return layout
 
     def show_hist_dash(self):
+        logging.debug("Showing Histogram Dashboard")
         tm = self.team_metrics
         fig_lead_time_hist = tm.draw_lead_time_hist("Total")
 

@@ -77,7 +77,7 @@ class Team_Metrics:
             title='Lead Time ' + type,
             showlegend=False,
             yaxis={'title': 'Lead time'},
-            xaxis={'title': 'days'}            
+            xaxis={'title': 'days'},
             )
         return fig
 
