@@ -15,12 +15,13 @@ class Jira:
 
         history_item = {}
         for workflow_step in self.workflow:
-            history_item[workflow_step]=nan
+            history_item[workflow_step] = nan
 
         for history in issue.changelog.histories:
             for item in history.items:
                 if item.field == 'status':
-                    history_item[item.toString]=dateutil.parser.parse(history.created).replace(tzinfo=None)
+                    history_item[item.toString] = dateutil.parser.parse(history.created).replace(tzinfo=None)
+                    
         
         for workflow_step in self.workflow:
             issue_data[workflow_step].append(history_item[workflow_step])

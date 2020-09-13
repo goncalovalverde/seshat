@@ -1,11 +1,11 @@
 import pandas as pd
+import logging
 
 
 # Productivity - How Much - "Do Lots"
 def throughput(cycle_data):
-    #throughput = count_items_in_week(cycle_data, "Done")
     throughput = group_by_date(cycle_data, "Done")
-    throughput = throughput.set_index("Done")
+    #throughput = throughput.set_index("Done")
     return throughput
 
 
@@ -41,10 +41,10 @@ def avg_lead_time(cycle_data, type):
 def net_flow(cycle_data, type):
     created = group_by_date(cycle_data, "Created")
     done = group_by_date(cycle_data, "Done")
-    net_flow = pd.merge(created, done, left_index=True, right_index=True)
+    net_flow = pd.merge(created, done, left_index=True, right_index=True,how='outer')
+    net_flow = net_flow.fillna(0)
     net_flow["Net Flow"] = net_flow[type + "_y"] - net_flow[type + "_x"]
-    net_flow = net_flow.set_index("Done")
-    net_flow["WIP"] = net_flow[type + "_y"].cumsum() - net_flow[type + "_x"].cumsum()
+    net_flow["WIP"] = net_flow[type + "_x"].cumsum() - net_flow[type + "_y"].cumsum()
     net_flow = net_flow.fillna(0)
     return net_flow
 
@@ -66,20 +66,10 @@ def defect_percentage(throughput, type):
     throughput = throughput.fillna(0)
     return throughput
 
-
-# Auxiliary function to simplify counting total per week
-def count_items_in_week(cycle_data, index):
-    table = pd.pivot_table(cycle_data, values="Key", index=[index], columns="Type", aggfunc='count')
-    item_count_in_week = pd.DataFrame(table.to_records())
-    item_count_in_week["Date"] = item_count_in_week[index].dt.strftime('%Y-%U')
-    item_count_in_week = item_count_in_week.rename({index: "Total"}, axis=1)
-    item_count_in_week = item_count_in_week.groupby("Date").count()
-    return item_count_in_week
-
-
 def group_by_date(cycle_data, index):
     table = pd.pivot_table(cycle_data, values="Key", index=[index], columns="Type", aggfunc='count')
     df = pd.DataFrame(table.to_records())
     df = df.fillna(0)
+    df = df.resample('D',on=index).sum()
     df["Total"] = df.sum(axis=1)
     return df
