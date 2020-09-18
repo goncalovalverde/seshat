@@ -1,7 +1,7 @@
 from jira import JIRA
 import dateutil.parser
 import logging
-from math import nan
+from pandas import NaT
 
 class Jira:
     def __init__(self, jira_config, workflow):
@@ -15,7 +15,7 @@ class Jira:
 
         history_item = {}
         for workflow_step in self.workflow:
-            history_item[workflow_step] = nan
+            history_item[workflow_step] = NaT
 
         for history in issue.changelog.histories:
             for item in history.items:
@@ -82,7 +82,7 @@ class Jira:
                 'key_cert': key_cert_data
             }
 
-            jira = JIRA(server=jira_url,oauth=oauth_dict)
+            jira = JIRA(jira_url,oauth=oauth_dict)
         else:
             jira = JIRA(
                 jira_url,

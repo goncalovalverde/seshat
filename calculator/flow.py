@@ -11,6 +11,7 @@ def throughput(cycle_data):
 
 # Responsivness - How Fast - "Do it Fast"
 def lead_time(cycle_data, start):
+    logging.debug("Calculating lead time for " + start)
     cycle_data["Lead Time"] = cycle_data["Done"]-cycle_data[start]
     cycle_data["Lead Time"] = pd.to_numeric(cycle_data["Lead Time"].dt.days, downcast='integer')
     return cycle_data
@@ -18,6 +19,7 @@ def lead_time(cycle_data, start):
 
 # TODO: migrate this to multi header df (and apply it to all dataframe )
 def cycle_time(cycle_data, start, end):
+    logging.debug("Calculating cycle time for strt:" + start + " and end:" + end)
     cycle_data["Cycle Time " + start] = cycle_data[end]-cycle_data[start]
     cycle_data["Cycle Time " + start] = pd.to_numeric(cycle_data["Cycle Time " + start].dt.days, downcast='integer')
     return cycle_data    
