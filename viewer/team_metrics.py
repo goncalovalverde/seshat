@@ -4,10 +4,9 @@ import datetime
 import statsmodels.api as sm
 import numpy as np
 import calculator.flow
-import logging
 
 
-# TODO: refactor to remove cycle_data and throughput to invocation of internal 
+# TODO: refactor to remove cycle_data and throughput to invocation of internal
 # methods and use the class properties instead
 class Team_Metrics:
     def __init__(self, cycle_data, throughput, config):
@@ -33,7 +32,7 @@ class Team_Metrics:
         lead_time = calculator.flow.avg_lead_time(self.cycle_data, type)
         fig = lead_time.plot.line()
         fig.update_layout(
-            title='Responsivness - How Fast - "Do it Fast"',
+            title='Responsiveness - How Fast - "Do it Fast"',
             showlegend=False,
             yaxis={'title': 'Lead Time Avg'})
         fig = self.add_trendline(lead_time, fig, "Lead Time")
@@ -93,10 +92,10 @@ class Team_Metrics:
             title=cycle_time_name,
             showlegend=False,
             yaxis={'title': 'Cycle time'},
-            xaxis={'title': 'days'}            
+            xaxis={'title': 'days'}
             )
         return fig
-    
+
     def draw_all_cycle_time_hist(self, type):
         workflow_keys = list(self.config["Workflow"].keys())
         figures = []
@@ -105,7 +104,7 @@ class Team_Metrics:
             wkflow_step = workflow_keys[i]
             fig = self.draw_cycle_time_hist(type, wkflow_step)
             figures.append(fig)
-        
+
         return figures
 
     def show_all(self):
@@ -145,4 +144,3 @@ class Team_Metrics:
             )
         )
         return fig
-

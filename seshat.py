@@ -17,10 +17,12 @@ with open('log_config.yaml', 'r') as f:
 logger = logging.getLogger(__name__)
 logger.info("Starting seshat. Let's do team magic!")
 
-with open("config.yml",'r') as f:
+with open("config.yml", 'r') as f:
     config = yaml.load(f.read(), Loader=yaml.FullLoader)
 
 mode = config["input"]["mode"]
+
+cycle_data = None
 
 if mode == "csv":
     cycle_data = reader.csv.read(
@@ -44,7 +46,7 @@ cycle_data = calculator.flow.lead_time(cycle_data, start)
 
 for i in range(len(workflow_keys)-1):
     start = workflow_keys[i]
-    end = workflow_keys[i+1]   
+    end = workflow_keys[i+1]
     calculator.flow.cycle_time(cycle_data, start, end)
 
 net_flow = calculator.flow.net_flow(cycle_data, "Total")

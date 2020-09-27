@@ -3,6 +3,7 @@ import dateutil.parser
 import logging
 from pandas import NaT
 
+
 class Jira:
     def __init__(self, jira_config, workflow):
         self.jira_config = jira_config
@@ -21,8 +22,7 @@ class Jira:
             for item in history.items:
                 if item.field == 'status':
                     history_item[item.toString] = dateutil.parser.parse(history.created).replace(tzinfo=None)
-                    
-        
+
         for workflow_step in self.workflow:
             issue_data[workflow_step].append(history_item[workflow_step])
 
@@ -55,7 +55,7 @@ class Jira:
         for workflow_step in self.workflow:
             issue_data[workflow_step] = []
 
-        issues = self.get_issues()   
+        issues = self.get_issues()
 
         for issue in issues:
             self.get_issue_data(issue, issue_data)
@@ -67,11 +67,11 @@ class Jira:
         logging.debug("connecting to jira " + jira_url)
         if self.jira_config["auth_method"] == "oauth":
             logging.debug("Connecting to jira via oauth")
-            
+
             key_cert_data = None
             key_cert = self.jira_config["oauth"]["key_cert_file"]
-            logging.debug("Opening Key Cert File " + key_cert )
-            
+            logging.debug("Opening Key Cert File " + key_cert)
+
             with open(key_cert, 'r') as key_cert_file:
                 key_cert_data = key_cert_file.read()
 
@@ -82,7 +82,7 @@ class Jira:
                 'key_cert': key_cert_data
             }
 
-            jira = JIRA(jira_url,oauth=oauth_dict)
+            jira = JIRA(jira_url, oauth=oauth_dict)
         else:
             jira = JIRA(
                 jira_url,

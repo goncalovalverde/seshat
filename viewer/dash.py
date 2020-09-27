@@ -6,6 +6,7 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 import logging
 
+
 class Dash:
     def __init__(self, team_metrics, config):
         super().__init__()
@@ -28,7 +29,7 @@ class Dash:
 
         self.app.callback(
             [Output('lead-time-graph', 'figure'),
-             Output('cycle-time-graphs','children')],
+             Output('cycle-time-graphs', 'children')],
             [Input('issue-type-sel-hist', 'value')]
         )(self.update_hist_dash)
 
@@ -44,7 +45,6 @@ class Dash:
             Output('wip-graph', 'figure'),
             [Input('issue-type-sel-wip', 'value')]
         )(self.update_wip_dash)
-        
 
     def show_main_dash(self):
         logging.debug("Showing Main Team Metrics Dashboard")
@@ -55,7 +55,7 @@ class Dash:
         fig_net_flow = tm.draw_net_flow("Total")
 
         layout = html.Div(children=[
-            html.H1(children='Team Metrics Main Dashoard'),
+            html.H1(children='Team Metrics Main Dashboard'),
 
             html.Div([
                 dcc.Dropdown(
@@ -85,10 +85,10 @@ class Dash:
         i = 0
         for fig in figures:
             i += 1
-            cycle_time_fig.append(dcc.Graph(id="cycle-time-graph"+str(i),figure=fig))
+            cycle_time_fig.append(dcc.Graph(id="cycle-time-graph"+str(i), figure=fig))
 
         layout = html.Div(children=[
-            html.H1(children='Team Metrics Lead & Cicle Time'),
+            html.H1(children='Team Metrics Lead & Cycle Time'),
 
             html.Div([
                 dcc.Dropdown(
@@ -157,7 +157,7 @@ class Dash:
         i = 0
         for fig in figures:
             i += 1
-            cycle_time_fig.append(dcc.Graph(id="cycle-time-graph"+str(i),figure=fig))
+            cycle_time_fig.append(dcc.Graph(id="cycle-time-graph"+str(i), figure=fig))
 
         return fig_lead_time_hist, cycle_time_fig
 
@@ -173,32 +173,32 @@ class Dash:
                 dbc.DropdownMenuItem("Main Dashboard", href="/main_dashboard"),
                 dbc.DropdownMenuItem("Lead & Cycle Time", href="/lead_cycle_time"),
                 dbc.DropdownMenuItem("WIP", href="/wip"),
-                dbc.DropdownMenuItem("Raw Data",href="/raw_data")
+                dbc.DropdownMenuItem("Raw Data", href="/raw_data")
             ],
             nav=True, in_navbar=True, label="Explore",
         )
 
         navbar = dbc.Navbar(
             dbc.Container(
-            [
-                html.A(
-                    dbc.Row(
-                        [
-                            dbc.Col(html.Img(src="/assets/metrics_icon.svg", height="30px")),
-                            dbc.Col(dbc.NavbarBrand("Seshat - Team Metrics Analysis", className="ml-2")),
-                        ],
-                        align="center", no_gutters=True,
+                [
+                    html.A(
+                        dbc.Row(
+                            [
+                                dbc.Col(html.Img(src="/assets/metrics_icon.svg", height="30px")),
+                                dbc.Col(dbc.NavbarBrand("Seshat - Team Metrics Analysis", className="ml-2")),
+                            ],
+                            align="center", no_gutters=True,
+                        ),
+                        href="/home",
                     ),
-                    href="/home",
-                ),
-                dbc.NavbarToggler(id="navbar-toggler2"),
-                dbc.Collapse(
-                    dbc.Nav(
-                        [dropdown], className="ml-auto", navbar=True
+                    dbc.NavbarToggler(id="navbar-toggler2"),
+                    dbc.Collapse(
+                        dbc.Nav(
+                            [dropdown], className="ml-auto", navbar=True
+                        ),
+                        id="navbar-collapse2", navbar=True,
                     ),
-                    id="navbar-collapse2", navbar=True,
-                ),
-            ]
+                ]
             ),
             color="dark", dark=True, className="mb-4",
         )
