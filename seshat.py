@@ -28,6 +28,9 @@ if mode == "csv":
 elif mode == "jira":
     jira = reader.jira.Jira(config["jira"], config["Workflow"])
     cycle_data = pd.DataFrame(jira.get_jira_data())
+    cycle_data.fillna(pd.NaT)
+
+print(cycle_data)
 
 throughput = calculator.flow.throughput(cycle_data)
 
@@ -35,6 +38,7 @@ throughput = calculator.flow.throughput(cycle_data)
 # to know where to start calculating the lead time
 workflow_keys = list(config["Workflow"].keys())
 start = workflow_keys[0]
+start = "Created"
 
 cycle_data = calculator.flow.lead_time(cycle_data, start)
 

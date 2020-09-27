@@ -25,6 +25,11 @@ One important note about jira passwords. Jira cloud version no longer support pa
 You can find more information about how to create API tokens here:
 https://confluence.atlassian.com/cloud/api-tokens-938839638.html
 
+#### oauth
+
+If using oauth authentication you can use the python jira-oauth package to do the oauth dance and get the token and secret:
+https://pypi.org/project/jira-oauth/
+
 ## Usage
 ### Starting
 To run the application just type ./seshat.py and after starting access http://localhost:8050/ using your browser of choice
