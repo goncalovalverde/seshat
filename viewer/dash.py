@@ -120,6 +120,7 @@ class Dash:
     def show_wip_dash(self):
         tm = self.team_metrics
         fig_wip = tm.draw_wip("Total")
+        fig_start_stop = tm.draw_start_stop("Total")
 
         layout = html.Div(children=[
             html.H1(children='Team Metrics WIP'),
@@ -133,7 +134,8 @@ class Dash:
                     )], style={'width': '18%', 'left': 'right', 'display': 'inline-block'}),
 
             html.Div(children=[
-                dcc.Graph(id='wip-graph', figure=fig_wip)],
+                dcc.Graph(id='wip-graph', figure=fig_wip),
+                dcc.Graph(id='start_stop-graph', figure=fig_start_stop)],
                 style={'columnCount': 1}),
         ])
         return layout

@@ -66,6 +66,14 @@ class Team_Metrics:
         fig = wip["WIP"].plot.bar()
         return fig
 
+    def draw_start_stop(self, type):
+        cycle_data = self.cycle_data
+        if type != "Total":
+            cycle_data =cycle_data.loc[["Type"] == type]
+
+        fig = cycle_data.plot.bar(y=["Created","Done"])
+        return fig
+
     def draw_lead_time_hist(self, type):
         lead_time = self.cycle_data[["Done", "Type", "Lead Time"]].copy()
         if type != "Total":
