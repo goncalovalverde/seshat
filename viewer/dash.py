@@ -42,7 +42,8 @@ class Dash:
         )(self.update_main_dash)
 
         self.app.callback(
-            Output('wip-graph', 'figure'),
+            [Output('wip-graph', 'figure'),
+            Output('start_stop-graph','figure')],
             [Input('issue-type-sel-wip', 'value')]
         )(self.update_wip_dash)
 
@@ -167,7 +168,9 @@ class Dash:
         logging.debug("Updating wip dashboard for type " + type)
         tm = self.team_metrics
         fig_wip = tm.draw_wip(type)
-        return fig_wip
+        fig_start_stop = tm.draw_start_stop(type)
+
+        return fig_wip, fig_start_stop
 
     def navbar(self):
         dropdown = dbc.DropdownMenu(

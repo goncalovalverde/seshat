@@ -67,11 +67,15 @@ class Team_Metrics:
         return fig
 
     def draw_start_stop(self, type):
-        cycle_data = self.cycle_data
-        if type != "Total":
-            cycle_data =cycle_data.loc[["Type"] == type]
-
-        fig = cycle_data.plot.bar(y=["Created","Done"])
+        start = calculator.flow.group_by_date(self.cycle_data,"Created")
+        end = calculator.flow.group_by_date(self.cycle_data,"Done")
+        
+        fig = start[type].plot.line()
+        fig.add_trace(go.Scatter(
+            x=end.index,
+            y=end[type],
+            mode='lines'
+        ))
         return fig
 
     def draw_lead_time_hist(self, type):
