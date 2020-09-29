@@ -1,23 +1,41 @@
 jira:
-  username: YOUR_EMAIL
-  password: YOURPASSWORD
-  url: https://yoururl.atlassian.net
+  username: your_emil@domain.com
+  password: your_password_or_token
+  url: https://collaboration.msi.audi.com/jira/
   jql_query: PROJECT ='FUBAR'
           AND
           issuetype in ("story","task","bug")
+  auth_method: oauth #can be token or oauth
+  cache: true #can be true or false
+  oauth:
+    token: YOURTOKEN
+    token_secret: YOURPASSWORD
+    consumer_key: YOUR_CONSUMER_KEY
+    key_cert_file: PATH_TO_YOU_CERT_FILE
+
 output:
-  format: none #use xlsx to output to excel
+  format: none # valid values: xlsx
   filename: "/tmp/my_data.xlsx"
 
 input:
-  mode: csv #select either csv or jira
+  mode:  jira #select either csv or jira
   csv_file: my_raw_data.csv
 
+#Configure here your workflow
 Workflow:
-  In Analysis: In Analysis,
-  Ready for Dev: Ready for Dev,
-  In Dev: In Dev,
-  Ready for QA: Ready for QA,
-  In QA: In QA,
-  Ready for Signoff: Ready for Signoff,
+  To Do: To Do
+  In Progress: In Progress
+  Waiting for Response: Waiting for Response
+  Impediments: Impediments
+  Approval: Approval
+  Review: Review
   Done: Done
+  
+
+#Configure here the issue types 
+issue_type:
+  - Total
+  - Bug
+  - Story
+  - Task
+
