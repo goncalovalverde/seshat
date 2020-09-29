@@ -29,7 +29,7 @@ if mode == "csv":
         config["input"]["csv_file"], config["Workflow"])
 elif mode == "jira":
     jira = reader.jira.Jira(config["jira"], config["Workflow"])
-    cycle_data = pd.DataFrame(jira.get_jira_data())
+    cycle_data = jira.get_jira_data()
     cycle_data.fillna(pd.NaT)
 
 print(cycle_data)

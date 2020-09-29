@@ -1,13 +1,23 @@
 from jira import JIRA
 import dateutil.parser
 import logging
-from pandas import NaT
+import reader.cache
+import hashlib
+from pandas import NaT, DataFrame
 
 
 class Jira:
     def __init__(self, jira_config, workflow):
         self.jira_config = jira_config
         self.workflow = workflow
+        
+        def cache_name(self):
+            name_hashed = hashlib.md5((self.jira_config["url"]+self.jira_config["jql_query"]).encode('utf-8'))
+            return name_hashed.hexdigest()
+        
+        self.cache = reader.cache.Cache(cache_name(self))
+
+
 
     def get_issue_data(self, issue, issue_data):
         issue_data["Key"].append(issue.key)
@@ -45,6 +55,10 @@ class Jira:
         return issues
 
     def get_jira_data(self):
+        if self.jira_config["cache"] and self.cache.is_valid():
+            df_issue_data = self.cache.read()
+            return df_issue_data
+
         logging.debug("Getting info from jira")
         issue_data = {
             "Key": [],
@@ -60,7 +74,11 @@ class Jira:
         for issue in issues:
             self.get_issue_data(issue, issue_data)
 
-        return issue_data
+        df_issue_data = DataFrame(issue_data)
+        if self.jira_config["cache"]:
+            self.cache.write(df_issue_data)
+
+        return df_issue_data
 
     def get_jira_instance(self):
         jira_url = self.jira_config["url"]
