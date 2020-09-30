@@ -1,7 +1,7 @@
 # Seshat
 
 A tool to extract metrics from agile tools such as Jira (currently only supporting Jira and CSV).
-It is heavilly influenced by the work of Troy Maggenis (https://www.focusedobjective.com/) 
+It is heavilly influenced by the work of Troy Magennis (https://www.focusedobjective.com/) 
 
 ## Instalation
 
