@@ -63,12 +63,15 @@ class Team_Metrics:
 
     def draw_wip(self, type):
         wip = calculator.flow.net_flow(self.cycle_data, type)
+        wip = wip.resample("W").sum()
         fig = wip["WIP"].plot.bar()
         return fig
 
     def draw_start_stop(self, type):
         start = calculator.flow.group_by_date(self.cycle_data,"Created")
+        start = start.resample("W").sum()
         end = calculator.flow.group_by_date(self.cycle_data,"Done")
+        end = end.resample("W").sum()
         
         fig = start[type].plot.line()
         fig.add_trace(go.Scatter(
