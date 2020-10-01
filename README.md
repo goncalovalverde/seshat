@@ -13,12 +13,12 @@ Install Python 3 and the pip package manager. Then run to install required modul
      
 ## Configuration
 
-Two configuration files exist, one for configuring logging (log_config.yaml) and another for the app configuration (config.yaml)
+Two configuration files exist, one for configuring logging (log_config.yml) and another for the app configuration (config.yml)
 
-### Config.yaml
-An example file is provided called config.yaml-example.
+### config.yaml
+An example file is provided called config.yml-example.
 
-Copy this file to config.yaml and change it to your needs.
+Copy this file to config.yml and change it according to your needs.
 
 #### Jira passwords
 
@@ -30,6 +30,10 @@ https://confluence.atlassian.com/cloud/api-tokens-938839638.html
 
 If using oauth authentication you can use the python jira-oauth package to do the oauth dance and get the token and secret:
 https://pypi.org/project/jira-oauth/
+
+### log_config.yml
+
+Change this file to your needs. By default it writes to /tmp/seshat.log
 
 ## Usage
 ### Starting
