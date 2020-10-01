@@ -83,7 +83,10 @@ class Team_Metrics:
         if type != "Total":
             lead_time = lead_time.loc[lead_time["Type"] == type]
 
+        percentile = lead_time["Lead Time"].quantile([.5,.85,.95])
+
         fig = lead_time["Lead Time"].plot.hist()
+        fig.update_traces(xbins_size=1)
         fig.update_layout(
             title='Lead Time ' + type,
             showlegend=False,
