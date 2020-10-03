@@ -41,7 +41,8 @@ class Team_Metrics:
     def draw_defect_percentage(self, type):
         throughput = self.throughput
         throughput = calculator.flow.defect_percentage(throughput, type)
-        fig = throughput["Defect Percentage"].plot.line(text=throughput["Defect Percentage"])
+        fig = throughput["Defect Percentage"].plot.line(
+            text=throughput["Defect Percentage"])
         fig.update_layout(
             title='Quality - How Well - "Do it Right"',
             showlegend=False,
@@ -65,20 +66,39 @@ class Team_Metrics:
         wip = calculator.flow.net_flow(self.cycle_data, type)
         wip = wip.resample("W").sum()
         fig = wip["WIP"].plot.bar()
+        fig.update_layout(
+            title="Work in Progress",
+            showlegend=False,
+            xaxis={'title': 'Week'},
+            yaxis={'title': 'WIP'}
+        )
         return fig
 
     def draw_start_stop(self, type):
-        start = calculator.flow.group_by_date(self.cycle_data,"Created")
+        start = calculator.flow.group_by_date(self.cycle_data, "Created")
         start = start.resample("W").sum()
-        end = calculator.flow.group_by_date(self.cycle_data,"Done")
+        end = calculator.flow.group_by_date(self.cycle_data, "Done")
         end = end.resample("W").sum()
-        
-        fig = start[type].plot.line()
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=start.index,
+            y=start[type],
+            mode='lines',
+            name='Created')
+        )
         fig.add_trace(go.Scatter(
             x=end.index,
             y=end[type],
-            mode='lines'
+            mode='lines',
+            name='Done'
         ))
+
+        fig.update_layout(
+            legend_xanchor="left",
+            legend_x=0.01,
+            title='Created vs Done'
+        )
         return fig
 
     def draw_lead_time_hist(self, type):
@@ -86,7 +106,7 @@ class Team_Metrics:
         if type != "Total":
             lead_time = lead_time.loc[lead_time["Type"] == type]
 
-        percentile = lead_time["Lead Time"].quantile([.5,.85,.95])
+        percentile = lead_time["Lead Time"].quantile([.5, .85, .95])
 
         fig = lead_time["Lead Time"].plot.hist()
         fig.update_traces(xbins_size=1)
@@ -139,7 +159,10 @@ class Team_Metrics:
     def add_trendline(self, df, fig, column):
         # This is needed because we can't use DateTimeIndex as input for OLS
         df['serialtime'] = [(d-datetime.datetime(1970, 1, 1)).days for d in df.index]
-        df['bestfit'] = sm.OLS(df[column], sm.add_constant(df["serialtime"])).fit().fittedvalues
+        df['bestfit'] = sm.OLS(
+            df[column], 
+            sm.add_constant(df["serialtime"])
+            ).fit().fittedvalues
         fig = fig.add_trace(go.Scatter(
             x=df.index,
             y=df["bestfit"],
