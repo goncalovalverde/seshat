@@ -191,9 +191,9 @@ class Team_Metrics:
         )
 
         fig = fig.add_annotation(
-            x=percentile[.85]+5,
+            x=percentile[.85],
             yref="paper",
-            y=.85,
+            y=1,
             showarrow=False,
             text="85%"
         )
