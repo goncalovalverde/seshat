@@ -106,8 +106,6 @@ class Team_Metrics:
         if type != "Total":
             lead_time = lead_time.loc[lead_time["Type"] == type]
 
-        percentile = lead_time["Lead Time"].quantile([.5, .85, .95])
-
         fig = lead_time["Lead Time"].plot.hist()
         fig.update_traces(xbins_size=1)
         fig.update_layout(
@@ -116,6 +114,8 @@ class Team_Metrics:
             yaxis={'title': 'Lead time'},
             xaxis={'title': 'days'},
             )
+
+        fig = self.add_percentile(lead_time["Lead Time"], fig)
         return fig
 
     def draw_cycle_time_hist(self, type, wkflow_step):
@@ -125,13 +125,18 @@ class Team_Metrics:
         if type != "Total":
             cycle_time = cycle_time.loc[cycle_time["Type"] == type]
 
+        cycle_time = cycle_time.loc[cycle_time[cycle_time_name] > 0]
+
         fig = cycle_time[cycle_time_name].plot.hist()
+        fig.update_traces(xbins_size=1)
         fig.update_layout(
             title=cycle_time_name,
             showlegend=False,
             yaxis={'title': 'Cycle time'},
             xaxis={'title': 'days'}
             )
+        
+        fig = self.add_percentile(cycle_time[cycle_time_name], fig)
         return fig
 
     def draw_all_cycle_time_hist(self, type):
@@ -169,6 +174,29 @@ class Team_Metrics:
             mode='lines',
             line={'dash': 'dash'},
             marker_color="red"))
+        return fig
+    
+    def add_percentile(self, df, fig):
+        percentile = df.quantile([.5, .85, .95])
+
+
+        fig = fig.add_shape(
+            type="line",
+            yref="paper",
+            x0=percentile[.85],
+            y0=0,
+            x1=percentile[.85],
+            y1=.95,
+            line_dash="dash"
+        )
+
+        fig = fig.add_annotation(
+            x=percentile[.85]+5,
+            yref="paper",
+            y=.85,
+            showarrow=False,
+            text="85%"
+        )
         return fig
 
     def add_range_buttons(self, fig):
