@@ -121,6 +121,7 @@ class Team_Metrics:
     def draw_cycle_time_hist(self, type, wkflow_step):
         cycle_data = self.cycle_data
         cycle_time_name = "Cycle Time " + wkflow_step
+
         cycle_time = cycle_data[["Done", "Type", cycle_time_name]].copy()
         if type != "Total":
             cycle_time = cycle_time.loc[cycle_time["Type"] == type]
@@ -179,24 +180,27 @@ class Team_Metrics:
     def add_percentile(self, df, fig):
         percentile = df.quantile([.5, .85, .95])
 
+        for key in percentile.keys():
+            position = percentile[key]
+            label = f"{int(key*100)}%"
 
-        fig = fig.add_shape(
-            type="line",
-            yref="paper",
-            x0=percentile[.85],
-            y0=0,
-            x1=percentile[.85],
-            y1=.95,
-            line_dash="dash"
-        )
+            fig = fig.add_shape(
+                type="line",
+                yref="paper",
+                x0=position,
+                y0=0,
+                x1=position,
+                y1=.95,
+                line_dash="dash"
+            )
 
-        fig = fig.add_annotation(
-            x=percentile[.85],
-            yref="paper",
-            y=1,
-            showarrow=False,
-            text="85%"
-        )
+            fig = fig.add_annotation(
+                x=position,
+                yref="paper",
+                y=1,
+                showarrow=False,
+                text=label
+            )
         return fig
 
     def add_range_buttons(self, fig):
