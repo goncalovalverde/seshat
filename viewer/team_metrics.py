@@ -19,6 +19,9 @@ class Team_Metrics:
         throughput = self.throughput
         throughput = throughput.resample("W").sum()
         fig = throughput[type].plot.line(text=throughput[type])
+        fig.update_traces(
+            textposition="top center"
+        )
         fig.update_layout(
             title='Productivity - How Much - "Do Lots"',
             showlegend=False,
@@ -43,10 +46,17 @@ class Team_Metrics:
         throughput = calculator.flow.defect_percentage(throughput, type)
         fig = throughput["Defect Percentage"].plot.line(
             text=throughput["Defect Percentage"])
+        fig.update_traces(
+            texttemplate="%{text:%}",
+            textposition="top center"
+        )
         fig.update_layout(
             title='Quality - How Well - "Do it Right"',
             showlegend=False,
-            yaxis={'title': 'Defect Percentage'})
+            yaxis={
+                'title': 'Defect Percentage',
+                'tickformat' : '.0%'
+                })
         fig = self.add_trendline(throughput, fig, 'Defect Percentage')
         return fig
 
@@ -136,7 +146,7 @@ class Team_Metrics:
             yaxis={'title': 'Cycle time'},
             xaxis={'title': 'days'}
             )
-        
+
         fig = self.add_percentile(cycle_time[cycle_time_name], fig)
         return fig
 
@@ -151,22 +161,11 @@ class Team_Metrics:
 
         return figures
 
-    def show_all(self):
-        fig_throughput = self.draw_throughput(self.throughput, "Total")
-        fig_defect_percentage = self.draw_defect_percentage(self.throughput)
-        fig_lead_time = self.draw_lead_time(self.cycle_data)
-        fig_net_flow = self.draw_net_flow(self.cycle_data)
-
-        fig_throughput.show()
-        fig_defect_percentage.show()
-        fig_lead_time.show()
-        fig_net_flow.show()
-
     def add_trendline(self, df, fig, column):
         # This is needed because we can't use DateTimeIndex as input for OLS
         df['serialtime'] = [(d-datetime.datetime(1970, 1, 1)).days for d in df.index]
         df['bestfit'] = sm.OLS(
-            df[column], 
+            df[column],
             sm.add_constant(df["serialtime"])
             ).fit().fittedvalues
         fig = fig.add_trace(go.Scatter(
@@ -176,7 +175,7 @@ class Team_Metrics:
             line={'dash': 'dash'},
             marker_color="red"))
         return fig
-    
+
     def add_percentile(self, df, fig):
         percentile = df.quantile([.5, .85, .95])
 

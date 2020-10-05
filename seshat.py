@@ -19,6 +19,8 @@ logger.info("Starting seshat. Let's do team magic!")
 
 with open("config.yml", 'r') as f:
     config = yaml.load(f.read(), Loader=yaml.FullLoader)
+# Add special "issue_type" Total to ensure we can see the total in all graphs
+    config["issue_type"].insert(0, "Total")
 
 mode = config["input"]["mode"]
 

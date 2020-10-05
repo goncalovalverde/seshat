@@ -43,6 +43,7 @@ def avg_lead_time(cycle_data, type):
 def net_flow(cycle_data, type):
     created = group_by_date(cycle_data, "Created")
     done = group_by_date(cycle_data, "Done")
+
     net_flow = pd.merge(created, done, left_index=True, right_index=True, how='outer')
     net_flow = net_flow.fillna(0)
     # Net Flow : Done items - Created items
@@ -66,7 +67,7 @@ def defect_percentage(throughput, type):
         total = throughput["Bug"] + throughput[type]
 
     if "Bug" in throughput:
-        throughput["Defect Percentage"] = round((throughput["Bug"]/(total))*100, 2)
+        throughput["Defect Percentage"] = round((throughput["Bug"]/(total)), 2)
     else:
         throughput["Defect Percentage"] = throughput["Total"]*0
     throughput = throughput.fillna(0)
