@@ -61,5 +61,7 @@ if config["output"]["format"] == "xlsx":
         logging.debug("Writing cycle_data to " + config["output"]["filename"])
         cycle_data.to_excel(writer)
 
+server = dash.server
+
 if __name__ == '__main__':
     dash.run()

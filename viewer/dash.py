@@ -16,6 +16,7 @@ class Dash:
 
         self.app = dash.Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
         self.app.title = "Seshat - A Team Metrics app"
+        self.server = self.app.server
 
         self.app.layout = html.Div([
             dcc.Location(id='url', refresh=False),
