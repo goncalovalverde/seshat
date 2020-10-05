@@ -190,7 +190,7 @@ class Dash:
                     html.A(
                         dbc.Row(
                             [
-                                dbc.Col(html.Img(src="/assets/metrics_icon.svg", height="30px")),
+                                dbc.Col(html.Img(src=self.app.get_asset_url("metrics_icon.svg"), height="30px")),
                                 dbc.Col(dbc.NavbarBrand("Seshat - Team Metrics Analysis", className="ml-2")),
                             ],
                             align="center", no_gutters=True,
@@ -212,7 +212,8 @@ class Dash:
         return navbar
 
     def display_page(self, pathname):
-        logging.debug("Changing page to " + pathname)
+        if pathname:
+            logging.debug("Changing page to " + pathname)
         if pathname == '/lead_cycle_time':
             return self.show_hist_dash()
         elif pathname == '/raw_data':
