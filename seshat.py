@@ -34,8 +34,6 @@ elif mode == "jira":
     cycle_data = jira.get_jira_data()
     cycle_data.fillna(pd.NaT)
 
-print(cycle_data)
-
 throughput = calculator.flow.throughput(cycle_data)
 
 # get the first element of the workflow
@@ -57,9 +55,13 @@ team_metrics = viewer.team_metrics.Team_Metrics(cycle_data, throughput, config)
 dash = viewer.dash.Dash(team_metrics, config)
 
 if config["output"]["format"] == "xlsx":
+    logging.debug("Writing cycle_data to excel file " + config["output"]["filename"])
     with pd.ExcelWriter(config["output"]["filename"]) as writer:
-        logging.debug("Writing cycle_data to " + config["output"]["filename"])
-        cycle_data.to_excel(writer)
+        cycle_data.to_excel(config["output"]["filename"])
+elif config["output"]["format"] == "csv":
+    logging.debug("Writing cycle_data to csv file " + config["output"]["filename"])
+    cycle_data.to_csv(config["output"]["filename"],index=False)
+
 
 server = dash.server
 
