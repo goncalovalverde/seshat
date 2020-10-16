@@ -8,6 +8,7 @@ import viewer.team_metrics
 import viewer.dash
 import logging
 import logging.config
+import writer
 
 
 with open('log_config.yaml', 'r') as f:
@@ -54,14 +55,8 @@ net_flow = calculator.flow.net_flow(cycle_data, "Total")
 team_metrics = viewer.team_metrics.Team_Metrics(cycle_data, throughput, config)
 dash = viewer.dash.Dash(team_metrics, config)
 
-if config["output"]["format"] == "xlsx":
-    logging.debug("Writing cycle_data to excel file " + config["output"]["filename"])
-    with pd.ExcelWriter(config["output"]["filename"]) as writer:
-        cycle_data.to_excel(config["output"]["filename"])
-elif config["output"]["format"] == "csv":
-    logging.debug("Writing cycle_data to csv file " + config["output"]["filename"])
-    cycle_data.to_csv(config["output"]["filename"],index=False)
-
+if config["output"]:
+    writer.write(cycle_data,config["output"])
 
 server = dash.server
 
