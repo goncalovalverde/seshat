@@ -1,7 +1,7 @@
 import pandas as pd
 import logging
 
-def write(data,config):
+def write_data(data,config):
     if config["format"] == "xlsx":
         logging.debug("Writing cycle_data to excel file " + config["filename"])
         with pd.ExcelWriter(config["filename"]) as writer:

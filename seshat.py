@@ -9,7 +9,6 @@ import logging
 import logging.config
 import writer
 
-
 with open('log_config.yaml', 'r') as f:
     log_config = yaml.safe_load(f.read())
     logging.config.dictConfig(log_config)
@@ -54,7 +53,7 @@ team_metrics = viewer.team_metrics.Team_Metrics(cycle_data, throughput, config)
 dash = viewer.dash.Dash(team_metrics, config)
 
 if config["output"]:
-    writer.write(cycle_data,config["output"])
+    writer.write_data(cycle_data,config["output"])
 
 server = dash.server
 
