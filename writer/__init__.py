@@ -9,3 +9,5 @@ def write(data,config):
     elif config["format"] == "csv":
         logging.debug("Writing cycle_data to csv file " + config["filename"])
         data.to_csv(config["filename"],index=False)
+    else:
+        logging.debug("I don't have a clue of what I should be doing")
