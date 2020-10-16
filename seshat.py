@@ -30,14 +30,14 @@ workflow_keys = list(config["Workflow"].keys())
 start = workflow_keys[0]
 start = "Created"
 
+#adding lead time to cycle_data
 cycle_data = calculator.flow.lead_time(cycle_data, start)
 
 for i in range(len(workflow_keys)-1):
     start = workflow_keys[i]
     end = workflow_keys[i+1]
+    #adding cycle_time to cycle_data
     calculator.flow.cycle_time(cycle_data, start, end)
-
-net_flow = calculator.flow.net_flow(cycle_data, "Total")
 
 team_metrics = viewer.team_metrics.Team_Metrics(cycle_data, throughput, config)
 dash = viewer.dash.Dash(team_metrics, config)
