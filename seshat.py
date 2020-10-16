@@ -1,7 +1,6 @@
 #!/usr/bin/python
 import yaml
-import reader.jira
-import reader.csv
+import reader
 import calculator.flow
 import viewer.team_metrics
 import viewer.dash
@@ -21,16 +20,7 @@ with open("config.yml", 'r') as f:
 # Add special "issue_type" Total to ensure we can see the total in all graphs
     config["issue_type"].insert(0, "Total")
 
-mode = config["input"]["mode"]
-
-cycle_data = None
-
-if mode == "csv":
-    cycle_data = reader.csv.read(
-        config["input"]["csv_file"], config["Workflow"])
-elif mode == "jira":
-    jira = reader.jira.Jira(config["jira"], config["Workflow"])
-    cycle_data = jira.get_jira_data()
+cycle_data = reader.read_data(config)
 
 throughput = calculator.flow.throughput(cycle_data)
 
