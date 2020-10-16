@@ -1,6 +1,5 @@
 #!/usr/bin/python
 import yaml
-import pandas as pd
 import reader.jira
 import reader.csv
 import calculator.flow
@@ -33,7 +32,6 @@ if mode == "csv":
 elif mode == "jira":
     jira = reader.jira.Jira(config["jira"], config["Workflow"])
     cycle_data = jira.get_jira_data()
-    cycle_data.fillna(pd.NaT)
 
 throughput = calculator.flow.throughput(cycle_data)
 

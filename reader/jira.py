@@ -80,6 +80,7 @@ class Jira:
         if self.jira_config["cache"]:
             self.cache.write(df_issue_data)
 
+        df_issue_data.fillna(NaT)
         return df_issue_data
 
     def get_jira_instance(self):
