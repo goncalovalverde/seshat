@@ -1,11 +1,12 @@
 import reader.jira
 import reader.csv
 
+
 def read_data(config):
     cycle_data = None
 
     mode = config["input"]["mode"]
-    
+
     if mode == "csv":
         cycle_data = reader.csv.read(
             config["input"]["csv_file"], config["Workflow"])
