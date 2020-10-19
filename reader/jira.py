@@ -10,14 +10,14 @@ class Jira:
     def __init__(self, jira_config, workflow):
         self.jira_config = jira_config
         self.workflow = workflow
-        
+
         def cache_name(self):
-            name_hashed = hashlib.md5((self.jira_config["url"]+self.jira_config["jql_query"]).encode('utf-8'))
+            url = self.jira_config["url"]
+            jql_query = self.jira_config["jql_query"]
+            name_hashed = hashlib.md5((url+jql_query).encode('utf-8'))
             return name_hashed.hexdigest()
-        
+
         self.cache = reader.cache.Cache(cache_name(self))
-
-
 
     def get_issue_data(self, issue, issue_data):
         issue_data["Key"].append(issue.key)
@@ -107,6 +107,8 @@ class Jira:
         else:
             jira = JIRA(
                 jira_url,
-                basic_auth=(self.jira_config["username"], self.jira_config["password"])
+                basic_auth=(self.jira_config["username"],
+                            self.jira_config["password"]
+                            )
             )
         return jira

@@ -14,7 +14,9 @@ class Dash:
         self.team_metrics = team_metrics
         external_stylesheets = [dbc.themes.LUX]
 
-        self.app = dash.Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
+        self.app = dash.Dash(__name__,
+                             external_stylesheets=external_stylesheets,
+                             suppress_callback_exceptions=True)
         self.app.title = "Seshat - A Team Metrics app"
         self.server = self.app.server
 
@@ -44,7 +46,7 @@ class Dash:
 
         self.app.callback(
             [Output('wip-graph', 'figure'),
-            Output('start_stop-graph','figure')],
+             Output('start_stop-graph', 'figure')],
             [Input('issue-type-sel-wip', 'value')]
         )(self.update_wip_dash)
 
@@ -87,7 +89,8 @@ class Dash:
         i = 0
         for fig in figures:
             i += 1
-            cycle_time_fig.append(dcc.Graph(id="cycle-time-graph"+str(i), figure=fig))
+            cycle_time_fig.append(dcc.Graph(id="cycle-time-graph"+str(i),
+                                            figure=fig))
 
         layout = html.Div(children=[
             html.H1(children='Team Metrics Lead & Cycle Time'),
@@ -104,8 +107,10 @@ class Dash:
                 dcc.Graph(id='lead-time-graph', figure=fig_lead_time_hist),
                 ],
                 style={'columnCount': 1}),
-# TODO: [SES-33] Figure out how to improve the display of this graphics per columns
-            html.Div(id='cycle-time-graphs', children=cycle_time_fig, style={'columnCount': len(cycle_time_fig)})
+            # TODO: [SES-33] Figure out how to improve the display of this graphics per columns
+            html.Div(id='cycle-time-graphs',
+                     children=cycle_time_fig,
+                     style={'columnCount': len(cycle_time_fig)})
         ])
 
         return layout
@@ -161,7 +166,8 @@ class Dash:
         i = 0
         for fig in figures:
             i += 1
-            cycle_time_fig.append(dcc.Graph(id="cycle-time-graph"+str(i), figure=fig))
+            cycle_time_fig.append(dcc.Graph(id="cycle-time-graph"+str(i),
+                                            figure=fig))
 
         return fig_lead_time_hist, cycle_time_fig
 

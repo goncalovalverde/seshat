@@ -55,7 +55,7 @@ class Team_Metrics:
             showlegend=False,
             yaxis={
                 'title': 'Defect Percentage',
-                'tickformat' : '.0%'
+                'tickformat': '.0%'
                 })
         fig = self.add_trendline(throughput, fig, 'Defect Percentage')
         return fig
