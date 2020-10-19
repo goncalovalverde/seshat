@@ -107,7 +107,7 @@ class Dash:
                 dcc.Graph(id='lead-time-graph', figure=fig_lead_time_hist),
                 ],
                 style={'columnCount': 1}),
-# TODO: [SES-33] Figure out how to improve the display of this graphics per columns
+            # TODO: [SES-33] Figure out how to improve the display of this graphics per columns
             html.Div(id='cycle-time-graphs',
                      children=cycle_time_fig,
                      style={'columnCount': len(cycle_time_fig)})
