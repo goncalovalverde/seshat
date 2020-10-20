@@ -4,6 +4,7 @@ import datetime
 import statsmodels.api as sm
 import numpy as np
 import calculator.flow
+import logging
 
 
 # TODO: refactor to remove cycle_data and throughput to invocation of internal
@@ -130,25 +131,31 @@ class Team_Metrics:
 
     def draw_cycle_time_hist(self, type, wkflow_step):
         cycle_data = self.cycle_data
+        print(cycle_data)
         cycle_time_name = "Cycle Time " + wkflow_step
+        logging.debug(f"Showing histogram for {cycle_time_name}")
 
         cycle_time = cycle_data[["Done", "Type", cycle_time_name]].copy()
         if type != "Total":
             cycle_time = cycle_time.loc[cycle_time["Type"] == type]
 
         cycle_time = cycle_time.loc[cycle_time[cycle_time_name] > 0]
+        try:
+            fig = cycle_time[cycle_time_name].plot.hist()
+            fig.update_traces(xbins_size=1)
+            fig.update_layout(
+                title=cycle_time_name,
+                showlegend=False,
+                yaxis={'title': 'Cycle time'},
+                xaxis={'title': 'days'}
+                )
 
-        fig = cycle_time[cycle_time_name].plot.hist()
-        fig.update_traces(xbins_size=1)
-        fig.update_layout(
-            title=cycle_time_name,
-            showlegend=False,
-            yaxis={'title': 'Cycle time'},
-            xaxis={'title': 'days'}
-            )
-
-        fig = self.add_percentile(cycle_time[cycle_time_name], fig)
-        return fig
+            fig = self.add_percentile(cycle_time[cycle_time_name], fig)
+            return fig
+        except KeyError:
+            logging.error(f"Didn't got any information for {cycle_time_name}")
+            logging.error("Are you sure you configured your wrokflow correctly?")
+            return {}
 
     def draw_all_cycle_time_hist(self, type):
         workflow_keys = list(self.config["Workflow"].keys())
