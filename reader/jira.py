@@ -24,7 +24,9 @@ class Jira:
         issue_data["Key"].append(issue.key)
         issue_data["Type"].append(issue.fields.issuetype.name)
         issue_data["Created"].append(dateutil.parser.parse(issue.fields.created).replace(tzinfo=None))
-
+        if self.jira_config["story_points_field"]:
+            issue_data["Story Points"].append(getattr(issue.fields,self.jira_config["story_points_field"]))
+ 
         history_item = {}
         for workflow_step in self.workflow:
             history_item[workflow_step] = NaT
@@ -66,6 +68,7 @@ class Jira:
         issue_data = {
             "Key": [],
             "Type": [],
+            "Story Points": [],
             "Created": []
         }
 
