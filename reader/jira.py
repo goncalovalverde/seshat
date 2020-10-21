@@ -14,7 +14,8 @@ class Jira:
         def cache_name(self):
             url = self.jira_config["url"]
             jql_query = self.jira_config["jql_query"]
-            name_hashed = hashlib.md5((url+jql_query).encode('utf-8'))
+            workflow = str(self.workflow)
+            name_hashed = hashlib.md5((url+jql_query+workflow).encode('utf-8'))
             return name_hashed.hexdigest()
 
         self.cache = reader.cache.Cache(cache_name(self))

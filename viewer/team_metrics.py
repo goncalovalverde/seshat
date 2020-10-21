@@ -131,7 +131,6 @@ class Team_Metrics:
 
     def draw_cycle_time_hist(self, type, wkflow_step):
         cycle_data = self.cycle_data
-        print(cycle_data)
         cycle_time_name = "Cycle Time " + wkflow_step
         logging.debug(f"Showing histogram for {cycle_time_name}")
 

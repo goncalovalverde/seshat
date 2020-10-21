@@ -1,6 +1,6 @@
 import reader.jira
 import reader.csv
-
+import logging
 
 def read_data(config):
     cycle_data = None
@@ -15,3 +15,7 @@ def read_data(config):
         cycle_data = jira.get_jira_data()
 
     return cycle_data
+
+def validate_data(cycle_data,config):
+    for workflow_step in config["workflow"]:
+        logging(f"No data found for {workflow_step}")
