@@ -33,7 +33,7 @@ start = "Created"
 # adding lead time to cycle_data
 cycle_data = calculator.flow.lead_time(cycle_data, start)
 
-#adding cycle_time (between workflow steps) to cycle_data
+# adding cycle_time (between workflow steps) to cycle_data
 for i in range(len(workflow_keys)-1):
     start = workflow_keys[i]
     end = workflow_keys[i+1]

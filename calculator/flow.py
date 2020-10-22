@@ -13,15 +13,18 @@ def throughput(cycle_data):
 def lead_time(cycle_data, start):
     logging.debug("Calculating lead time for " + start)
     cycle_data["Lead Time"] = cycle_data["Done"]-cycle_data[start]
-    cycle_data["Lead Time"] = pd.to_numeric(cycle_data["Lead Time"].dt.days, downcast='integer')
+    cycle_data["Lead Time"] = pd.to_numeric(cycle_data["Lead Time"].dt.days,
+                                            downcast='integer')
     return cycle_data
 
 
 # TODO: migrate this to multi header df (and apply it to all dataframe )
 def cycle_time(cycle_data, start, end):
+    column = "Cycle Time " + start
     logging.debug("Calculating cycle time for start:" + start + " and end:" + end)
-    cycle_data["Cycle Time " + start] = cycle_data[end]-cycle_data[start]
-    cycle_data["Cycle Time " + start] = pd.to_numeric(cycle_data["Cycle Time " + start].dt.days, downcast='integer')
+    cycle_data[column] = cycle_data[end]-cycle_data[start]
+    cycle_data[column] = pd.to_numeric(cycle_data[column].dt.days,
+                                       downcast='integer')
     return cycle_data
 
 
@@ -44,7 +47,11 @@ def net_flow(cycle_data, type):
     created = group_by_date(cycle_data, "Created")
     done = group_by_date(cycle_data, "Done")
 
-    net_flow = pd.merge(created, done, left_index=True, right_index=True, how='outer')
+    net_flow = pd.merge(created,
+                        done,
+                        left_index=True,
+                        right_index=True,
+                        how='outer')
     net_flow = net_flow.fillna(0)
     # Net Flow : Done items - Created items
     net_flow["Net Flow"] = net_flow[type + "_y"] - net_flow[type + "_x"]
@@ -75,7 +82,11 @@ def defect_percentage(throughput, type):
 
 
 def group_by_date(cycle_data, index):
-    table = pd.pivot_table(cycle_data, values="Key", index=[index], columns="Type", aggfunc='count')
+    table = pd.pivot_table(cycle_data,
+                           values="Key",
+                           index=[index],
+                           columns="Type",
+                           aggfunc='count')
     df = pd.DataFrame(table.to_records())
     df = df.fillna(0)
     df = df.resample('D', on=index).sum()

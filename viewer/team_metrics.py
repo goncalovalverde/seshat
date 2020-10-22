@@ -153,7 +153,7 @@ class Team_Metrics:
             return fig
         except KeyError:
             logging.error(f"Didn't got any information for {cycle_time_name}")
-            logging.error("Are you sure you configured your wrokflow correctly?")
+            logging.error("Are you sure you configured the workflow correctly?")
             return {}
 
     def draw_all_cycle_time_hist(self, type):
