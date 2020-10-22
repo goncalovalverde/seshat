@@ -12,6 +12,8 @@ jira:
     token_secret: YOURPASSWORD
     consumer_key: YOUR_CONSUMER_KEY
     key_cert_file: PATH_TO_YOU_CERT_FILE
+  # you need to look at either jira configuration or a rest output to figure this one
+  story_points_field: customfield_XXX 
 
 output:
   format: none # valid values: xlsx
