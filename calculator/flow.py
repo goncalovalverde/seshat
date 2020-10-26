@@ -14,9 +14,9 @@ def velocity(cycle_data):
                         values="Story Points",
                         index=["Done"],
                         columns="Type",
+                        fill_value=0,
                         aggfunc='sum')
     df = pd.DataFrame(table.to_records())
-    df = df.fillna(0)
     df = df.resample('D', on="Done").sum()
     df["Total"] = df.sum(axis=1)
     return df
@@ -98,9 +98,9 @@ def group_by_date(cycle_data, index):
                            values="Key",
                            index=[index],
                            columns="Type",
+                           fill_value=0,
                            aggfunc='count')
     df = pd.DataFrame(table.to_records())
-    df = df.fillna(0)
     df = df.resample('D', on=index).sum()
     df["Total"] = df.sum(axis=1)
     return df

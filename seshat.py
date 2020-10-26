@@ -25,6 +25,8 @@ cycle_data = reader.read_data(config)
 
 throughput = calculator.flow.throughput(cycle_data)
 
+print(calculator.flow.velocity(cycle_data))
+
 # get the first element of the workflow
 # to know where to start calculating the lead time
 workflow_keys = list(config["Workflow"].keys())
