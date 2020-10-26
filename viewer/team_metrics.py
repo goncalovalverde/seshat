@@ -17,19 +17,42 @@ class Team_Metrics:
         pd.options.plotting.backend = "plotly"
 
     def draw_throughput(self, type):
+        logging.debug("Showing throughput graph for " + type)
         throughput = self.throughput
         throughput = throughput.resample("W").sum()
-        fig = throughput[type].plot.line(text=throughput[type])
+
+        if type == "all":
+            logging.debug("Showing all throughput")
+            fig = throughput.plot.line()
+        else:
+            fig = throughput[type].plot.line(text=throughput[type])
+
         fig.update_traces(
             textposition="top center"
         )
-        fig.update_layout(
-            title='Productivity - How Much - "Do Lots"',
-            showlegend=False,
-            yaxis={'title': 'Throughput'}
+    
+        if type != "all":
+            fig.update_layout(
+                title='Productivity - How Much - "Do Lots"',
+                showlegend=False,
+                yaxis={'title': 'Throughput'}
             )
 
-        fig = self.add_trendline(throughput, fig, type)
+            fig = self.add_trendline(throughput, fig, type)
+        return fig
+
+    def add_velocity(self,fig):
+        velocity = calculator.flow.velocity(self.cycle_data)
+    
+    def draw_velocity(self,type):
+        velocity = calculator.flow.velocity(self.cycle_data)
+        fig = velocity[type].plot.line()
+
+        fig.update_layout(
+                title='Velocity - How much story points delivered?',
+                showlegend=False,
+                yaxis={'title': 'Story Points'}
+            )
         return fig
 
     def draw_lead_time(self, type):
