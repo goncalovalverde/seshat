@@ -60,6 +60,8 @@ class Team_Metrics:
                 title='Velocity - How much story points delivered?',
                 yaxis={'title': 'Story Points'}
             )
+        
+        fig = self.add_trendline(velocity,fig,"Total")
         return fig
 
     def draw_lead_time(self, type):
@@ -207,6 +209,7 @@ class Team_Metrics:
         fig = fig.add_trace(go.Scatter(
             x=df.index,
             y=df["bestfit"],
+            name="Trend",
             mode='lines',
             line={'dash': 'dash'},
             marker_color="red"))
