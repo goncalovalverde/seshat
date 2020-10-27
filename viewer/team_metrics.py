@@ -42,15 +42,22 @@ class Team_Metrics:
         return fig
 
     def add_velocity(self,fig):
-        velocity = calculator.flow.velocity(self.cycle_data)
+        velocity = calculator.flow.velocity(self.cycle_data).resample("W").sum()
+        fig = fig.add_trace(go.Scatter(
+            x=velocity.index,
+            y=velocity["Total"],
+            name="Velocity",
+            mode='lines',
+            line={'dash': 'dash'},
+            marker_color="red"))
+        return fig
     
     def draw_velocity(self,type):
-        velocity = calculator.flow.velocity(self.cycle_data)
+        velocity = calculator.flow.velocity(self.cycle_data).resample("W").sum()
         fig = velocity[type].plot.line()
 
         fig.update_layout(
                 title='Velocity - How much story points delivered?',
-                showlegend=False,
                 yaxis={'title': 'Story Points'}
             )
         return fig
