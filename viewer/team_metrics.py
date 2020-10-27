@@ -23,9 +23,13 @@ class Team_Metrics:
 
         if type == "all":
             logging.debug("Showing all throughput")
-            fig = throughput.plot.line()
+            fig = throughput.plot.line(
+                title="Throughput : how many PBI's delivered",
+                labels = {'value': 'Throughput'})
         else:
-            fig = throughput[type].plot.line(text=throughput[type])
+            fig = throughput[type].plot.line(
+                labels = {'value': 'Throughput'},
+                text=throughput[type])
 
         fig.update_traces(
             textposition="top center"
@@ -34,11 +38,10 @@ class Team_Metrics:
         if type != "all":
             fig.update_layout(
                 title='Productivity - How Much - "Do Lots"',
-                showlegend=False,
-                yaxis={'title': 'Throughput'}
-            )
+                showlegend=False)
 
             fig = self.add_trendline(throughput, fig, type)
+
         return fig
 
     def add_velocity(self,fig):
@@ -57,7 +60,7 @@ class Team_Metrics:
         fig = velocity[type].plot.line()
 
         fig.update_layout(
-                title='Velocity - How much story points delivered?',
+                title='Velocity : How much story points delivered?',
                 yaxis={'title': 'Story Points'}
             )
         
