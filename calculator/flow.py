@@ -9,6 +9,18 @@ def throughput(cycle_data):
     return throughput
 
 
+def velocity(cycle_data):
+    table = pd.pivot_table(cycle_data,
+                        values="Story Points",
+                        index=["Done"],
+                        columns="Type",
+                        fill_value=0,
+                        aggfunc='sum')
+    df = pd.DataFrame(table.to_records())
+    df = df.resample('D', on="Done").sum()
+    df["Total"] = df.sum(axis=1)
+    return df
+
 # Responsiveness - How Fast - "Do it Fast"
 def lead_time(cycle_data, start):
     logging.debug("Calculating lead time for " + start)
@@ -87,9 +99,9 @@ def group_by_date(cycle_data, index):
                            values="Key",
                            index=[index],
                            columns="Type",
+                           fill_value=0,
                            aggfunc='count')
     df = pd.DataFrame(table.to_records())
-    df = df.fillna(0)
     df = df.resample('D', on=index).sum()
     df["Total"] = df.sum(axis=1)
     return df

@@ -17,19 +17,54 @@ class Team_Metrics:
         pd.options.plotting.backend = "plotly"
 
     def draw_throughput(self, type):
+        logging.debug("Showing throughput graph for " + type)
         throughput = self.throughput
         throughput = throughput.resample("W").sum()
-        fig = throughput[type].plot.line(text=throughput[type])
+
+        if type == "all":
+            logging.debug("Showing all throughput")
+            fig = throughput.plot.line(
+                title="Throughput : how many PBI's delivered",
+                labels = {'value': 'Throughput'})
+        else:
+            fig = throughput[type].plot.line(
+                labels = {'value': 'Throughput'},
+                text=throughput[type])
+
         fig.update_traces(
             textposition="top center"
         )
-        fig.update_layout(
-            title='Productivity - How Much - "Do Lots"',
-            showlegend=False,
-            yaxis={'title': 'Throughput'}
-            )
+    
+        if type != "all":
+            fig.update_layout(
+                title='Productivity - How Much - "Do Lots"',
+                showlegend=False)
 
-        fig = self.add_trendline(throughput, fig, type)
+            fig = self.add_trendline(throughput, fig, type)
+
+        return fig
+
+    def add_velocity(self,fig):
+        velocity = calculator.flow.velocity(self.cycle_data).resample("W").sum()
+        fig = fig.add_trace(go.Scatter(
+            x=velocity.index,
+            y=velocity["Total"],
+            name="Velocity",
+            mode='lines',
+            line={'dash': 'dash'},
+            marker_color="red"))
+        return fig
+    
+    def draw_velocity(self,type):
+        velocity = calculator.flow.velocity(self.cycle_data).resample("W").sum()
+        fig = velocity[type].plot.line()
+
+        fig.update_layout(
+                title='Velocity : How much story points delivered?',
+                yaxis={'title': 'Story Points'}
+            )
+        
+        fig = self.add_trendline(velocity,fig,"Total")
         return fig
 
     def draw_lead_time(self, type):
@@ -177,6 +212,7 @@ class Team_Metrics:
         fig = fig.add_trace(go.Scatter(
             x=df.index,
             y=df["bestfit"],
+            name="Trend",
             mode='lines',
             line={'dash': 'dash'},
             marker_color="red"))

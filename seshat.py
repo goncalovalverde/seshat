@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from numpy.core.fromnumeric import cumprod
 import yaml
 import reader
 import calculator.flow

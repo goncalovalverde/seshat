@@ -147,6 +147,22 @@ class Dash:
         ])
         return layout
 
+    def show_throughput_dash(self):
+        tm = self.team_metrics
+        fig_throughput = tm.draw_throughput("all")
+        fig_velocity = tm.draw_velocity("Total")
+
+        layout = html.Div(children=[
+            html.H1(children='Throughput'),
+
+            html.Div(children=[
+                dcc.Graph(id='throughput-graph', figure=fig_throughput),
+                dcc.Graph(id='velocity-graph',figure=fig_velocity) 
+                ],
+                style={'columnCount': 1}),
+        ])
+        return layout
+
     def update_main_dash(self, type):
         logging.debug("Updating main dashboard for type " + type)
         tm = self.team_metrics
@@ -185,6 +201,7 @@ class Dash:
                 dbc.DropdownMenuItem("Main Dashboard", href="/main_dashboard"),
                 dbc.DropdownMenuItem("Lead & Cycle Time", href="/lead_cycle_time"),
                 dbc.DropdownMenuItem("WIP", href="/wip"),
+                dbc.DropdownMenuItem("Throughput", href="/throughput"),
                 dbc.DropdownMenuItem("Raw Data", href="/raw_data")
             ],
             nav=True, in_navbar=True, label="Explore",
@@ -226,6 +243,8 @@ class Dash:
             return self.show_raw_data()
         elif pathname == '/wip':
             return self.show_wip_dash()
+        elif pathname == '/throughput':
+            return self.show_throughput_dash()
         else:
             return self.show_main_dash()
 
