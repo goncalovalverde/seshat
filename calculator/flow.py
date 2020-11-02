@@ -61,11 +61,12 @@ def net_flow(cycle_data, type):
     created = group_by_date(cycle_data, "Created")
     done = group_by_date(cycle_data, "Done")
 
-    net_flow = pd.merge(created,
-                        done,
-                        left_index=True,
-                        right_index=True,
-                        how='outer')
+    net_flow = pd.merge(
+                created,
+                done,
+                left_index=True,
+                right_index=True,
+                how='outer')
     net_flow = net_flow.fillna(0)
     # Net Flow : Done items - Created items
     net_flow["Net Flow"] = net_flow[type + "_y"] - net_flow[type + "_x"]
