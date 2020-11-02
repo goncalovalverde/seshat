@@ -14,6 +14,7 @@ class Team_Metrics:
         self.cycle_data = cycle_data
         self.throughput = throughput
         self.config = config
+        self.has_story_points = True if "Story Points" in cycle_data else False
         pd.options.plotting.backend = "plotly"
 
     def draw_throughput(self, type):
@@ -22,7 +23,6 @@ class Team_Metrics:
         throughput = throughput.resample("W").sum()
 
         if type == "all":
-            logging.debug("Showing all throughput")
             fig = throughput.plot.line(
                 title="Throughput : how many PBI's delivered",
                 labels = {'value': 'Throughput'})

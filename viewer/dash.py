@@ -39,7 +39,7 @@ class Dash:
         self.app.callback(
             [Output('throughput-graph', 'figure'),
              Output('defect-percentage-graph', 'figure'),
-             Output('defect-lead_time-graph', 'figure'),
+             Output('lead_time-graph', 'figure'),
              Output('net_flow', 'figure')],
             [Input('issue-type-sel-main', 'value')]
         )(self.update_main_dash)
@@ -72,7 +72,7 @@ class Dash:
             html.Div(children=[
                 dcc.Graph(id='throughput-graph', figure=fig_throughput),
                 dcc.Graph(id='defect-percentage-graph', figure=fig_defect_percentage),
-                dcc.Graph(id='defect-lead_time-graph', figure=fig_lead_time),
+                dcc.Graph(id='lead_time-graph', figure=fig_lead_time),
                 dcc.Graph(id='net_flow', figure=fig_net_flow)],
                 style={'columnCount': 2}),
         ])
@@ -150,7 +150,11 @@ class Dash:
     def show_throughput_dash(self):
         tm = self.team_metrics
         fig_throughput = tm.draw_throughput("all")
-        fig_velocity = tm.draw_velocity("Total")
+        #TODO: improve this logic
+        if tm.has_story_points:
+            fig_velocity = tm.draw_velocity("Total")
+        else:
+            fig_velocity = {}
 
         layout = html.Div(children=[
             html.H1(children='Throughput'),

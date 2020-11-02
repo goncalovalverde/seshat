@@ -1,3 +1,4 @@
+from logging import exception
 import pandas as pd
 import logging
 
@@ -20,6 +21,7 @@ def velocity(cycle_data):
     df = df.resample('D', on="Done").sum()
     df["Total"] = df.sum(axis=1)
     return df
+
 
 # Responsiveness - How Fast - "Do it Fast"
 def lead_time(cycle_data, start):
@@ -83,7 +85,11 @@ def defect_percentage(throughput, type):
     elif type == "Bug":
         total = throughput["Bug"]
     else:
-        total = throughput["Bug"] + throughput[type]
+        try:
+            total = throughput["Bug"] + throughput[type]
+        except KeyError:
+            total = throughput[type]
+
 
     if "Bug" in throughput:
         throughput["Defect Percentage"] = round((throughput["Bug"]/(total)), 2)
