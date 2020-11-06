@@ -1,4 +1,5 @@
 pyyaml
+pytest
 openpyxl
 pandas
 jira
