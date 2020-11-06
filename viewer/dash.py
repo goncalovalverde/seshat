@@ -14,40 +14,47 @@ class Dash:
         self.team_metrics = team_metrics
         external_stylesheets = [dbc.themes.LUX]
 
-        self.app = dash.Dash(__name__,
-                             external_stylesheets=external_stylesheets,
-                             suppress_callback_exceptions=True)
+        self.app = dash.Dash(
+            __name__,
+            external_stylesheets=external_stylesheets,
+            suppress_callback_exceptions=True,
+        )
         self.app.title = "Seshat - A Team Metrics app"
         self.server = self.app.server
 
-        self.app.layout = html.Div([
-            dcc.Location(id='url', refresh=False),
-            self.navbar(),
-            html.Div(id='page-content')
-        ])
+        self.app.layout = html.Div(
+            [
+                dcc.Location(id="url", refresh=False),
+                self.navbar(),
+                html.Div(id="page-content"),
+            ]
+        )
 
         self.app.callback(
-              Output('page-content', 'children'),
-              [Input('url', 'pathname')])(self.display_page)
+            Output("page-content", "children"), [Input("url", "pathname")]
+        )(self.display_page)
 
         self.app.callback(
-            [Output('lead-time-graph', 'figure'),
-             Output('cycle-time-graphs', 'children')],
-            [Input('issue-type-sel-hist', 'value')]
+            [
+                Output("lead-time-graph", "figure"),
+                Output("cycle-time-graphs", "children"),
+            ],
+            [Input("issue-type-sel-hist", "value")],
         )(self.update_hist_dash)
 
         self.app.callback(
-            [Output('throughput-graph', 'figure'),
-             Output('defect-percentage-graph', 'figure'),
-             Output('lead_time-graph', 'figure'),
-             Output('net_flow', 'figure')],
-            [Input('issue-type-sel-main', 'value')]
+            [
+                Output("throughput-graph", "figure"),
+                Output("defect-percentage-graph", "figure"),
+                Output("lead_time-graph", "figure"),
+                Output("net_flow", "figure"),
+            ],
+            [Input("issue-type-sel-main", "value")],
         )(self.update_main_dash)
 
         self.app.callback(
-            [Output('wip-graph', 'figure'),
-             Output('start_stop-graph', 'figure')],
-            [Input('issue-type-sel-wip', 'value')]
+            [Output("wip-graph", "figure"), Output("start_stop-graph", "figure")],
+            [Input("issue-type-sel-wip", "value")],
         )(self.update_wip_dash)
 
     def show_main_dash(self):
@@ -58,24 +65,36 @@ class Dash:
         fig_lead_time = tm.draw_lead_time("Total")
         fig_net_flow = tm.draw_net_flow("Total")
 
-        layout = html.Div(children=[
-            html.H1(children='Team Metrics Main Dashboard'),
-
-            html.Div([
-                dcc.Dropdown(
-                    id='issue-type-sel-main',
-                    options=[{'label': i, 'value': i} for i in self.config["issue_type"]],
-                    value='Total',
-                    clearable=False
-                    )], style={'width': '18%', 'left': 'right', 'display': 'inline-block'}),
-
-            html.Div(children=[
-                dcc.Graph(id='throughput-graph', figure=fig_throughput),
-                dcc.Graph(id='defect-percentage-graph', figure=fig_defect_percentage),
-                dcc.Graph(id='lead_time-graph', figure=fig_lead_time),
-                dcc.Graph(id='net_flow', figure=fig_net_flow)],
-                style={'columnCount': 2}),
-        ])
+        layout = html.Div(
+            children=[
+                html.H1(children="Team Metrics Main Dashboard"),
+                html.Div(
+                    [
+                        dcc.Dropdown(
+                            id="issue-type-sel-main",
+                            options=[
+                                {"label": i, "value": i}
+                                for i in self.config["issue_type"]
+                            ],
+                            value="Total",
+                            clearable=False,
+                        )
+                    ],
+                    style={"width": "18%", "left": "right", "display": "inline-block"},
+                ),
+                html.Div(
+                    children=[
+                        dcc.Graph(id="throughput-graph", figure=fig_throughput),
+                        dcc.Graph(
+                            id="defect-percentage-graph", figure=fig_defect_percentage
+                        ),
+                        dcc.Graph(id="lead_time-graph", figure=fig_lead_time),
+                        dcc.Graph(id="net_flow", figure=fig_net_flow),
+                    ],
+                    style={"columnCount": 2},
+                ),
+            ]
+        )
 
         return layout
 
@@ -89,38 +108,48 @@ class Dash:
         i = 0
         for fig in figures:
             i += 1
-            cycle_time_fig.append(dcc.Graph(id="cycle-time-graph"+str(i),
-                                            figure=fig))
+            cycle_time_fig.append(dcc.Graph(id="cycle-time-graph" + str(i), figure=fig))
 
-        layout = html.Div(children=[
-            html.H1(children='Team Metrics Lead & Cycle Time'),
-
-            html.Div([
-                dcc.Dropdown(
-                    id='issue-type-sel-hist',
-                    options=[{'label': i, 'value': i} for i in self.config["issue_type"]],
-                    value='Total',
-                    clearable=False
-                    )], style={'width': '18%', 'left': 'right', 'display': 'inline-block'}),
-
-            html.Div(children=[
-                dcc.Graph(id='lead-time-graph', figure=fig_lead_time_hist),
-                ],
-                style={'columnCount': 1}),
-            # TODO: [SES-33] Figure out how to improve the display of this graphics per columns
-            html.Div(id='cycle-time-graphs',
-                     children=cycle_time_fig,
-                     style={'columnCount': len(cycle_time_fig)})
-        ])
+        layout = html.Div(
+            children=[
+                html.H1(children="Team Metrics Lead & Cycle Time"),
+                html.Div(
+                    [
+                        dcc.Dropdown(
+                            id="issue-type-sel-hist",
+                            options=[
+                                {"label": i, "value": i}
+                                for i in self.config["issue_type"]
+                            ],
+                            value="Total",
+                            clearable=False,
+                        )
+                    ],
+                    style={"width": "18%", "left": "right", "display": "inline-block"},
+                ),
+                html.Div(
+                    children=[
+                        dcc.Graph(id="lead-time-graph", figure=fig_lead_time_hist),
+                    ],
+                    style={"columnCount": 1},
+                ),
+                # TODO: [SES-33] Figure out how to improve the display of this graphics per columns
+                html.Div(
+                    id="cycle-time-graphs",
+                    children=cycle_time_fig,
+                    style={"columnCount": len(cycle_time_fig)},
+                ),
+            ]
+        )
 
         return layout
 
     def show_raw_data(self):
         df = self.team_metrics.cycle_data
         layout = dash_table.DataTable(
-            id='table',
+            id="table",
             columns=[{"name": i, "id": i} for i in df.columns],
-            data=df.to_dict('records'),
+            data=df.to_dict("records"),
         )
         return layout
 
@@ -129,44 +158,59 @@ class Dash:
         fig_wip = tm.draw_wip("Total")
         fig_start_stop = tm.draw_start_stop("Total")
 
-        layout = html.Div(children=[
-            html.H1(children='Team Metrics WIP'),
-
-            html.Div([
-                dcc.Dropdown(
-                    id='issue-type-sel-wip',
-                    options=[{'label': i, 'value': i} for i in self.config["issue_type"]],
-                    value='Total',
-                    clearable=False
-                    )], style={'width': '18%', 'left': 'right', 'display': 'inline-block'}),
-
-            html.Div(children=[
-                dcc.Graph(id='wip-graph', figure=fig_wip),
-                dcc.Graph(id='start_stop-graph', figure=fig_start_stop)],
-                style={'columnCount': 1}),
-        ])
+        layout = html.Div(
+            children=[
+                html.H1(children="Team Metrics WIP"),
+                html.Div(
+                    [
+                        dcc.Dropdown(
+                            id="issue-type-sel-wip",
+                            options=[
+                                {"label": i, "value": i}
+                                for i in self.config["issue_type"]
+                            ],
+                            value="Total",
+                            clearable=False,
+                        )
+                    ],
+                    style={"width": "18%", "left": "right", "display": "inline-block"},
+                ),
+                html.Div(
+                    children=[
+                        dcc.Graph(id="wip-graph", figure=fig_wip),
+                        dcc.Graph(id="start_stop-graph", figure=fig_start_stop),
+                    ],
+                    style={"columnCount": 1},
+                ),
+            ]
+        )
         return layout
 
     def show_throughput_dash(self):
         tm = self.team_metrics
         fig_throughput = tm.draw_throughput("all")
         fig_spoints_throughput = tm.draw_story_points()
-        #TODO: improve this logic
+        # TODO: improve this logic
         if tm.has_story_points:
             fig_velocity = tm.draw_velocity("Total")
         else:
             fig_velocity = {}
 
-        layout = html.Div(children=[
-            html.H1(children='Throughput'),
-
-            html.Div(children=[
-                dcc.Graph(id='throughput-graph', figure=fig_throughput),
-                dcc.Graph(id='velocity-graph',figure=fig_velocity),
-                dcc.Graph(id='throughput-spoints-graph',figure=fig_spoints_throughput)
-                ],
-                style={'columnCount': 1}),
-        ])
+        layout = html.Div(
+            children=[
+                html.H1(children="Throughput"),
+                html.Div(
+                    children=[
+                        dcc.Graph(id="throughput-graph", figure=fig_throughput),
+                        dcc.Graph(id="velocity-graph", figure=fig_velocity),
+                        dcc.Graph(
+                            id="throughput-spoints-graph", figure=fig_spoints_throughput
+                        ),
+                    ],
+                    style={"columnCount": 1},
+                ),
+            ]
+        )
         return layout
 
     def update_main_dash(self, type):
@@ -188,8 +232,7 @@ class Dash:
         i = 0
         for fig in figures:
             i += 1
-            cycle_time_fig.append(dcc.Graph(id="cycle-time-graph"+str(i),
-                                            figure=fig))
+            cycle_time_fig.append(dcc.Graph(id="cycle-time-graph" + str(i), figure=fig))
 
         return fig_lead_time_hist, cycle_time_fig
 
@@ -208,9 +251,11 @@ class Dash:
                 dbc.DropdownMenuItem("Lead & Cycle Time", href="/lead_cycle_time"),
                 dbc.DropdownMenuItem("WIP", href="/wip"),
                 dbc.DropdownMenuItem("Throughput", href="/throughput"),
-                dbc.DropdownMenuItem("Raw Data", href="/raw_data")
+                dbc.DropdownMenuItem("Raw Data", href="/raw_data"),
             ],
-            nav=True, in_navbar=True, label="Explore",
+            nav=True,
+            in_navbar=True,
+            label="Explore",
         )
 
         navbar = dbc.Navbar(
@@ -219,23 +264,35 @@ class Dash:
                     html.A(
                         dbc.Row(
                             [
-                                dbc.Col(html.Img(src=self.app.get_asset_url("metrics_icon.svg"), height="30px")),
-                                dbc.Col(dbc.NavbarBrand("Seshat - Team Metrics Analysis", className="ml-2")),
+                                dbc.Col(
+                                    html.Img(
+                                        src=self.app.get_asset_url("metrics_icon.svg"),
+                                        height="30px",
+                                    )
+                                ),
+                                dbc.Col(
+                                    dbc.NavbarBrand(
+                                        "Seshat - Team Metrics Analysis",
+                                        className="ml-2",
+                                    )
+                                ),
                             ],
-                            align="center", no_gutters=True,
+                            align="center",
+                            no_gutters=True,
                         ),
                         href="/home",
                     ),
                     dbc.NavbarToggler(id="navbar-toggler2"),
                     dbc.Collapse(
-                        dbc.Nav(
-                            [dropdown], className="ml-auto", navbar=True
-                        ),
-                        id="navbar-collapse2", navbar=True,
+                        dbc.Nav([dropdown], className="ml-auto", navbar=True),
+                        id="navbar-collapse2",
+                        navbar=True,
                     ),
                 ]
             ),
-            color="dark", dark=True, className="mb-4",
+            color="dark",
+            dark=True,
+            className="mb-4",
         )
 
         return navbar
@@ -243,13 +300,13 @@ class Dash:
     def display_page(self, pathname):
         if pathname:
             logging.debug("Changing page to " + pathname)
-        if pathname == '/lead_cycle_time':
+        if pathname == "/lead_cycle_time":
             return self.show_hist_dash()
-        elif pathname == '/raw_data':
+        elif pathname == "/raw_data":
             return self.show_raw_data()
-        elif pathname == '/wip':
+        elif pathname == "/wip":
             return self.show_wip_dash()
-        elif pathname == '/throughput':
+        elif pathname == "/throughput":
             return self.show_throughput_dash()
         else:
             return self.show_main_dash()
