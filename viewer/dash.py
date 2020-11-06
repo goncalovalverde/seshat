@@ -150,6 +150,7 @@ class Dash:
     def show_throughput_dash(self):
         tm = self.team_metrics
         fig_throughput = tm.draw_throughput("all")
+        fig_spoints_throughput = tm.draw_story_points()
         #TODO: improve this logic
         if tm.has_story_points:
             fig_velocity = tm.draw_velocity("Total")
@@ -161,7 +162,8 @@ class Dash:
 
             html.Div(children=[
                 dcc.Graph(id='throughput-graph', figure=fig_throughput),
-                dcc.Graph(id='velocity-graph',figure=fig_velocity) 
+                dcc.Graph(id='velocity-graph',figure=fig_velocity),
+                dcc.Graph(id='throughput-spoints-graph',figure=fig_spoints_throughput)
                 ],
                 style={'columnCount': 1}),
         ])

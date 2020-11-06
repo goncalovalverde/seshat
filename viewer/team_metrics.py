@@ -6,6 +6,8 @@ import numpy as np
 import calculator.flow
 import logging
 
+from calculator.flow import story_points
+
 
 # TODO: refactor to remove cycle_data and throughput to invocation of internal
 # methods and use the class properties instead
@@ -65,6 +67,12 @@ class Team_Metrics:
             )
         
         fig = self.add_trendline(velocity,fig,"Total")
+        return fig
+
+    def draw_story_points(self):
+        story_points = calculator.flow.story_points(self.cycle_data).resample("W").sum()
+        fig = story_points.plot.line()
+
         return fig
 
     def draw_lead_time(self, type):

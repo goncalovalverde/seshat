@@ -22,6 +22,18 @@ def velocity(cycle_data):
     df["Total"] = df.sum(axis=1)
     return df
 
+def story_points(cycle_data):
+    table = pd.pivot_table(cycle_data,
+                        values="Key",
+                        index=["Done"],
+                        columns="Story Points",
+                        fill_value=0,
+                        aggfunc='count')
+    df = pd.DataFrame(table.to_records())
+    df = df.resample('D', on="Done").sum()
+    df["Total"] = df.sum(axis=1)
+    return df
+
 
 # Responsiveness - How Fast - "Do it Fast"
 def lead_time(cycle_data, start):
