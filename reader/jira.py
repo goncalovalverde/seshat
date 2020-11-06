@@ -65,7 +65,7 @@ class Jira:
 
         return issues
 
-    def get_jira_data(self):
+    def get_data(self):
 
         if self.jira_config["cache"] and self.cache.is_valid():
             logging.debug("Getting jira info cached ")
