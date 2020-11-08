@@ -1,4 +1,5 @@
 pyyaml
+py-trello
 pytest
 openpyxl
 pandas
