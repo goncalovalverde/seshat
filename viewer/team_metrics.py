@@ -165,12 +165,13 @@ class Team_Metrics:
         cycle_time_name = "Cycle Time " + wkflow_step
         logging.debug(f"Showing histogram for {cycle_time_name}")
 
-        cycle_time = cycle_data[["Done", "Type", cycle_time_name]].copy()
-        if type != "Total":
-            cycle_time = cycle_time.loc[cycle_time["Type"] == type]
-
-        cycle_time = cycle_time.loc[cycle_time[cycle_time_name] > 0]
         try:
+            cycle_time = cycle_data[["Done", "Type", cycle_time_name]].copy()
+            if type != "Total":
+                cycle_time = cycle_time.loc[cycle_time["Type"] == type]
+
+            cycle_time = cycle_time.loc[cycle_time[cycle_time_name] > 0]
+
             fig = cycle_time[cycle_time_name].plot.hist()
             fig.update_traces(xbins_size=1)
             fig.update_layout(
