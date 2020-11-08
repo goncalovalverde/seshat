@@ -52,11 +52,18 @@ def lead_time(cycle_data, start):
 
 # TODO: migrate this to multi header df (and apply it to all dataframe )
 def cycle_time(cycle_data, start, end):
-    column = "Cycle Time " + start
     logging.debug("Calculating cycle time for start:" + start + " and end:" + end)
-    cycle_data[column] = cycle_data[end] - cycle_data[start]
-    cycle_data[column] = pd.to_numeric(cycle_data[column].dt.days, downcast="integer")
-    return cycle_data
+    try:
+        column = "Cycle Time " + start
+        cycle_data[column] = cycle_data[end] - cycle_data[start]
+        cycle_data[column] = pd.to_numeric(
+            cycle_data[column].dt.days, downcast="integer"
+        )
+        return cycle_data
+    except KeyError as e:
+        logging.error("No data found for " + str(e))
+        logging.error("Are you sure you configured your workflow correctly?")
+        return cycle_data
 
 
 def avg_lead_time(cycle_data, type):

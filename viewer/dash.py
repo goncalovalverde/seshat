@@ -189,12 +189,13 @@ class Dash:
     def show_throughput_dash(self):
         tm = self.team_metrics
         fig_throughput = tm.draw_throughput("all")
-        fig_spoints_throughput = tm.draw_story_points()
         # TODO: improve this logic
         if tm.has_story_points:
             fig_velocity = tm.draw_velocity("Total")
+            fig_spoints_throughput = tm.draw_story_points()
         else:
             fig_velocity = {}
+            fig_spoints_throughput = {}
 
         layout = html.Div(
             children=[

@@ -1,5 +1,6 @@
 import reader.jira
 import reader.csv
+import reader.trello
 import logging
 
 
@@ -17,6 +18,12 @@ def read_data(config):
     elif mode == "jira":
         jira = reader.jira.Jira(config["jira"], config["Workflow"])
         cycle_data = jira.get_data()
+    elif mode == "trello":
+        trello = reader.trello.Trello(config["trello"], config["Workflow"])
+        cycle_data = trello.get_cards()
+    else:
+        logging.error("Don't know what to do fore mode " + mode)
+        return {}
 
     return cycle_data
 

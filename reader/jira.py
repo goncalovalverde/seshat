@@ -66,6 +66,7 @@ class Jira:
         return issues
 
     def get_data(self):
+        """Retrieve data from jira and return as a Data Frame"""
 
         if self.jira_config["cache"] and self.cache.is_valid():
             logging.debug("Getting jira info cached ")
