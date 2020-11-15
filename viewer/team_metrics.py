@@ -118,7 +118,7 @@ class Team_Metrics:
 
     def draw_wip(self, type):
         wip = calculator.flow.net_flow(self.cycle_data, type)
-        wip = wip.resample("W").sum()
+        # wip = wip.resample("W").sum()
         fig = wip["WIP"].plot.bar()
         fig.update_layout(
             title="Work in Progress",

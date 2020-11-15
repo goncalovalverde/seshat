@@ -1,7 +1,8 @@
 import pandas as pd
+from pandas.core.frame import DataFrame
 
 
-def read(csv_file, workflow):
+def read(csv_file: str, workflow: dict) -> DataFrame:
     """Read information from 'csv_file' into dataframe 'cycle_data'
     Interact over 'workflow' and convert the date into datetime
     """
