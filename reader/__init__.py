@@ -1,3 +1,4 @@
+from pandas.core.frame import DataFrame
 import reader.jira
 import reader.csv
 import reader.trello
@@ -22,7 +23,7 @@ def read_data(config):
         trello = reader.trello.Trello(config["trello"], config["Workflow"])
         cycle_data = trello.get_cards()
     else:
-        logging.error("Don't know what to do fore mode " + mode)
+        logging.error("Don't know what to do for mode " + mode)
         return {}
 
     return cycle_data
@@ -30,4 +31,4 @@ def read_data(config):
 
 def validate_data(cycle_data, config):
     for workflow_step in config["workflow"]:
-        logging(f"No data found for {workflow_step}")
+        logging.info(f"No data found for {workflow_step}")
