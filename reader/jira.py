@@ -7,7 +7,7 @@ from pandas import NaT, DataFrame
 
 
 class Jira:
-    def __init__(self, jira_config, workflow):
+    def __init__(self, jira_config: dict, workflow: dict):
         self.jira_config = jira_config
         self.workflow = workflow
 
@@ -21,6 +21,7 @@ class Jira:
         self.cache = reader.cache.Cache(cache_name(self))
 
     def get_issue_data(self, issue, issue_data):
+        logging.debug("Getting data for issue " + issue.key)
         issue_data["Key"].append(issue.key)
         issue_data["Type"].append(issue.fields.issuetype.name)
         issue_data["Created"].append(
@@ -46,6 +47,7 @@ class Jira:
             issue_data[workflow_step].append(history_item[workflow_step])
 
     def get_issues(self):
+        logging.debug("Getting chunk of issue")
 
         jira = self.get_jira_instance()
         issues = []
@@ -65,8 +67,9 @@ class Jira:
 
         return issues
 
-    def get_data(self):
+    def get_data(self) -> DataFrame:
         """Retrieve data from jira and return as a Data Frame"""
+        logging.debug("Getting data from jira")
 
         if self.jira_config["cache"] and self.cache.is_valid():
             logging.debug("Getting jira info cached ")
@@ -111,6 +114,7 @@ class Jira:
                 "key_cert": key_cert_data,
             }
 
+            logging.debug("Connecting to jira")
             jira = JIRA(jira_url, oauth=oauth_dict)
         else:
             jira = JIRA(
