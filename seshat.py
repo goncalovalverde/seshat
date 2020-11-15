@@ -1,5 +1,4 @@
 #!/usr/bin/python
-from numpy.core.fromnumeric import cumprod
 import yaml
 import reader
 import calculator.flow
@@ -8,6 +7,7 @@ import viewer.dash
 import logging
 import logging.config
 import writer
+import config
 
 with open("log_config.yaml", "r") as f:
     log_config = yaml.safe_load(f.read())
@@ -16,10 +16,7 @@ with open("log_config.yaml", "r") as f:
 logger = logging.getLogger(__name__)
 logger.info("Starting seshat. Let's do team magic!")
 
-with open("config.yml", "r") as f:
-    config = yaml.load(f.read(), Loader=yaml.FullLoader)
-    # Add special "issue_type" Total to ensure we can see the total in all graphs
-    config["issue_type"].insert(0, "Total")
+config = config.get()
 
 cycle_data = reader.read_data(config)
 
