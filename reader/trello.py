@@ -54,6 +54,7 @@ class Trello:
         return df_card_data
 
     def get_card_data(self, card, card_data):
+        logging.debug("Getting data for card " + card.id)
         card_data["Key"].append(card.id)
         card_data["Name"].append(card.name)
         card_data["Created"].append(card.created_date.replace(tzinfo=None))
@@ -61,7 +62,8 @@ class Trello:
         done = NaT
 
         for movement in card.list_movements():
-            if movement["destination"]["name"] == "Done 🏆":
+            if movement["destination"]["name"] == self.trello_config["done_column"]:
                 done = movement["datetime"].replace(tzinfo=None)
+                logging.debug("Got done date: " + str(done))
 
         card_data["Done"].append(done)
