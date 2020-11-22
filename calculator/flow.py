@@ -3,6 +3,26 @@ import pandas as pd
 import logging
 
 
+def cycle_data(data, config):
+    # get the first element of the workflow
+    # to know where to start calculating the lead time
+    workflow_keys = list(config["Workflow"].keys())
+    start = workflow_keys[0]
+    start = "Created"
+
+    # adding lead time to cycle_data
+    cycle_data = lead_time(data, start)
+
+    # adding cycle_time (between workflow steps) to cycle_data
+    for i in range(len(workflow_keys) - 1):
+        start = workflow_keys[i]
+        end = workflow_keys[i + 1]
+        # adding cycle_time to cycle_data
+        cycle_time(cycle_data, start, end)
+
+    return cycle_data
+
+
 # Productivity - How Much - "Do Lots"
 def throughput(cycle_data):
     throughput = group_by_date(cycle_data, "Done")

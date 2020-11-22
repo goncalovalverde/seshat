@@ -6,17 +6,17 @@ import numpy as np
 import calculator.flow
 import logging
 
-from calculator.flow import story_points
-
 
 # TODO: refactor to remove cycle_data and throughput to invocation of internal
 # methods and use the class properties instead
 class Team_Metrics:
-    def __init__(self, cycle_data, throughput, config):
+    def __init__(self, cycle_data, config):
         self.cycle_data = cycle_data
-        self.throughput = throughput
+        self.throughput = calculator.flow.throughput(self.cycle_data)
         self.config = config
+        self.name = config["name"]
         self.has_story_points = True if "Story Points" in cycle_data else False
+        self.issue_types = config["issue_types"]
         pd.options.plotting.backend = "plotly"
 
     def draw_throughput(self, type):
@@ -118,7 +118,7 @@ class Team_Metrics:
 
     def draw_wip(self, type):
         wip = calculator.flow.net_flow(self.cycle_data, type)
-        # wip = wip.resample("W").sum()
+        wip = wip.resample("W").sum()
         fig = wip["WIP"].plot.bar()
         fig.update_layout(
             title="Work in Progress",

@@ -1,4 +1,5 @@
 import dash
+from dash_bootstrap_components._components.DropdownMenuItem import DropdownMenuItem
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_table
@@ -8,11 +9,12 @@ import logging
 
 
 class Dash:
-    def __init__(self, team_metrics, config):
+    def __init__(self, projects, config):
         super().__init__()
         self.config = config
-        self.team_metrics = team_metrics
-        external_stylesheets = [dbc.themes.LUX]
+        self.team_metrics = projects[0]
+        self.projects = projects
+        external_stylesheets = [dbc.themes.SKETCHY]
 
         self.app = dash.Dash(
             __name__,
@@ -72,10 +74,7 @@ class Dash:
                     [
                         dcc.Dropdown(
                             id="issue-type-sel-main",
-                            options=[
-                                {"label": i, "value": i}
-                                for i in self.config["issue_type"]
-                            ],
+                            options=[{"label": i, "value": i} for i in tm.issue_types],
                             value="Total",
                             clearable=False,
                         )
@@ -117,10 +116,7 @@ class Dash:
                     [
                         dcc.Dropdown(
                             id="issue-type-sel-hist",
-                            options=[
-                                {"label": i, "value": i}
-                                for i in self.config["issue_type"]
-                            ],
+                            options=[{"label": i, "value": i} for i in tm.issue_types],
                             value="Total",
                             clearable=False,
                         )
@@ -165,10 +161,7 @@ class Dash:
                     [
                         dcc.Dropdown(
                             id="issue-type-sel-wip",
-                            options=[
-                                {"label": i, "value": i}
-                                for i in self.config["issue_type"]
-                            ],
+                            options=[{"label": i, "value": i} for i in tm.issue_types],
                             value="Total",
                             clearable=False,
                         )
@@ -259,6 +252,21 @@ class Dash:
             label="Explore",
         )
 
+        project_menu = (
+            dbc.DropdownMenu(
+                children=[
+                    dbc.DropdownMenuItem(project.name, href=f"/{str(i)}")
+                    for i, project in enumerate(self.projects)
+                ],
+                nav=True,
+                in_navbar=True,
+                color="secondary",
+                label="Select Project",
+            )
+            if len(self.projects) > 1
+            else ""
+        )
+
         navbar = dbc.Navbar(
             dbc.Container(
                 [
@@ -285,7 +293,9 @@ class Dash:
                     ),
                     dbc.NavbarToggler(id="navbar-toggler2"),
                     dbc.Collapse(
-                        dbc.Nav([dropdown], className="ml-auto", navbar=True),
+                        dbc.Nav(
+                            [dropdown, project_menu], className="ml-auto", navbar=True
+                        ),
                         id="navbar-collapse2",
                         navbar=True,
                     ),
@@ -310,6 +320,11 @@ class Dash:
         elif pathname == "/throughput":
             return self.show_throughput_dash()
         else:
+            import regex as re
+
+            idx = re.search(r"\d+", pathname)
+            if idx:
+                self.team_metrics = self.projects[int(idx.group())]
             return self.show_main_dash()
 
     def run(self):

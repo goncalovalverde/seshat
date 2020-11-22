@@ -1,6 +1,8 @@
+from array import ArrayType
 from jira import JIRA
 import dateutil.parser
 import logging
+from numpy.core.records import array
 import reader.cache
 import hashlib
 from pandas import NaT, DataFrame
@@ -47,7 +49,7 @@ class Jira:
             issue_data[workflow_step].append(history_item[workflow_step])
 
     def get_issues(self):
-        logging.debug("Getting chunk of issue")
+        logging.debug("Getting chunk of issues")
 
         jira = self.get_jira_instance()
         issues = []

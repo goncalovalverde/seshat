@@ -18,31 +18,17 @@ logger.info("Starting seshat. Let's do team magic!")
 
 config = config.get()
 
-cycle_data = reader.read_data(config)
+projects = []
+for source_config in config["input"]:
+    data = reader.read_data(source_config)
+    cycle_data = calculator.flow.cycle_data(data, source_config)
+    team_metrics = viewer.team_metrics.Team_Metrics(cycle_data, source_config)
+    projects.append(team_metrics)
 
-throughput = calculator.flow.throughput(cycle_data)
-
-# get the first element of the workflow
-# to know where to start calculating the lead time
-workflow_keys = list(config["Workflow"].keys())
-start = workflow_keys[0]
-start = "Created"
-
-# adding lead time to cycle_data
-cycle_data = calculator.flow.lead_time(cycle_data, start)
-
-# adding cycle_time (between workflow steps) to cycle_data
-for i in range(len(workflow_keys) - 1):
-    start = workflow_keys[i]
-    end = workflow_keys[i + 1]
-    # adding cycle_time to cycle_data
-    calculator.flow.cycle_time(cycle_data, start, end)
-
-team_metrics = viewer.team_metrics.Team_Metrics(cycle_data, throughput, config)
-dash = viewer.dash.Dash(team_metrics, config)
+dash = viewer.dash.Dash(projects, config)
 
 if config["output"]:
-    writer.write_data(cycle_data, config["output"])
+    writer.write_data(projects[0].cycle_data, config["output"])
 
 server = dash.server
 
