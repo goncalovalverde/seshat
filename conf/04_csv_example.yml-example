@@ -1,0 +1,19 @@
+name: CSV example
+mode: csv
+csv:
+  file: my_raw_data.csv
+
+Workflow:
+  To Do: To Do
+  In Progress: In Progress
+  Waiting for Response: Waiting for Response
+  Approval: Approval
+  Review: Review
+  Done: Done
+
+issue_types:
+  - Bug
+  - Story
+  - Task
+  - Spike
+

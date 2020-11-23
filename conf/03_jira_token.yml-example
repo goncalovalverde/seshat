@@ -1,0 +1,30 @@
+name: Jira Token Example
+mode: jira
+jira:
+  username: YOUR USERNAME
+  password: YOUR_TOKEN/PASSWORD
+  url: https://foobar.atlassian.net
+  jql_query: PROJECT ='FUBAR'
+          AND
+          issuetype in ("story","task","bug")
+  auth_method: token #can be token or oauth
+  cache: true #can be true or false
+
+  story_points_field: CUSTOM FIELD FOR STORY POINTS
+  sprints_field: CUSTOM FIELD FOR SPRINTS
+
+Workflow:
+  To Do: To Do
+  In Progress: In Progress
+  Waiting for Response: Waiting for Response
+  Approval: Approval
+  Review: Review
+  Done: Done
+  
+
+issue_types:
+  - Bug
+  - Story
+  - Task
+  - Spike
+

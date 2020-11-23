@@ -6,12 +6,14 @@ import dash_table
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 import logging
+import regex as re
 
 
 class Dash:
     def __init__(self, projects, config):
         super().__init__()
         self.config = config
+        # TODO: remove/review this after refactoring the main dashboard to list projects
         self.team_metrics = projects[0]
         self.projects = projects
         external_stylesheets = [dbc.themes.SKETCHY]
@@ -320,8 +322,6 @@ class Dash:
         elif pathname == "/throughput":
             return self.show_throughput_dash()
         else:
-            import regex as re
-
             idx = re.search(r"\d+", pathname)
             if idx:
                 self.team_metrics = self.projects[int(idx.group())]
