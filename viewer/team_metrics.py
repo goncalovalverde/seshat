@@ -72,10 +72,18 @@ class Team_Metrics:
         return fig
 
     def draw_story_points(self):
-        story_points = calculator.flow.story_points(self.cycle_data).resample("W").sum()
-        fig = story_points.plot.line()
+        try:
+            story_points = (
+                calculator.flow.story_points(self.cycle_data).resample("W").sum()
+            )
+            fig = story_points.plot.line()
 
-        return fig
+            return fig
+        except AttributeError:
+            logging.error(
+                "No valid Story Points found. Are you sure you configured the custom field right?"
+            )
+            return {}
 
     def draw_lead_time(self, type):
         lead_time = calculator.flow.avg_lead_time(self.cycle_data, type)

@@ -322,9 +322,9 @@ class Dash:
         elif pathname == "/throughput":
             return self.show_throughput_dash()
         else:
-            idx = re.search(r"\d+", pathname)
+            idx = re.search(r"/(\d+)", pathname)
             if idx:
-                self.team_metrics = self.projects[int(idx.group())]
+                self.team_metrics = self.projects[int(idx.group(1))]
             return self.show_main_dash()
 
     def run(self):
