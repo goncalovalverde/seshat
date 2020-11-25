@@ -35,7 +35,8 @@ class Dash:
         )
 
         self.app.callback(
-            Output("page-content", "children"), [Input("url", "pathname")]
+            [Output("page-content", "children"), Output("nav-bar-brand", "children")],
+            [Input("url", "pathname")],
         )(self.display_page)
 
         self.app.callback(
@@ -283,8 +284,9 @@ class Dash:
                                 ),
                                 dbc.Col(
                                     dbc.NavbarBrand(
-                                        "Seshat - Team Metrics Analysis",
+                                        self.app.title,
                                         className="ml-2",
+                                        id="nav-bar-brand",
                                     )
                                 ),
                             ],
@@ -311,21 +313,24 @@ class Dash:
         return navbar
 
     def display_page(self, pathname):
+        idx = re.search(r"/(\d+)", pathname)
+        if idx:
+            self.team_metrics = self.projects[int(idx.group(1))]
+
+        title = f"{self.app.title} : {self.team_metrics.name}"
+
         if pathname:
             logging.debug("Changing page to " + pathname)
         if pathname == "/lead_cycle_time":
-            return self.show_hist_dash()
+            return self.show_hist_dash(), title
         elif pathname == "/raw_data":
-            return self.show_raw_data()
+            return self.show_raw_data(), title
         elif pathname == "/wip":
-            return self.show_wip_dash()
+            return self.show_wip_dash(), title
         elif pathname == "/throughput":
-            return self.show_throughput_dash()
+            return self.show_throughput_dash(), title
         else:
-            idx = re.search(r"/(\d+)", pathname)
-            if idx:
-                self.team_metrics = self.projects[int(idx.group(1))]
-            return self.show_main_dash()
+            return self.show_main_dash(), title
 
     def run(self):
         self.app.run_server(debug=True)
