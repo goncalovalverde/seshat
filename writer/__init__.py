@@ -12,3 +12,7 @@ def write_data(data, config):
         data.to_csv(config["filename"], index=False)
     else:
         logging.debug("I don't have a clue of what I should be doing")
+
+
+def export_csv(data):
+    return True

@@ -5,6 +5,8 @@ import dash_html_components as html
 import dash_table
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
+from dash_extensions import Download
+from dash_extensions.snippets import send_data_frame
 import logging
 import regex as re
 
@@ -56,6 +58,10 @@ class Dash:
             ],
             [Input("issue-type-sel-main", "value")],
         )(self.update_main_dash)
+
+        self.app.callback(
+            Output("download", "data"), [Input("download_csv_btn", "n_clicks")]
+        )(self.export_to_csv)
 
         self.app.callback(
             [Output("wip-graph", "figure"), Output("start_stop-graph", "figure")],
@@ -145,10 +151,20 @@ class Dash:
 
     def show_raw_data(self):
         df = self.team_metrics.cycle_data
-        layout = dash_table.DataTable(
-            id="table",
-            columns=[{"name": i, "id": i} for i in df.columns],
-            data=df.to_dict("records"),
+        layout = (
+            html.Div(
+                [
+                    html.Button(
+                        "Download data as CSV file", id="download_csv_btn", n_clicks=0
+                    ),
+                    Download(id="download"),
+                ]
+            ),
+            dash_table.DataTable(
+                id="table",
+                columns=[{"name": i, "id": i} for i in df.columns],
+                data=df.to_dict("records"),
+            ),
         )
         return layout
 
@@ -311,6 +327,14 @@ class Dash:
         )
 
         return navbar
+
+    def export_to_csv(self, n_clicks):
+        if n_clicks > 0:
+            logging.debug("Downloading CSV file")
+            return send_data_frame(
+                self.team_metrics.cycle_data.to_csv,
+                filename=f"{self.team_metrics.name}.csv",
+            )
 
     def display_page(self, pathname):
         idx = re.search(r"/(\d+)", pathname)

@@ -27,10 +27,6 @@ for source_config in config["input"]:
 
 dash = viewer.dash.Dash(projects, config)
 
-# TODO: refactor the output to handle multi projects
-if config["output"]:
-    writer.write_data(projects[0].cycle_data, config["output"])
-
 server = dash.server
 
 if __name__ == "__main__":
