@@ -226,6 +226,14 @@ class Dash:
         )
         return layout
 
+    def show_cfd(self):
+        tm = self.team_metrics
+        fig_cfd = tm.draw_cfd("Total")
+
+        layout = html.Div(children=[dcc.Graph(id="cfd-graph", figure=fig_cfd)])
+
+        return layout
+
     def update_main_dash(self, type):
         logging.debug("Updating main dashboard for type " + type)
         tm = self.team_metrics
@@ -353,6 +361,8 @@ class Dash:
             return self.show_wip_dash(), title
         elif pathname == "/throughput":
             return self.show_throughput_dash(), title
+        elif pathname == "/cfd":
+            return self.show_cfd(), title
         else:
             return self.show_main_dash(), title
 

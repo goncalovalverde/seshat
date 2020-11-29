@@ -13,6 +13,7 @@ class Team_Metrics:
     def __init__(self, cycle_data, config):
         self.cycle_data = cycle_data
         self.throughput = calculator.flow.throughput(self.cycle_data)
+        self.cfd = calculator.flow.cfd(self.cycle_data, config)
         self.config = config
         self.name = config["name"]
         self.has_story_points = True if "Story Points" in cycle_data else False
@@ -125,8 +126,7 @@ class Team_Metrics:
         return fig
 
     def draw_wip(self, type):
-        wip = calculator.flow.net_flow(self.cycle_data, type)
-        wip = wip.resample("W").sum()
+        wip = calculator.flow.wip(self.cfd)
         fig = wip["WIP"].plot.bar()
         fig.update_layout(
             title="Work in Progress",
@@ -206,6 +206,10 @@ class Team_Metrics:
             figures.append(fig)
 
         return figures
+
+    def draw_cfd(self, type):
+        fig = self.cfd.plot.line()
+        return fig
 
     def add_trendline(self, df, fig, column):
         # This is needed because we can't use DateTimeIndex as input for OLS
