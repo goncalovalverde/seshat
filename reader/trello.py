@@ -1,5 +1,5 @@
 from trello import TrelloClient
-from pandas import NaT, DataFrame
+from pandas import NaT, DataFrame, isnull
 import reader.cache
 import hashlib
 import logging
@@ -54,7 +54,11 @@ class Trello:
         return df_card_data
 
     def get_card_data(self, card, card_data):
-        logging.debug("Getting data for card " + card.id)
+        if card.get_list().name in self.trello_config["ignore"]:
+            logging.debug(f"Card in ignored list {card.get_list().name}")
+            return
+
+        logging.debug(f"Getting data for card {card.id} in list {card.get_list().name}")
         card_data["Key"].append(card.id)
         card_data["Name"].append(card.name)
         card_data["Created"].append(card.created_date.replace(tzinfo=None))
@@ -65,5 +69,10 @@ class Trello:
             if movement["destination"]["name"] == self.trello_config["done_column"]:
                 done = movement["datetime"].replace(tzinfo=None)
                 logging.debug("Got done date: " + str(done))
+
+        # If card was not moved to done column(s) but was already closed (archived)
+        if isnull(done) and card.closed:
+            done = card.dateLastActivity.replace(tzinfo=None)
+            logging.debug(f"Card is closed. using last activity date: {done}")
 
         card_data["Done"].append(done)
