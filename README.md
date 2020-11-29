@@ -1,6 +1,10 @@
 # Seshat
 
-A tool to extract metrics from agile tools such as Jira (currently only supporting Jira and CSV).
+A tool to extract metrics from agile tools such as Jira.
+Currently the following sources of information are supported:
+- Jira
+- Trello
+- CSV file
 It is heavilly influenced by the work of Troy Magennis (https://www.focusedobjective.com/) 
 
 ## Instalation
@@ -13,13 +17,24 @@ Install Python 3 and the pip package manager. Then run to install required modul
      
 ## Configuration
 
-Two configuration files exist, one for configuring logging (log_config.yml) and another for the app configuration (config.yml)
+Two major configuration files exist, one for configuring logging (log_config.yml) and another for the app main configuration (config.yml)
+Also for each project/team a config file needs to be created and stored in the directory configured in config.yml.
+Please check conf/ directory with several examples for each case:
+- Jira with oauth
+- Jira with token
+- Trello
+- CSV file
 
 ### config.yaml
-An example file is provided called config.yml-example.
+This file provide basic needed information:
+config_dir: directory where configuration files for each project are stored
+cache_dir: the directory where cache files are stored (needs yet to be implemented)
 
-Copy this file to config.yml and change it according to your needs.
+### log_config.yml
 
+Change this file to your needs. By default it writes to /tmp/seshat.log
+
+### Project configuration files
 #### Jira passwords
 
 One important note about jira passwords. Jira cloud version no longer support passwords and you need to create an API token instead and then copy&paste it to the password field.
@@ -31,9 +46,12 @@ https://confluence.atlassian.com/cloud/api-tokens-938839638.html
 If using oauth authentication you can use the python jira-oauth package to do the oauth dance and get the token and secret:
 https://pypi.org/project/jira-oauth/
 
-### log_config.yml
+### Trello
+You need to get a trello API key and secret 
+Check here for more information:
+https://trello.com/app-key
 
-Change this file to your needs. By default it writes to /tmp/seshat.log
+(in the future oauth support will be provided)
 
 ## Usage
 ### Starting
