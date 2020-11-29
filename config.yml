@@ -1,0 +1,5 @@
+cache_dir: /tmp/
+config_dir: conf
+
+web:
+  root: /
