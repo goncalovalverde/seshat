@@ -2,6 +2,7 @@
 
 A tool to extract metrics from agile tools such as Jira.
 It is heavilly influenced by the work of Troy Magennis (https://www.focusedobjective.com/) 
+
 Currently the following sources of information are supported:
 - Jira
 - Trello
