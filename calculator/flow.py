@@ -102,7 +102,7 @@ def avg_lead_time(cycle_data, type):
 
 
 # Predictability - How Repeatable - "Do it Predictably"
-def net_flow(cycle_data, type):
+def net_flow(cycle_data, type) -> pd.DataFrame:
     created = group_by_date(cycle_data, "Created")
     done = group_by_date(cycle_data, "Done")
 
@@ -118,7 +118,7 @@ def net_flow(cycle_data, type):
     return net_flow
 
 
-def wip(cfd_data):
+def wip(cfd_data) -> pd.DataFrame:
     return pd.DataFrame(
         {"WIP": cfd_data["Created"] - cfd_data["Done"]}, index=cfd_data.index
     )
@@ -177,7 +177,8 @@ def defect_percentage(throughput, type):
     return throughput
 
 
-def group_by_date(cycle_data, index):
+def group_by_date(cycle_data, index) -> pd.DataFrame:
+    """Group information in cycle_date by date and use index as index"""
     table = pd.pivot_table(
         cycle_data,
         values="Key",
