@@ -89,7 +89,9 @@ class Dash:
                         )
                     ],
                     style={"width": "18%", "left": "right", "display": "inline-block"},
-                ),
+                )
+                if len(tm.issue_types) > 2
+                else "",
                 html.Div(
                     children=[
                         dcc.Graph(id="throughput-graph", figure=fig_throughput),
@@ -131,7 +133,9 @@ class Dash:
                         )
                     ],
                     style={"width": "18%", "left": "right", "display": "inline-block"},
-                ),
+                )
+                if len(tm.issue_types) > 2
+                else "",
                 html.Div(
                     children=[
                         dcc.Graph(id="lead-time-graph", figure=fig_lead_time_hist),
@@ -186,7 +190,9 @@ class Dash:
                         )
                     ],
                     style={"width": "18%", "left": "right", "display": "inline-block"},
-                ),
+                )
+                if len(tm.issue_types) > 2
+                else "",
                 html.Div(
                     children=[
                         dcc.Graph(id="wip-graph", figure=fig_wip),
