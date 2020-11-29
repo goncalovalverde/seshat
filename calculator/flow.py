@@ -1,6 +1,7 @@
 from logging import exception
 import pandas as pd
 import logging
+import numpy as np
 
 
 def cycle_data(data, config):
@@ -113,7 +114,45 @@ def net_flow(cycle_data, type):
     # We calculate this using cumulative sum
     net_flow["WIP"] = net_flow[type + "_x"].cumsum() - net_flow[type + "_y"].cumsum()
     net_flow = net_flow.fillna(0)
+
     return net_flow
+
+
+def wip(cfd_data):
+    return pd.DataFrame(
+        {"WIP": cfd_data["Created"] - cfd_data["Done"]}, index=cfd_data.index
+    )
+
+
+def cfd(cycle_data, config):
+    cycle_names = [s for s in config["Workflow"]]
+    cycle_names.insert(0, "Created")
+    cfd_data = cycle_data[cycle_names]
+
+    # Strip out times from all dates
+    cfd_data = pd.DataFrame(
+        np.array(cfd_data.values, dtype="<M8[ns]").astype("<M8[D]").astype("<M8[ns]"),
+        columns=cfd_data.columns,
+        index=cfd_data.index,
+    )
+
+    # Replace missing NaT values (happens if a status is skipped) with the subsequent timestamp
+    cfd_data = cfd_data.fillna(method="bfill", axis=1)
+
+    # Count number of times each date occurs, preserving column order
+    cfd_data = pd.concat(
+        {col: cfd_data[col].value_counts() for col in cfd_data}, axis=1
+    )[cycle_names]
+
+    # Fill missing dates with 0 and run a cumulative sum
+    cfd_data = cfd_data.fillna(0).cumsum(axis=0).sort_index()
+
+    # Reindex to make sure we have all dates
+    start, end = cfd_data.index.min(), cfd_data.index.max()
+    if start is not pd.NaT and end is not pd.NaT:
+        cfd_data = cfd_data.reindex(pd.date_range(start, end, freq="D"), method="ffill")
+
+    return cfd_data
 
 
 # Quality - How Well - "Do it Right"
