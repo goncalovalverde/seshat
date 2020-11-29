@@ -21,6 +21,7 @@ Install Python 3 and the pip package manager. Then run to install required modul
 
 Two major configuration files exist, one for configuring logging (log_config.yml) and another for the app main configuration (config.yml)
 Also for each project/team a config file needs to be created and stored in the directory configured in config.yml.
+
 Please check conf/ directory with several examples for each case:
 - Jira with oauth
 - Jira with token
