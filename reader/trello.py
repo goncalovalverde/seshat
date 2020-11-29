@@ -18,7 +18,7 @@ class Trello:
 
         self.cache = reader.cache.Cache(cache_name(self))
 
-    def get_trello_instance(self):
+    def get_trello_instance(self) -> TrelloClient:
         logging.info("Getting Trello client info")
         client = TrelloClient(
             api_key=self.trello_config["api_key"],
@@ -27,8 +27,9 @@ class Trello:
 
         return client
 
-    def get_cards(self):
+    def get_cards(self) -> DataFrame:
         """ Retrieve card info from Trello """
+        """ Returns results as a pandas DataFrame"""
 
         if self.trello_config["cache"] and self.cache.is_valid():
             logging.debug("Getting Trello info cached ")
@@ -54,6 +55,7 @@ class Trello:
         return df_card_data
 
     def get_card_data(self, card, card_data):
+        """Read card data information and append it to card_data array"""
         if card.get_list().name in self.trello_config["ignore"]:
             logging.debug(f"Card in ignored list {card.get_list().name}")
             return
