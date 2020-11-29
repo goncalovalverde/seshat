@@ -23,9 +23,11 @@ class Jira:
         self.cache = reader.cache.Cache(cache_name(self))
 
     def get_issue_data(self, issue, issue_data):
+        """Iterate over issue data and append it into issue_data array"""
         logging.debug("Getting data for issue " + issue.key)
         issue_data["Key"].append(issue.key)
         issue_data["Type"].append(issue.fields.issuetype.name)
+
         issue_data["Created"].append(
             dateutil.parser.parse(issue.fields.created).replace(tzinfo=None)
         )
@@ -36,17 +38,19 @@ class Jira:
 
         history_item = {}
         for workflow_step in self.workflow:
-            history_item[workflow_step] = NaT
+            if workflow_step != "Created":
+                history_item[workflow_step] = NaT
 
         for history in issue.changelog.histories:
-            for item in history.items:
-                if item.field == "status":
-                    history_item[item.toString] = dateutil.parser.parse(
-                        history.created
-                    ).replace(tzinfo=None)
+            items = filter(lambda item: item.field == "status", history.items)
+            for item in items:
+                history_item[item.toString] = dateutil.parser.parse(
+                    history.created
+                ).replace(tzinfo=None)
 
         for workflow_step in self.workflow:
-            issue_data[workflow_step].append(history_item[workflow_step])
+            if workflow_step != "Created":
+                issue_data[workflow_step].append(history_item[workflow_step])
 
     def get_issues(self):
         logging.debug("Getting chunk of issues")
@@ -56,6 +60,7 @@ class Jira:
         i = 0
         chunk_size = 100
         while True:
+            logging.debug(f"Getting chunk {i} of {chunk_size} issues")
             chunk = jira.search_issues(
                 self.jira_config["jql_query"],
                 expand="changelog",
