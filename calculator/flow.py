@@ -124,10 +124,15 @@ def wip(cfd_data) -> pd.DataFrame:
     )
 
 
-def cfd(cycle_data, config):
+def cfd(cycle_data, config, type="Total"):
     cycle_names = [s for s in config["Workflow"]]
     cycle_names.insert(0, "Created")
-    cfd_data = cycle_data[cycle_names]
+    cfd_data = cycle_data
+
+    if type != "Total":
+        cfd_data = cfd_data.loc[cfd_data["Type"] == type]
+
+    cfd_data = cfd_data[cycle_names]
 
     # Strip out times from all dates
     cfd_data = pd.DataFrame(
