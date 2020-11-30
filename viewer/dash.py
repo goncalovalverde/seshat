@@ -79,19 +79,7 @@ class Dash:
         layout = html.Div(
             children=[
                 html.H1(children="Team Metrics Main Dashboard"),
-                html.Div(
-                    [
-                        dcc.Dropdown(
-                            id="issue-type-sel-main",
-                            options=[{"label": i, "value": i} for i in tm.issue_types],
-                            value="Total",
-                            clearable=False,
-                        )
-                    ],
-                    style={"width": "18%", "left": "right", "display": "inline-block"},
-                )
-                if len(tm.issue_types) > 2
-                else "",
+                self.menu_issue_types(),
                 html.Div(
                     children=[
                         dcc.Graph(id="throughput-graph", figure=fig_throughput),
@@ -123,19 +111,7 @@ class Dash:
         layout = html.Div(
             children=[
                 html.H1(children="Team Metrics Lead & Cycle Time"),
-                html.Div(
-                    [
-                        dcc.Dropdown(
-                            id="issue-type-sel-hist",
-                            options=[{"label": i, "value": i} for i in tm.issue_types],
-                            value="Total",
-                            clearable=False,
-                        )
-                    ],
-                    style={"width": "18%", "left": "right", "display": "inline-block"},
-                )
-                if len(tm.issue_types) > 2
-                else "",
+                self.menu_issue_types(),
                 html.Div(
                     children=[
                         dcc.Graph(id="lead-time-graph", figure=fig_lead_time_hist),
@@ -180,19 +156,7 @@ class Dash:
         layout = html.Div(
             children=[
                 html.H1(children="Team Metrics WIP"),
-                html.Div(
-                    [
-                        dcc.Dropdown(
-                            id="issue-type-sel-wip",
-                            options=[{"label": i, "value": i} for i in tm.issue_types],
-                            value="Total",
-                            clearable=False,
-                        )
-                    ],
-                    style={"width": "18%", "left": "right", "display": "inline-block"},
-                )
-                if len(tm.issue_types) > 2
-                else "",
+                self.menu_issue_types(),
                 html.Div(
                     children=[
                         dcc.Graph(id="wip-graph", figure=fig_wip),
@@ -236,7 +200,12 @@ class Dash:
         tm = self.team_metrics
         fig_cfd = tm.draw_cfd("Total")
 
-        layout = html.Div(children=[dcc.Graph(id="cfd-graph", figure=fig_cfd)])
+        layout = html.Div(
+            children=[
+                html.H1(children="CFD"),
+                html.Div(children=[dcc.Graph(id="cfd-graph", figure=fig_cfd)]),
+            ]
+        )
 
         return layout
 
@@ -342,6 +311,26 @@ class Dash:
         )
 
         return navbar
+
+    def menu_issue_types(self):
+        tm = self.team_metrics
+        menu_issue_types = (
+            html.Div(
+                [
+                    dcc.Dropdown(
+                        id="issue-type-sel-wip",
+                        options=[{"label": i, "value": i} for i in tm.issue_types],
+                        value="Total",
+                        clearable=False,
+                    )
+                ],
+                style={"width": "18%", "left": "right", "display": "inline-block"},
+            )
+            if len(tm.issue_types) > 2
+            else ""
+        )
+
+        return menu_issue_types
 
     def export_to_csv(self, n_clicks):
         if n_clicks > 0:
