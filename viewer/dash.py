@@ -278,6 +278,7 @@ class Dash:
                 dbc.DropdownMenuItem("Lead & Cycle Time", href="/lead_cycle_time"),
                 dbc.DropdownMenuItem("WIP", href="/wip"),
                 dbc.DropdownMenuItem("Throughput", href="/throughput"),
+                dbc.DropdownMenuItem("CFD", href="/cfd"),
                 dbc.DropdownMenuItem("Raw Data", href="/raw_data"),
             ],
             nav=True,

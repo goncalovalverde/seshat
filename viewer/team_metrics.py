@@ -17,10 +17,10 @@ class Team_Metrics:
         self.config = config
         self.name = config["name"]
         self.has_story_points = True if "Story Points" in cycle_data else False
-        #        self.issue_types = config["issue_types"]
         self.issue_types = cycle_data["Type"].unique().tolist()
         # Append pseudo issue type "Total"
         self.issue_types.insert(0, "Total")
+
         pd.options.plotting.backend = "plotly"
 
     def draw_throughput(self, type):
@@ -31,7 +31,7 @@ class Team_Metrics:
         if type == "all":
             fig = throughput.plot.line(
                 title="Throughput : how many PBI's delivered",
-                labels={"value": "Throughput"},
+                labels={"value": "Throughput", "variable": "Issue Type  "},
             )
         else:
             fig = throughput[type].plot.line(
@@ -80,7 +80,10 @@ class Team_Metrics:
             story_points = (
                 calculator.flow.story_points(self.cycle_data).resample("W").sum()
             )
-            fig = story_points.plot.line()
+            fig = story_points.plot.line(
+                title="Velocity: Distribution of story points delivered",
+                labels={"value": "Count of Story Points"},
+            )
 
             return fig
         except AttributeError:
@@ -211,7 +214,9 @@ class Team_Metrics:
         return figures
 
     def draw_cfd(self, type):
+        logging.debug(f"Showing CFD for type {type}")
         fig = self.cfd.plot.line()
+        fig.update_traces(fill="tozeroy")
         return fig
 
     def add_trendline(self, df, fig, column):
