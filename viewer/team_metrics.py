@@ -13,7 +13,6 @@ class Team_Metrics:
     def __init__(self, cycle_data, config):
         self.cycle_data = cycle_data
         self.throughput = calculator.flow.throughput(self.cycle_data)
-        self.cfd = calculator.flow.cfd(self.cycle_data, config)
         self.config = config
         self.name = config["name"]
         self.has_story_points = True if "Story Points" in cycle_data else False
@@ -31,7 +30,7 @@ class Team_Metrics:
         if type == "all":
             fig = throughput.plot.line(
                 title="Throughput : how many PBI's delivered",
-                labels={"value": "Throughput", "variable": "Issue Type  "},
+                labels={"value": "Throughput", "variable": "Issue Type"},
             )
         else:
             fig = throughput[type].plot.line(
@@ -132,7 +131,7 @@ class Team_Metrics:
         return fig
 
     def draw_wip(self, type):
-        wip = calculator.flow.wip(self.cfd)
+        wip = calculator.flow.net_flow(self.cycle_data, type)
         fig = wip["WIP"].plot.bar()
         fig.update_layout(
             title="Work in Progress",
@@ -214,9 +213,14 @@ class Team_Metrics:
         return figures
 
     def draw_cfd(self, type):
+        cfd = calculator.flow.cfd(self.cycle_data, self.config)
         logging.debug(f"Showing CFD for type {type}")
-        fig = self.cfd.plot.line()
-        fig.update_traces(fill="tozeroy")
+        fig = cfd.plot.line(
+            labels={"value": "# of PBI's", "variable": "State", "index": "Date"},
+        )
+        fig.update_traces(
+            fill="tozeroy",
+        )
         return fig
 
     def add_trendline(self, df, fig, column):
