@@ -17,7 +17,10 @@ class Team_Metrics:
         self.config = config
         self.name = config["name"]
         self.has_story_points = True if "Story Points" in cycle_data else False
-        self.issue_types = config["issue_types"]
+        #        self.issue_types = config["issue_types"]
+        self.issue_types = cycle_data["Type"].unique().tolist()
+        # Append pseudo issue type "Total"
+        self.issue_types.insert(0, "Total")
         pd.options.plotting.backend = "plotly"
 
     def draw_throughput(self, type):

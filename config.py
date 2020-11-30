@@ -17,7 +17,6 @@ def get_input(config_dir):
         logging.error(f"Reading input configuration from {file_name}")
         with open(file_name, "r") as f:
             config = yaml.load(f.read(), Loader=yaml.FullLoader)
-            config["issue_types"].insert(0, "Total")
             input.append(config)
     return input
 
