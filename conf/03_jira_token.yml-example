@@ -20,11 +20,3 @@ Workflow:
   Approval: Approval
   Review: Review
   Done: Done
-  
-
-issue_types:
-  - Bug
-  - Story
-  - Task
-  - Spike
-
