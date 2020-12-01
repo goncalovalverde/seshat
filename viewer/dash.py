@@ -79,7 +79,7 @@ class Dash:
         layout = html.Div(
             children=[
                 html.H1(children="Team Metrics Main Dashboard"),
-                self.menu_issue_types(),
+                self.menu_issue_types("main"),
                 html.Div(
                     children=[
                         dcc.Graph(id="throughput-graph", figure=fig_throughput),
@@ -111,7 +111,7 @@ class Dash:
         layout = html.Div(
             children=[
                 html.H1(children="Team Metrics Lead & Cycle Time"),
-                self.menu_issue_types(),
+                self.menu_issue_types("hist"),
                 html.Div(
                     children=[
                         dcc.Graph(id="lead-time-graph", figure=fig_lead_time_hist),
@@ -156,7 +156,7 @@ class Dash:
         layout = html.Div(
             children=[
                 html.H1(children="Team Metrics WIP"),
-                self.menu_issue_types(),
+                self.menu_issue_types("wip"),
                 html.Div(
                     children=[
                         dcc.Graph(id="wip-graph", figure=fig_wip),
@@ -312,13 +312,13 @@ class Dash:
 
         return navbar
 
-    def menu_issue_types(self):
+    def menu_issue_types(self, dashboard):
         tm = self.team_metrics
         menu_issue_types = (
             html.Div(
                 [
                     dcc.Dropdown(
-                        id="issue-type-sel-wip",
+                        id=f"issue-type-sel-{dashboard}",
                         options=[{"label": i, "value": i} for i in tm.issue_types],
                         value="Total",
                         clearable=False,
