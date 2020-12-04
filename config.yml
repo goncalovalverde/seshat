@@ -1,5 +1,11 @@
-cache_dir: /tmp/
+# Where should we put our cache files?
+# Remember that the temporary directory goes away after a reboot
+cache_dir: /tmp
+
+# Where are we storing the input configurations?
 config_dir: conf
 
+# What will be the webroot ?
+# This is to allow reverse proxy. Not yet implemented
 web:
   root: /
