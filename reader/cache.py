@@ -1,11 +1,13 @@
 import os
 import pandas as pd
 import logging
+import config
 
 
 class Cache:
     def __init__(self, filename):
-        self.file = f"/tmp/seshat_cache_{filename}.pkl"
+        cache_dir = config.get("cache_dir")
+        self.file = f"{cache_dir}/seshat_cache_{filename}.pkl"
         logging.info("Initializing Cache")
 
     def write(self, data):
