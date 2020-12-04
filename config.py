@@ -3,12 +3,14 @@ import glob
 import logging
 
 
-def get():
+def get(type="all"):
     with open("config.yml", "r") as f:
         config = yaml.load(f.read(), Loader=yaml.FullLoader)
-        # Add special "issue_type" Total to ensure we can see the total in all graphs
-        config["input"] = get_input(config["config_dir"])
-    return config
+        if type == "all":
+            config["input"] = get_input(config["config_dir"])
+            return config
+        else:
+            return config[type]
 
 
 def get_input(config_dir):
