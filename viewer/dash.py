@@ -1,5 +1,4 @@
 import dash
-from dash_bootstrap_components._components.DropdownMenuItem import DropdownMenuItem
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_table
@@ -8,15 +7,16 @@ from dash.dependencies import Input, Output
 from dash_extensions import Download
 from dash_extensions.snippets import send_data_frame
 import logging
+from flask.globals import request
 import regex as re
+from werkzeug.exceptions import BadRequestKeyError
+import dash_pivottable
 
 
 class Dash:
     def __init__(self, projects, config):
         super().__init__()
         self.config = config
-        # TODO: remove/review this after refactoring the main dashboard to list projects
-        self.team_metrics = projects[0]
         self.projects = projects
         external_stylesheets = [dbc.themes.SKETCHY]
 
@@ -24,8 +24,8 @@ class Dash:
             __name__,
             external_stylesheets=external_stylesheets,
             suppress_callback_exceptions=True,
+            title="Seshat - A Team Metrics app",
         )
-        self.app.title = "Seshat - A Team Metrics app"
         self.server = self.app.server
 
         self.app.layout = html.Div(
@@ -68,9 +68,9 @@ class Dash:
             [Input("issue-type-sel-wip", "value")],
         )(self.update_wip_dash)
 
-    def show_main_dash(self):
+    def show_main_dash(self, team=0):
         logging.debug("Showing Main Team Metrics Dashboard")
-        tm = self.team_metrics
+        tm = self.projects[team]
         fig_throughput = tm.draw_throughput("Total")
         fig_defect_percentage = tm.draw_defect_percentage("Total")
         fig_lead_time = tm.draw_lead_time("Total")
@@ -79,7 +79,7 @@ class Dash:
         layout = html.Div(
             children=[
                 html.H1(children="Team Metrics Main Dashboard"),
-                self.menu_issue_types("main"),
+                self.menu_issue_types("main", team),
                 html.Div(
                     children=[
                         dcc.Graph(id="throughput-graph", figure=fig_throughput),
@@ -96,9 +96,9 @@ class Dash:
 
         return layout
 
-    def show_hist_dash(self):
+    def show_hist_dash(self, team=0):
         logging.debug("Showing Histogram Dashboard")
-        tm = self.team_metrics
+        tm = self.projects[team]
         fig_lead_time_hist = tm.draw_lead_time_hist("Total")
 
         figures = tm.draw_all_cycle_time_hist("Total")
@@ -129,8 +129,9 @@ class Dash:
 
         return layout
 
-    def show_raw_data(self):
-        df = self.team_metrics.cycle_data
+    def show_raw_data(self, team=0):
+        tm = self.projects[team]
+        df = tm.cycle_data
         layout = (
             html.Div(
                 [
@@ -148,15 +149,15 @@ class Dash:
         )
         return layout
 
-    def show_wip_dash(self):
-        tm = self.team_metrics
+    def show_wip_dash(self, team=0):
+        tm = self.projects[team]
         fig_wip = tm.draw_wip("Total")
         fig_start_stop = tm.draw_start_stop("Total")
 
         layout = html.Div(
             children=[
                 html.H1(children="Team Metrics WIP"),
-                self.menu_issue_types("wip"),
+                self.menu_issue_types("wip", team),
                 html.Div(
                     children=[
                         dcc.Graph(id="wip-graph", figure=fig_wip),
@@ -168,8 +169,8 @@ class Dash:
         )
         return layout
 
-    def show_throughput_dash(self):
-        tm = self.team_metrics
+    def show_throughput_dash(self, team=0):
+        tm = self.projects[team]
         fig_throughput = tm.draw_throughput("all")
         # TODO: improve this logic
         if tm.has_story_points:
@@ -196,8 +197,9 @@ class Dash:
         )
         return layout
 
-    def show_cfd(self):
-        tm = self.team_metrics
+    def show_cfd(self, team=0):
+        logging.debug("Showing CFD")
+        tm = self.projects[team]
         fig_cfd = tm.draw_cfd("Total")
 
         layout = html.Div(
@@ -209,9 +211,26 @@ class Dash:
 
         return layout
 
+    def show_pivottable(self, team=0):
+        tm = self.projects[team]
+        data = tm.cycle_data.values.tolist()
+        data.insert(0, tm.cycle_data.columns.to_list())
+        layout = html.Div(
+            children=[
+                html.H1(children="Pivot Table"),
+                html.Div(dash_pivottable.PivotTable(data=data)),
+            ]
+        )
+        return layout
+
     def update_main_dash(self, type):
+        try:
+            team = int(request.cookies["team_metrics_idx"])
+        except BadRequestKeyError:
+            team = 0
+
         logging.debug("Updating main dashboard for type " + type)
-        tm = self.team_metrics
+        tm = self.projects[team]
         fig_throughput = tm.draw_throughput(type)
         fig_defect_percentage = tm.draw_defect_percentage(type)
         fig_lead_time = tm.draw_lead_time(type)
@@ -219,8 +238,13 @@ class Dash:
         return fig_throughput, fig_defect_percentage, fig_lead_time, fig_net_flow
 
     def update_hist_dash(self, type):
+        try:
+            team = int(request.cookies["team_metrics_idx"])
+        except BadRequestKeyError:
+            team = 0
+
         logging.debug("Updating Histograms to type " + type)
-        tm = self.team_metrics
+        tm = self.projects[team]
         fig_lead_time_hist = tm.draw_lead_time_hist(type)
 
         figures = tm.draw_all_cycle_time_hist(type)
@@ -233,8 +257,12 @@ class Dash:
         return fig_lead_time_hist, cycle_time_fig
 
     def update_wip_dash(self, type):
+        try:
+            team = int(request.cookies["team_metrics_idx"])
+        except BadRequestKeyError:
+            team = 0
         logging.debug("Updating wip dashboard for type " + type)
-        tm = self.team_metrics
+        tm = self.projects[team]
         fig_wip = tm.draw_wip(type)
         fig_start_stop = tm.draw_start_stop(type)
 
@@ -312,8 +340,8 @@ class Dash:
 
         return navbar
 
-    def menu_issue_types(self, dashboard):
-        tm = self.team_metrics
+    def menu_issue_types(self, dashboard, team):
+        tm = self.projects[team]
         menu_issue_types = (
             html.Div(
                 [
@@ -333,34 +361,50 @@ class Dash:
         return menu_issue_types
 
     def export_to_csv(self, n_clicks):
+        try:
+            team = int(request.cookies["team_metrics_idx"])
+        except BadRequestKeyError:
+            team = 0
+
+        tm = self.projects[team]
+
         if n_clicks > 0:
             logging.debug("Downloading CSV file")
             return send_data_frame(
-                self.team_metrics.cycle_data.to_csv,
-                filename=f"{self.team_metrics.name}.csv",
+                tm.cycle_data.to_csv,
+                filename=f"{tm.name}.csv",
             )
 
     def display_page(self, pathname):
+
         idx = re.search(r"/(\d+)", pathname)
         if idx:
-            self.team_metrics = self.projects[int(idx.group(1))]
+            team = int(idx.group(1))
+            dash.callback_context.response.set_cookie("team_metrics_idx", str(team))
+        else:
+            try:
+                team = int(request.cookies["team_metrics_idx"])
+            except BadRequestKeyError:
+                team = 0
 
-        title = f"{self.app.title} : {self.team_metrics.name}"
+        title = f"{self.app.title} : {self.projects[team].name}"
 
         if pathname:
             logging.debug("Changing page to " + pathname)
         if pathname == "/lead_cycle_time":
-            return self.show_hist_dash(), title
+            return self.show_hist_dash(team), title
         elif pathname == "/raw_data":
-            return self.show_raw_data(), title
+            return self.show_raw_data(team), title
         elif pathname == "/wip":
-            return self.show_wip_dash(), title
+            return self.show_wip_dash(team), title
         elif pathname == "/throughput":
-            return self.show_throughput_dash(), title
+            return self.show_throughput_dash(team), title
         elif pathname == "/cfd":
-            return self.show_cfd(), title
+            return self.show_cfd(team), title
+        elif pathname == "/pivot":
+            return self.show_pivottable(team), title
         else:
-            return self.show_main_dash(), title
+            return self.show_main_dash(team), title
 
     def run(self):
         self.app.run_server(debug=True)
