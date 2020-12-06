@@ -13,3 +13,4 @@ setuptools
 wheel
 dash_bootstrap_components
 dash-extensions
+dash_pivottable
