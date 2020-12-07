@@ -124,8 +124,8 @@ def wip(cfd_data) -> pd.DataFrame:
     )
 
 
-def cfd(cycle_data, config, type="Total"):
-    cycle_names = [s for s in config["Workflow"]]
+def cfd(cycle_data, workflow, type="Total"):
+    cycle_names = [s for s in workflow]
     cycle_names.insert(0, "Created")
     cfd_data = cycle_data
 

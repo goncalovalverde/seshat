@@ -13,7 +13,7 @@ class Team_Metrics:
     def __init__(self, cycle_data, config):
         self.cycle_data = cycle_data
         self.throughput = calculator.flow.throughput(self.cycle_data)
-        self.config = config
+        self.workflow = config["Workflow"]
         self.name = config["name"]
         self.has_story_points = True if "Story Points" in cycle_data else False
         self.issue_types = cycle_data["Type"].unique().tolist()
@@ -202,7 +202,7 @@ class Team_Metrics:
             return {}
 
     def draw_all_cycle_time_hist(self, type):
-        workflow_keys = list(self.config["Workflow"].keys())
+        workflow_keys = list(self.workflow.keys())
         figures = []
 
         for i in range(len(workflow_keys) - 1):
@@ -213,7 +213,7 @@ class Team_Metrics:
         return figures
 
     def draw_cfd(self, type):
-        cfd = calculator.flow.cfd(self.cycle_data, self.config)
+        cfd = calculator.flow.cfd(self.cycle_data, self.workflow)
         logging.debug(f"Showing CFD for type {type}")
         fig = cfd.plot.line(
             labels={"value": "# of PBI's", "variable": "State", "index": "Date"},
