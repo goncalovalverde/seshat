@@ -8,6 +8,7 @@ trello:
   cache: true # can be true or false
 
 Workflow:
+  Created: Created
   To Do: To Do
   In Progress: In Progress
   Approval: Approval

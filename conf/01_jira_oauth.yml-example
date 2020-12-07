@@ -17,6 +17,7 @@ jira:
   sprints_field: CUSTOM FIELD FOR SPRINT
 
 Workflow:
+  Created: Created
   To Do: To Do
   In Progress: In Progress
   Approval: Approval

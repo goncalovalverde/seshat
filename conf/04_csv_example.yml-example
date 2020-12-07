@@ -4,6 +4,7 @@ csv:
   file: my_raw_data.csv
 
 Workflow:
+  Created: Created
   To Do: To Do
   In Progress: In Progress
   Waiting for Response: Waiting for Response
