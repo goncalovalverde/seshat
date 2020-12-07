@@ -111,7 +111,7 @@ class Dash:
         layout = html.Div(
             children=[
                 html.H1(children="Team Metrics Lead & Cycle Time"),
-                self.menu_issue_types("hist"),
+                self.menu_issue_types("hist", team),
                 html.Div(
                     children=[
                         dcc.Graph(id="lead-time-graph", figure=fig_lead_time_hist),
