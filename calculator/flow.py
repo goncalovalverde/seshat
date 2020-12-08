@@ -9,7 +9,7 @@ def cycle_data(data, config):
     # to know where to start calculating the lead time
     workflow_keys = list(config["Workflow"].keys())
     start = workflow_keys[0]
-    start = "Created"
+    # start = "Created"
 
     # adding lead time to cycle_data
     cycle_data = lead_time(data, start)
@@ -102,9 +102,9 @@ def avg_lead_time(cycle_data, type):
 
 
 # Predictability - How Repeatable - "Do it Predictably"
-def net_flow(cycle_data, type) -> pd.DataFrame:
-    created = group_by_date(cycle_data, "Created")
-    done = group_by_date(cycle_data, "Done")
+def net_flow(cycle_data, start, end, type) -> pd.DataFrame:
+    created = group_by_date(cycle_data, start)
+    done = group_by_date(cycle_data, end)
 
     net_flow = pd.merge(created, done, left_index=True, right_index=True, how="outer")
     net_flow = net_flow.fillna(0)
@@ -126,7 +126,7 @@ def wip(cfd_data) -> pd.DataFrame:
 
 def cfd(cycle_data, workflow, type="Total"):
     cycle_names = [s for s in workflow]
-    cycle_names.insert(0, "Created")
+    # cycle_names.insert(0, "Created")
     cfd_data = cycle_data
 
     if type != "Total":

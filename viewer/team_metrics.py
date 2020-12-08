@@ -13,9 +13,16 @@ class Team_Metrics:
     def __init__(self, cycle_data, config):
         self.cycle_data = cycle_data
         self.throughput = calculator.flow.throughput(self.cycle_data)
+
         self.workflow = config["Workflow"]
+
+        # Extract the beggining and end of the workflow
+        self.start_column = list(self.workflow.keys())[0]
+        self.end_column = list(self.workflow.keys())[-1]
+
         self.name = config["name"]
         self.has_story_points = True if "Story Points" in cycle_data else False
+
         self.issue_types = cycle_data["Type"].unique().tolist()
         # Append pseudo issue type "Total"
         self.issue_types.insert(0, "Total")
@@ -118,7 +125,11 @@ class Team_Metrics:
         return fig
 
     def draw_net_flow(self, type):
-        net_flow = calculator.flow.net_flow(self.cycle_data, type)
+        logging.debug("Drawing Net Flow")
+
+        net_flow = calculator.flow.net_flow(
+            self.cycle_data, self.start_column, self.end_column, type
+        )
         net_flow = net_flow.resample("W").sum()
         net_flow["Color"] = np.where(net_flow["Net Flow"] < 0, "red", "blue")
         fig = net_flow["Net Flow"].plot.bar(color=net_flow["Color"])
@@ -142,22 +153,26 @@ class Team_Metrics:
         return fig
 
     def draw_start_stop(self, type):
-        start = calculator.flow.group_by_date(self.cycle_data, "Created")
+        start = calculator.flow.group_by_date(self.cycle_data, self.start_column)
         start = start.resample("W").sum()
-        end = calculator.flow.group_by_date(self.cycle_data, "Done")
+        end = calculator.flow.group_by_date(self.cycle_data, self.end_column)
         end = end.resample("W").sum()
 
         fig = go.Figure()
         fig.add_trace(
-            go.Scatter(x=start.index, y=start[type], mode="lines", name="Created")
+            go.Scatter(
+                x=start.index, y=start[type], mode="lines", name=self.start_column
+            )
         )
-        fig.add_trace(go.Scatter(x=end.index, y=end[type], mode="lines", name="Done"))
+        fig.add_trace(
+            go.Scatter(x=end.index, y=end[type], mode="lines", name=self.end_column)
+        )
 
-        fig.update_layout(legend_xanchor="left", legend_x=0.01, title="Created vs Done")
+        fig.update_layout(legend_xanchor="left", legend_x=0.01, title="Started vs Done")
         return fig
 
     def draw_lead_time_hist(self, type):
-        lead_time = self.cycle_data[["Done", "Type", "Lead Time"]].copy()
+        lead_time = self.cycle_data[[self.end_column, "Type", "Lead Time"]].copy()
         if type != "Total":
             lead_time = lead_time.loc[lead_time["Type"] == type]
 
@@ -179,7 +194,7 @@ class Team_Metrics:
         logging.debug(f"Showing histogram for {cycle_time_name}")
 
         try:
-            cycle_time = cycle_data[["Done", "Type", cycle_time_name]].copy()
+            cycle_time = cycle_data[[self.end_column, "Type", cycle_time_name]].copy()
             if type != "Total":
                 cycle_time = cycle_time.loc[cycle_time["Type"] == type]
 
