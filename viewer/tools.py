@@ -4,6 +4,17 @@ import datetime
 
 
 def add_trendline(df, fig, column):
+    """Adds a trendline to an existing graphic based on the dataframe
+    Parameters
+    ----------
+        df: Dataframe with the data to generate the trendline
+        column: column in the data frame to be used for calculating the trendline
+        fig: original figure
+
+    Returns
+    -------
+        fig: original figure with the trendline
+    """
     # This is needed because we can't use DateTimeIndex as input for OLS
     df["serialtime"] = [(d - datetime.datetime(1970, 1, 1)).days for d in df.index]
     df["bestfit"] = (
@@ -23,6 +34,17 @@ def add_trendline(df, fig, column):
 
 
 def add_percentile(df, fig):
+    """Adds percebtile lines to an existing graphic based on the dataframe
+
+    Parameters
+    ----------
+        df (Dataframe): Dataframe with the data to generate the percentiles
+        fig (Figure): original figure
+
+    Returns
+    -------
+        fig: figure with the trendline included
+    """
     percentile = df.quantile([0.5, 0.85, 0.95])
 
     for key in percentile.keys():
