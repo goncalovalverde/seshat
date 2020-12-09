@@ -2,6 +2,7 @@ from logging import exception
 import pandas as pd
 import logging
 import numpy as np
+import calculator.tools
 
 
 def cycle_data(data, config):
@@ -26,7 +27,7 @@ def cycle_data(data, config):
 
 # Productivity - How Much - "Do Lots"
 def throughput(cycle_data):
-    throughput = group_by_date(cycle_data, "Done")
+    throughput = calculator.tools.group_by_date(cycle_data, "Done")
     # throughput = throughput.set_index("Done")
     return throughput
 
@@ -103,8 +104,8 @@ def avg_lead_time(cycle_data, type):
 
 # Predictability - How Repeatable - "Do it Predictably"
 def net_flow(cycle_data, start, end, type) -> pd.DataFrame:
-    created = group_by_date(cycle_data, start)
-    done = group_by_date(cycle_data, end)
+    created = calculator.tools.group_by_date(cycle_data, start)
+    done = calculator.tools.group_by_date(cycle_data, end)
 
     net_flow = pd.merge(created, done, left_index=True, right_index=True, how="outer")
     net_flow = net_flow.fillna(0)
@@ -180,19 +181,3 @@ def defect_percentage(throughput, type):
         throughput["Defect Percentage"] = throughput["Total"] * 0
     throughput = throughput.fillna(0)
     return throughput
-
-
-def group_by_date(cycle_data, index) -> pd.DataFrame:
-    """Group information in cycle_date by date and use index as index"""
-    table = pd.pivot_table(
-        cycle_data,
-        values="Key",
-        index=[index],
-        columns="Type",
-        fill_value=0,
-        aggfunc="count",
-    )
-    df = pd.DataFrame(table.to_records())
-    df = df.resample("D", on=index).sum()
-    df["Total"] = df.sum(axis=1)
-    return df
