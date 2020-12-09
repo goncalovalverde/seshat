@@ -142,7 +142,9 @@ class Team_Metrics:
         return fig
 
     def draw_wip(self, type):
-        wip = calculator.flow.net_flow(self.cycle_data, type)
+        wip = calculator.flow.net_flow(
+            self.cycle_data, self.start_column, self.end_column, type
+        )
         fig = wip["WIP"].plot.bar()
         fig.update_layout(
             title="Work in Progress",
