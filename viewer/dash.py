@@ -1,4 +1,5 @@
 import dash
+import pandas as pd
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_table
@@ -213,8 +214,18 @@ class Dash:
 
     def show_pivottable(self, team=0):
         tm = self.projects[team]
-        data = tm.cycle_data.values.tolist()
-        data.insert(0, tm.cycle_data.columns.to_list())
+        cycle_names = [s for s in tm.workflow]
+
+        # Create a new data frame to normalize data
+        cycle_data = tm.cycle_data.copy()
+        # Convert to date only (insted of date time)
+        cycle_data[cycle_names] = (
+            cycle_data[cycle_names].astype("<M8[D]").astype("<M8[ns]")
+        )
+
+        # Need to convert to list since this is what the
+        data = cycle_data.values.tolist()
+        data.insert(0, cycle_data.columns.to_list())
         layout = html.Div(
             children=[
                 html.H1(children="Pivot Table"),
