@@ -41,8 +41,6 @@ class Jira:
         for history in issue.changelog.histories:
             items = filter(lambda item: item.field == "status", history.items)
             for item in items:
-                print(item.toString)
-                print(history.created)
                 history_item[item.toString] = dateutil.parser.parse(
                     history.created
                 ).replace(tzinfo=None)
