@@ -37,20 +37,19 @@ class Jira:
             )
 
         history_item = {}
-        for workflow_step in self.workflow:
-            if workflow_step != "Created":
-                history_item[workflow_step] = NaT
 
         for history in issue.changelog.histories:
             items = filter(lambda item: item.field == "status", history.items)
             for item in items:
+                print(item.toString)
+                print(history.created)
                 history_item[item.toString] = dateutil.parser.parse(
                     history.created
                 ).replace(tzinfo=None)
 
         for workflow_step in self.workflow:
             if workflow_step != "Created":
-                issue_data[workflow_step].append(history_item[workflow_step])
+                issue_data[workflow_step].append(history_item.get(workflow_step, NaT))
 
     def get_issues(self):
         logging.debug("Getting chunk of issues")
