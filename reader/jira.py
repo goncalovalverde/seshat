@@ -2,7 +2,6 @@ from array import ArrayType
 from jira import JIRA
 import dateutil.parser
 import logging
-from numpy.core.records import array
 import reader.cache
 import hashlib
 from pandas import NaT, DataFrame
@@ -41,6 +40,7 @@ class Jira:
         for history in issue.changelog.histories:
             items = filter(lambda item: item.field == "status", history.items)
             for item in items:
+                print(history.created)
                 history_item[item.toString] = dateutil.parser.parse(
                     history.created
                 ).replace(tzinfo=None)
