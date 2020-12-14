@@ -9,6 +9,7 @@ class Trello:
     def __init__(self, trello_config, workflow):
         self.trello_config = trello_config
         self.workflow = workflow
+        self.done_column = list(self.workflow.keys())[-1]
 
         def cache_name(self):
             board = self.trello_config["board_id"]
@@ -41,7 +42,10 @@ class Trello:
         all_boards = client.list_boards()
         board = client.get_board(self.trello_config["board_id"])
         cards = board.all_cards()
-        card_data = {"Key": [], "Name": [], "Type": [], "Created": [], "Done": []}
+        card_data = {"Key": [], "Name": [], "Type": [], "Created": []}
+
+        for workflow_step in self.workflow:
+            card_data[workflow_step] = []
 
         for card in cards:
             self.get_card_data(card, card_data)
@@ -67,14 +71,24 @@ class Trello:
         card_data["Type"].append("Card")
         done = NaT
 
+        movement_item = {}
+
         for movement in card.list_movements():
-            if movement["destination"]["name"] == self.trello_config["done_column"]:
-                done = movement["datetime"].replace(tzinfo=None)
-                logging.debug("Got done date: " + str(done))
+            movement_item[movement["destination"]["name"]] = movement[
+                "datetime"
+            ].replace(tzinfo=None)
+            logging.debug(
+                f'Got {movement["destination"]["name"]} date: {str(movement["datetime"])}'
+            )
+            # if movement["destination"]["name"] == self.done_column:
+            #    done = movement["datetime"].replace(tzinfo=None)
+            #    logging.debug("Got done date: " + str(done))
 
         # If card was not moved to done column(s) but was already closed (archived)
-        if isnull(done) and card.closed:
-            done = card.dateLastActivity.replace(tzinfo=None)
+        if isnull(movement_item.get(self.done_column, NaT)) and card.closed:
+            movement_item[self.done_column] = card.dateLastActivity.replace(tzinfo=None)
             logging.debug(f"Card is closed. using last activity date: {done}")
 
-        card_data["Done"].append(done)
+        for workflow_step in self.workflow:
+            if workflow_step != "Created":
+                card_data[workflow_step].append(movement_item.get(workflow_step, NaT))

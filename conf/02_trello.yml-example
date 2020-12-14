@@ -4,7 +4,6 @@ trello:
   api_key: YOUR API KEY
   api_secret: YOUR API SECRET
   board_id: YOUR_BOARD_ID
-  done_column: Column to be used as done
   cache: true # can be true or false
 
 Workflow:

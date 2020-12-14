@@ -2,6 +2,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import numpy as np
 import calculator.flow
+import calculator.tools
 import logging
 import viewer.tools
 
@@ -11,13 +12,14 @@ import viewer.tools
 class Team_Metrics:
     def __init__(self, cycle_data, config):
         self.cycle_data = cycle_data
-        self.throughput = calculator.flow.throughput(self.cycle_data)
 
         self.workflow = config["Workflow"]
 
         # Extract the beggining and end of the workflow
         self.start_column = list(self.workflow.keys())[0]
         self.end_column = list(self.workflow.keys())[-1]
+
+        self.throughput = calculator.flow.throughput(self.cycle_data, self.end_column)
 
         self.name = config["name"]
         self.has_story_points = True if "Story Points" in cycle_data else False
@@ -98,7 +100,9 @@ class Team_Metrics:
             return {}
 
     def draw_lead_time(self, type):
-        lead_time = calculator.flow.avg_lead_time(self.cycle_data, type)
+        lead_time = calculator.flow.avg_lead_time(
+            self.cycle_data, type, self.end_column
+        )
         fig = lead_time.plot.line()
         fig.update_layout(
             title='Responsiveness - How Fast - "Do it Fast"',
@@ -154,9 +158,9 @@ class Team_Metrics:
         return fig
 
     def draw_start_stop(self, type):
-        start = calculator.flow.group_by_date(self.cycle_data, self.start_column)
+        start = calculator.tools.group_by_date(self.cycle_data, self.start_column)
         start = start.resample("W").sum()
-        end = calculator.flow.group_by_date(self.cycle_data, self.end_column)
+        end = calculator.tools.group_by_date(self.cycle_data, self.end_column)
         end = end.resample("W").sum()
 
         fig = go.Figure()

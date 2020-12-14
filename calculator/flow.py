@@ -9,11 +9,13 @@ def cycle_data(data, config):
     # get the first element of the workflow
     # to know where to start calculating the lead time
     workflow_keys = list(config["Workflow"].keys())
-    start = workflow_keys[0]
+    start_column = workflow_keys[0]
+    end_column = workflow_keys[-1]
+
     # start = "Created"
 
     # adding lead time to cycle_data
-    cycle_data = lead_time(data, start)
+    cycle_data = lead_time(data, start_column, end_column)
 
     # adding cycle_time (between workflow steps) to cycle_data
     for i in range(len(workflow_keys) - 1):
@@ -26,8 +28,8 @@ def cycle_data(data, config):
 
 
 # Productivity - How Much - "Do Lots"
-def throughput(cycle_data):
-    throughput = calculator.tools.group_by_date(cycle_data, "Done")
+def throughput(cycle_data, end_column):
+    throughput = calculator.tools.group_by_date(cycle_data, end_column)
     # throughput = throughput.set_index("Done")
     return throughput
 
@@ -63,9 +65,9 @@ def story_points(cycle_data):
 
 
 # Responsiveness - How Fast - "Do it Fast"
-def lead_time(cycle_data, start):
-    logging.debug("Calculating lead time for " + start)
-    cycle_data["Lead Time"] = cycle_data["Done"] - cycle_data[start]
+def lead_time(cycle_data, start_column, end_column):
+    logging.debug("Calculating lead time for " + start_column)
+    cycle_data["Lead Time"] = cycle_data[end_column] - cycle_data[start_column]
     cycle_data["Lead Time"] = pd.to_numeric(
         cycle_data["Lead Time"].dt.days, downcast="integer"
     )
@@ -88,13 +90,13 @@ def cycle_time(cycle_data, start, end):
         return cycle_data
 
 
-def avg_lead_time(cycle_data, type):
-    lead_time = cycle_data[["Done", "Type", "Lead Time"]].copy()
+def avg_lead_time(cycle_data, type, end_column):
+    lead_time = cycle_data[[end_column, "Type", "Lead Time"]].copy()
 
     if type != "Total":
         lead_time = lead_time.loc[lead_time["Type"] == type]
 
-    lead_time = lead_time.groupby("Done").mean()
+    lead_time = lead_time.groupby(end_column).mean()
 
     # TODO: check if using mean here is correct
     lead_time = lead_time.resample("W").mean()
