@@ -26,6 +26,7 @@ class Jira:
         logging.debug("Getting data for issue " + issue.key)
         issue_data["Key"].append(issue.key)
         issue_data["Type"].append(issue.fields.issuetype.name)
+        issue_data["Creator"].append(issue.fields.creator.displayName)
 
         issue_data["Created"].append(
             dateutil.parser.parse(issue.fields.created).replace(tzinfo=None)
@@ -40,7 +41,6 @@ class Jira:
         for history in issue.changelog.histories:
             items = filter(lambda item: item.field == "status", history.items)
             for item in items:
-                print(history.created)
                 history_item[item.toString] = dateutil.parser.parse(
                     history.created
                 ).replace(tzinfo=None)
@@ -81,7 +81,13 @@ class Jira:
             return df_issue_data
 
         logging.debug("Getting info from jira")
-        issue_data = {"Key": [], "Type": [], "Story Points": [], "Created": []}
+        issue_data = {
+            "Key": [],
+            "Type": [],
+            "Story Points": [],
+            "Creator": [],
+            "Created": [],
+        }
 
         for workflow_step in self.workflow:
             issue_data[workflow_step] = []
