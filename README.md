@@ -23,8 +23,8 @@ Two major configuration files exist, one for configuring logging (log_config.yml
 Also for each project/team a config file needs to be created and stored in the directory configured in config.yml.
 
 Please check conf/ directory with several examples for each case:
-- Jira with oauth
-- Jira with token
+- Jira with oauth (server)
+- Jira with token (cloud)
 - Trello
 - CSV file
 
@@ -58,7 +58,7 @@ https://trello.com/app-key
 
 ## Usage
 ### Starting
-To run the application just type ./seshat.py and after starting access http://localhost:8050/ using your browser of choice
+To run the application just type python seshat.py (or just ./seshat.py in unix based OS) and after starting access http://localhost:8050/ using your browser of choice
 
 ## Trivia
 ### Why Seshat?
