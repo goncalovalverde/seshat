@@ -57,7 +57,7 @@ class Jira:
         i = 0
         chunk_size = 100
         while True:
-            logging.debug(f"Getting chunk {i} of {chunk_size} issues")
+            logging.debug(f"Getting chunk {int(i/chunk_size)+1} of {chunk_size} issues")
             chunk = jira.search_issues(
                 self.jira_config["jql_query"],
                 expand="changelog",

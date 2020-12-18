@@ -5,6 +5,9 @@ cache_dir: /tmp
 # Where are we storing the input configurations?
 config_dir: conf
 
+# Run in debug mode?
+debug: True
+
 # What will be the webroot ?
 # This is to allow reverse proxy. Not yet implemented
 web:

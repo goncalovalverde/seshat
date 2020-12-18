@@ -32,6 +32,7 @@ Please check conf/ directory with several examples for each case:
 This file provide basic needed information:
 config_dir: directory where configuration files for each project are stored
 cache_dir: the directory where cache files are stored (needs yet to be implemented)
+debug: run application in debug mode or not (applicable for the web interface). Could be set to true or false
 
 ### log_config.yml
 

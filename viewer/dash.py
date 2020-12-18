@@ -19,6 +19,7 @@ class Dash:
         super().__init__()
         self.config = config
         self.projects = projects
+        self.debug = config["debug"]
         external_stylesheets = [dbc.themes.SKETCHY]
 
         self.app = dash.Dash(
@@ -157,7 +158,7 @@ class Dash:
 
         layout = html.Div(
             children=[
-                html.H1(children="Team Metrics WIP"),
+                html.H1(children="Team Metrics Work In Progress (WIP)"),
                 self.menu_issue_types("wip", team),
                 html.Div(
                     children=[
@@ -418,4 +419,4 @@ class Dash:
             return self.show_main_dash(team), title
 
     def run(self):
-        self.app.run_server(debug=True)
+        self.app.run_server(debug=self.debug)
