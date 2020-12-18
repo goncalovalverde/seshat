@@ -19,6 +19,7 @@ class Dash:
         super().__init__()
         self.config = config
         self.projects = projects
+        self.debug = config["debug"]
         external_stylesheets = [dbc.themes.SKETCHY]
 
         self.app = dash.Dash(
@@ -418,4 +419,4 @@ class Dash:
             return self.show_main_dash(team), title
 
     def run(self):
-        self.app.run_server(debug=True)
+        self.app.run_server(debug=self.debug)
