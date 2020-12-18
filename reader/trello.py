@@ -69,7 +69,6 @@ class Trello:
         card_data["Name"].append(card.name)
         card_data["Created"].append(card.created_date.replace(tzinfo=None))
         card_data["Type"].append("Card")
-        done = NaT
 
         movement_item = {}
 
@@ -80,14 +79,13 @@ class Trello:
             logging.debug(
                 f'Got {movement["destination"]["name"]} date: {str(movement["datetime"])}'
             )
-            # if movement["destination"]["name"] == self.done_column:
-            #    done = movement["datetime"].replace(tzinfo=None)
-            #    logging.debug("Got done date: " + str(done))
 
         # If card was not moved to done column(s) but was already closed (archived)
         if isnull(movement_item.get(self.done_column, NaT)) and card.closed:
             movement_item[self.done_column] = card.dateLastActivity.replace(tzinfo=None)
-            logging.debug(f"Card is closed. using last activity date: {done}")
+            logging.debug(
+                f"Card is closed. using last activity date: {movement_item[self.done_column]}"
+            )
 
         for workflow_step in self.workflow:
             if workflow_step != "Created":
