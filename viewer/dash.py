@@ -157,7 +157,7 @@ class Dash:
 
         layout = html.Div(
             children=[
-                html.H1(children="Team Metrics WIP"),
+                html.H1(children="Team Metrics Work In Progress (WIP)"),
                 self.menu_issue_types("wip", team),
                 html.Div(
                     children=[
