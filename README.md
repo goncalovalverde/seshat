@@ -69,7 +69,16 @@ To run the application just type
  
 (or just ./seshat.py in unix based OS).
 
-After loading the data and starting with success, use your browser of choce and access http://localhost:80i50/ 
+After loading the data and starting with success, use your browser of choice and access http://localhost:80i50/ 
+
+
+### Running in a server
+
+To run the application in a server and access it from the outside, install a WSGI server (for example gunicorn) and don't forget to bind it to the public address.
+
+For example:
+
+     $ gunicorn --bind 0.0.0.0 seshat:server
 
 ## Trivia
 ### Why Seshat?
