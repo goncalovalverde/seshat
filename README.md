@@ -13,10 +13,14 @@ Currently the following sources of information are supported:
 
 Requires Python 3.6 or later.
 
-Install Python 3 and the pip package manager. Then run to install required modules:
+Install Python 3 and the pip package manager. 
 
-     $ pip install -r requirements.txt
-     
+If you're using Windows, install Python from Anaconda distribution (https://www.anaconda.com/products/individual). This will install some essential packages that fail to install via the standard python distribution.
+
+Then run to install required modules:
+
+     $ pip install -r requirements.txt     
+
 ## Configuration
 
 Two major configuration files exist, one for configuring logging (log_config.yml) and another for the app main configuration (config.yml)
@@ -58,9 +62,20 @@ https://trello.com/app-key
 (in the future oauth support will be provided)
 
 ## Usage
+<<<<<<< HEAD
 ### Starting in your computer
 
 To run the application just type python seshat.py (or just ./seshat.py in unix based OS) and after starting access http://localhost:8050/ using your browser of choice
+=======
+### Starting
+To run the application just type 
+
+     $python seshat.py 
+ 
+(or just ./seshat.py in unix based OS).
+
+After loading the data and starting with success, use your browser of choce and access http://localhost:80i50/ 
+>>>>>>> 1d70a0268de6bf9c3423cbcf6af84ec2ad0b099f
 
 
 ### Running in a server
