@@ -62,11 +62,6 @@ https://trello.com/app-key
 (in the future oauth support will be provided)
 
 ## Usage
-<<<<<<< HEAD
-### Starting in your computer
-
-To run the application just type python seshat.py (or just ./seshat.py in unix based OS) and after starting access http://localhost:8050/ using your browser of choice
-=======
 ### Starting
 To run the application just type 
 
@@ -74,8 +69,7 @@ To run the application just type
  
 (or just ./seshat.py in unix based OS).
 
-After loading the data and starting with success, use your browser of choce and access http://localhost:80i50/ 
->>>>>>> 1d70a0268de6bf9c3423cbcf6af84ec2ad0b099f
+After loading the data and starting with success, use your browser of choice and access http://localhost:80i50/ 
 
 
 ### Running in a server
