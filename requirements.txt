@@ -11,6 +11,7 @@ statsmodels
 dash
 setuptools
 wheel
+regex
 dash_bootstrap_components
 dash-extensions
 dash_pivottable
