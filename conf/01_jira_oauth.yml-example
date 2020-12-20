@@ -9,7 +9,7 @@ jira:
   cache: true #can be true or false
   oauth:
     token: YOUR_TOKEN
-    token_secret: YOUR_SECRT
+    token_secret: YOUR_SECRET
     consumer_key: YOUR_KEY
     key_cert_file: path to certs (ex: certs/oauth.pem)
     
