@@ -1,9 +1,11 @@
 name: Clubhouse Example
 mode: clubhouse
 clubhouse:
-  api_key: "5fdef1b5-8350-449f-9073-eec7201fac66"
-  project_id: "2"
+  api_key: YOUR_CLUBHOUSE_API_KEY
+  project_id: YOUR_PROJECT_ID
 
+# Configure your workflow here
+# Right now Clubhouse support in Seshat only handles Created and Done
 Workflow:
   Created: Created
   Done: Done
