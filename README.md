@@ -15,7 +15,7 @@ Requires Python 3.6 or later.
 
 Install Python 3 and the pip package manager. 
 
-If you're using Windows, install Python from Anaconda distribution (https://www.anaconda.com/products/individual). This will install some essential packages that fail to install via the standard python distribution.
+If you're using Windows, install Python from Anaconda distribution (https://www.anaconda.com/products/individual). This will install some essential packages that fail to install via the standard python distribution. No guarantees that it will work well in Windows!
 
 Then run to install required modules:
 
@@ -45,7 +45,7 @@ Change this file to your needs. By default it writes to /tmp/seshat.log
 
 ### Project configuration files
 
-Sample files for each 
+Sample files for each type of project have been provided. You can just copy them and rename it to .yml adding your own data
 
 #### Jira
 ##### Jira passwords

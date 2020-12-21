@@ -3,6 +3,7 @@ mode: clubhouse
 clubhouse:
   api_key: YOUR_CLUBHOUSE_API_KEY
   project_id: YOUR_PROJECT_ID
+  cache: true
 
 # Configure your workflow here
 # Right now Clubhouse support in Seshat only handles Created and Done
