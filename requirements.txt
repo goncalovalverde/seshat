@@ -15,3 +15,4 @@ regex
 dash_bootstrap_components
 dash-extensions
 dash_pivottable
+clubhouse
