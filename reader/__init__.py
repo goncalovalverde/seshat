@@ -2,6 +2,7 @@ from pandas.core.frame import DataFrame
 import reader.jira
 import reader.csv
 import reader.trello
+import reader.clubhouse
 import logging
 
 
@@ -22,6 +23,9 @@ def read_data(config):
     elif mode == "trello":
         trello = reader.trello.Trello(config["trello"], config["Workflow"])
         cycle_data = trello.get_cards()
+    elif mode == "clubhouse":
+        clubhouse = reader.clubhouse.Clubhouse(config["clubhouse"], config["Workflow"])
+        cycle_data = clubhouse.get_data()
     else:
         logging.error("Don't know what to do for mode " + mode)
         return {}

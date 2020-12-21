@@ -1,0 +1,9 @@
+name: Clubhouse Example
+mode: clubhouse
+clubhouse:
+  api_key: "5fdef1b5-8350-449f-9073-eec7201fac66"
+  project_id: "2"
+
+Workflow:
+  Created: Created
+  Done: Done
