@@ -7,6 +7,8 @@ Currently the following sources of information are supported:
 - Jira
 - Trello
 - CSV file
+- Clubhouse.io
+- Gitlab
 
 
 ## Instalation
