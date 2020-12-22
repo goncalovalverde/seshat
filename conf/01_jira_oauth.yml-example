@@ -16,6 +16,9 @@ jira:
   story_points_field: CUSTOM FIELD FOR STORY POINTS
   sprints_field: CUSTOM FIELD FOR SPRINT
 
+# Map here the status of your workflow according to the flow
+# WARNING: In the future the plan is to be able to assign several statuses to the same step
+# WARNING: This is not yet working, so make sure that in the left and the right the names are the same
 Workflow:
   Created: Created
   To Do: To Do
