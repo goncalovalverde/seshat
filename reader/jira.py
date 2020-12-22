@@ -31,7 +31,7 @@ class Jira:
         issue_data["Created"].append(
             dateutil.parser.parse(issue.fields.created).replace(tzinfo=None)
         )
-        if self.jira_config["story_points_field"]:
+        if self.jira_config.get("story_points_field"):
             issue_data["Story Points"].append(
                 getattr(issue.fields, self.jira_config["story_points_field"])
             )
@@ -76,7 +76,7 @@ class Jira:
         logging.debug("Getting data from jira")
 
         if self.jira_config["cache"] and self.cache.is_valid():
-            logging.debug("Getting jira info cached ")
+            logging.debug("Getting jira data from cache")
             df_issue_data = self.cache.read()
             return df_issue_data
 

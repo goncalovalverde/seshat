@@ -1,6 +1,5 @@
 import logging
-
-# import reader.cache
+import reader.cache
 import hashlib
 import pprint as pp
 import dateutil.parser
@@ -14,6 +13,16 @@ class Clubhouse:
         self.clubhouse_config = clubhouse_config
         self.project_id = clubhouse_config["project_id"]
         self.workflow = workflow
+
+        def cache_name(self):
+            api_key = self.clubhouse_config["api_key"]
+            workflow = str(self.workflow)
+            name_hashed = hashlib.md5(
+                (api_key + self.project_id + workflow).encode("utf-8")
+            )
+            return name_hashed.hexdigest()
+
+        self.cache = reader.cache.Cache(cache_name(self))
 
     def get_clubhouse_instance(self):
         clubhouse = ClubhouseClient(self.clubhouse_config["api_key"])
@@ -41,7 +50,13 @@ class Clubhouse:
         return stories
 
     def get_data(self):
-        logging.debug("Getting stories from Clubhouse")
+        logging.debug("Getting stories from Clubhouse.io")
+
+        if self.clubhouse_config["cache"] and self.cache.is_valid():
+            logging.debug("Getting clubhouse.io data from cache")
+            df_issue_data = self.cache.read()
+            return df_issue_data
+
         stories = self.get_stories()
         story_data = {
             "Key": [],
@@ -56,4 +71,9 @@ class Clubhouse:
             self.get_story_data(story, story_data)
 
         df_story_data = DataFrame(story_data)
+
+        if self.clubhouse_config["cache"]:
+            logging.debug("Storing clubhouse.io story data in cache")
+            self.cache.write(df_story_data)
+
         return df_story_data
