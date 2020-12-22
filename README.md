@@ -56,7 +56,7 @@ https://confluence.atlassian.com/cloud/api-tokens-938839638.html
 
 ##### oauth
 
-If using oauth authentication (more used for jira server) you will need to create your own certificates for the application and create an application link in you Jira instance. You can find more information about it here:
+If using oauth authentication (more used for jira server) you will need to create your own certificates for the application and create an application link in you Jira instance. You can find more information about it here (Step 1):
 https://developer.atlassian.com/server/jira/platform/oauth/
 
 To do the oauth dance and get the oauth token you can you can use the python jira-oauth packaget:
