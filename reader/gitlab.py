@@ -31,8 +31,15 @@ class Gitlab:
 
     def get_issues(self):
         gl = self.get_gitlab_instance()
-        project = gl.projects.get(self.gitlab_config["project_id"])
-        issues = project.issues.list()
+
+        if self.gitlab_config.get("project_id"):
+            project = gl.projects.get(self.gitlab_config["project_id"])
+            issues = project.issues.list()
+
+        elif self.gitlab_config.get("group_id"):
+            group = gl.groups.get(self.gitlab_config["group_id"])
+            issues = group.issues.list()
+
         return issues
 
     def get_data(self):

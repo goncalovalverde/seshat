@@ -3,7 +3,9 @@ mode: gitlab
 gitlab:
   url: YOU_GITLAB_BASE_URL
   token: YOUR_GITLAB_TOKEN
-  project_id: YOUR_PROJECT_ID
+  # WARNING! Use only project_id or group_id
+  project_id: YOUR_PROJECT_ID 
+  group_id: YOUR GROUP_ID
   cache: true
 
 #For now only Created and Done are supported
