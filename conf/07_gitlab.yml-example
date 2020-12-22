@@ -1,0 +1,12 @@
+name: Gitlab Example
+mode: gitlab
+gitlab:
+  url: YOU_GITLAB_BASE_URL
+  token: YOUR_GITLAB_TOKEN
+  project_id: YOUR_PROJECT_ID
+  cache: true
+
+#For now only Created and Done are supported
+Workflow:
+  Created: Created
+  Done: Done
