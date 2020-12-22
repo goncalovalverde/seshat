@@ -7,6 +7,8 @@ Currently the following sources of information are supported:
 - Jira
 - Trello
 - CSV file
+- Clubhouse.io
+- Gitlab
 
 
 ## Instalation
@@ -31,6 +33,7 @@ Please check conf/ directory with several examples for each case:
 - Jira with token (cloud)
 - Trello
 - Clubhouse.io
+- Gitlab
 - CSV file
 
 ### config.yaml
@@ -56,8 +59,13 @@ https://confluence.atlassian.com/cloud/api-tokens-938839638.html
 
 ##### oauth
 
-If using oauth authentication you can use the python jira-oauth package to do the oauth dance and get the token and secret:
+If using oauth authentication (more used for jira server) you will need to create your own certificates for the application and create an application link in you Jira instance. You can find more information about it here (Step 1):
+https://developer.atlassian.com/server/jira/platform/oauth/
+
+To do the oauth dance and get the oauth token you can you can use the python jira-oauth packaget:
 https://pypi.org/project/jira-oauth/
+
+Then use this to configure your access following the oauth example in conf/ directory
 
 #### Trello
 You need to get a trello API key and secret 
@@ -68,6 +76,10 @@ https://trello.com/app-key
 
 #### Clubhouse.io
 You need to get a Clubouse API key
+
+#### Gitlab
+Only project issues are supported for now. You will need to get a Personal access token:
+https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html
 
 ## Usage
 ### Starting

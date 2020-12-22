@@ -3,6 +3,7 @@ import reader.jira
 import reader.csv
 import reader.trello
 import reader.clubhouse
+import reader.gitlab
 import logging
 
 
@@ -26,6 +27,9 @@ def read_data(config):
     elif mode == "clubhouse":
         clubhouse = reader.clubhouse.Clubhouse(config["clubhouse"], config["Workflow"])
         cycle_data = clubhouse.get_data()
+    elif mode == "gitlab":
+        gitlab = reader.gitlab.Gitlab(config["gitlab"], config["Workflow"])
+        cycle_data = gitlab.get_data()
     else:
         logging.error("Don't know what to do for mode " + mode)
         return {}

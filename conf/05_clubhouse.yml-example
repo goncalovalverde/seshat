@@ -7,6 +7,8 @@ clubhouse:
 
 # Configure your workflow here
 # Right now Clubhouse support in Seshat only handles Created and Done
+# WARNING: In the future the plan is to be able to assign several statuses to the same step
+# WARNING: This is not yet working, so make sure that in the left and the right the names are the same
 Workflow:
   Created: Created
   Done: Done
