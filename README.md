@@ -31,6 +31,7 @@ Please check conf/ directory with several examples for each case:
 - Jira with token (cloud)
 - Trello
 - Clubhouse.io
+- Gitlab
 - CSV file
 
 ### config.yaml
@@ -73,6 +74,10 @@ https://trello.com/app-key
 
 #### Clubhouse.io
 You need to get a Clubouse API key
+
+#### Gitlab
+Only project issues are supported for now. You will need to get a Personal access token:
+https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html
 
 ## Usage
 ### Starting
