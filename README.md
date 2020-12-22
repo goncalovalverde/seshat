@@ -56,8 +56,13 @@ https://confluence.atlassian.com/cloud/api-tokens-938839638.html
 
 ##### oauth
 
-If using oauth authentication you can use the python jira-oauth package to do the oauth dance and get the token and secret:
+If using oauth authentication (more used for jira server) you will need to create your own certificates for the application and create an application link in you Jira instance. You can find more information about it here:
+https://developer.atlassian.com/server/jira/platform/oauth/
+
+To do the oauth dance and get the oauth token you can you can use the python jira-oauth packaget:
 https://pypi.org/project/jira-oauth/
+
+Then use this to configure your access following the oauth example in conf/ directory
 
 #### Trello
 You need to get a trello API key and secret 
