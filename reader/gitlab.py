@@ -40,6 +40,9 @@ class Gitlab:
             group = gl.groups.get(self.gitlab_config["group_id"])
             issues = group.issues.list()
 
+        else:
+            raise Exception("No valid project_id or group_id found!")
+
         return issues
 
     def get_data(self):
