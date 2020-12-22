@@ -37,6 +37,11 @@ class Clubhouse:
         story_data["Created"].append(
             dateutil.parser.parse(story["created_at"]).replace(tzinfo=None)
         )
+        story_data["Started"].append(
+            dateutil.parser.parse(story["started_at"]).replace(tzinfo=None)
+            if story["started"]
+            else NaT
+        )
         story_data["Done"].append(
             dateutil.parser.parse(story["completed_at"]).replace(tzinfo=None)
             if story["completed"]
@@ -64,6 +69,7 @@ class Clubhouse:
             "Story Points": [],
             "Creator": [],
             "Created": [],
+            "Started": [],
             "Done": [],
         }
 
