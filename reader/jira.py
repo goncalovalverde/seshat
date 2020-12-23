@@ -38,6 +38,11 @@ class Jira:
 
         history_item = {}
 
+        if issue.changelog.total > issue.changelog.maxResults:
+            logging.debug(
+                f"WARNING: Changelog maxResults {issue.changelog.maxResults}, total {issue.changelog.total}"
+            )
+        # TODO: [SES-47] deal with pagination of issue if total > maxResults
         for history in issue.changelog.histories:
             items = filter(lambda item: item.field == "status", history.items)
             for item in items:
