@@ -71,7 +71,11 @@ class Team_Metrics:
         return fig
 
     def draw_velocity(self, type):
-        velocity = calculator.flow.velocity(self.cycle_data).resample("W").sum()
+        velocity = (
+            calculator.flow.velocity(self.cycle_data, self.end_column)
+            .resample("W")
+            .sum()
+        )
         fig = velocity[type].plot.line()
 
         fig.update_layout(
