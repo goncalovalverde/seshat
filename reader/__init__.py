@@ -23,7 +23,7 @@ def read_data(config):
         cycle_data = jira.get_data()
     elif mode == "trello":
         trello = reader.trello.Trello(config["trello"], config["Workflow"])
-        cycle_data = trello.get_cards()
+        cycle_data = trello.get_data()
     elif mode == "clubhouse":
         clubhouse = reader.clubhouse.Clubhouse(config["clubhouse"], config["Workflow"])
         cycle_data = clubhouse.get_data()

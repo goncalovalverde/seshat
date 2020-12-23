@@ -27,25 +27,26 @@ class Clubhouse:
         clubhouse = ClubhouseClient(self.clubhouse_config["api_key"])
         return clubhouse
 
-    def get_story_data(self, story, story_data):
+    def get_story_data(self, story):
         logging.debug("Reading data for story " + str(story["id"]))
-        story_data["Key"].append(story["id"])
-        story_data["Type"].append(story["story_type"])
-        story_data["Story Points"].append(story["estimate"])
-        story_data["Creator"].append(NaT)
-        story_data["Created"].append(
-            dateutil.parser.parse(story["created_at"]).replace(tzinfo=None)
-        )
-        story_data["Started"].append(
-            dateutil.parser.parse(story["started_at"]).replace(tzinfo=None)
-            if story["started"]
-            else NaT
-        )
-        story_data["Done"].append(
-            dateutil.parser.parse(story["completed_at"]).replace(tzinfo=None)
-            if story["completed"]
-            else NaT
-        )
+        story_data = {
+            "Key": story["id"],
+            "Type": story["story_type"],
+            "Story Points": story["estimate"],
+            "Creator": NaT,
+            "Created": dateutil.parser.parse(story["created_at"]).replace(tzinfo=None),
+            "Started": (
+                dateutil.parser.parse(story["started_at"]).replace(tzinfo=None)
+                if story["started"]
+                else NaT
+            ),
+            "Done": (
+                dateutil.parser.parse(story["completed_at"]).replace(tzinfo=None)
+                if story["completed"]
+                else NaT
+            ),
+        }
+        return story_data
 
     def get_stories(self):
         logging.debug("Getting stories")
@@ -62,23 +63,13 @@ class Clubhouse:
             return df_story_data
 
         stories = self.get_stories()
-        story_data = {
-            "Key": [],
-            "Type": [],
-            "Story Points": [],
-            "Creator": [],
-            "Created": [],
-            "Started": [],
-            "Done": [],
-        }
 
-        for story in stories:
-            self.get_story_data(story, story_data)
+        stories_data = [self.get_story_data(story) for story in stories]
 
-        df_story_data = DataFrame(story_data)
+        df_stories_data = DataFrame(stories_data)
 
         if self.clubhouse_config["cache"]:
             logging.debug("Storing clubhouse.io story data in cache")
-            self.cache.write(df_story_data)
+            self.cache.write(df_stories_data)
 
-        return df_story_data
+        return df_stories_data

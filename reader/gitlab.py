@@ -35,18 +35,30 @@ class Gitlab:
 
         return gl
 
-    def get_issue_data(self, issue, issue_data):
-        issue_data["Key"].append(issue.id)
-        issue_data["Type"].append("issue")
-        issue_data["Creator"].append(issue.author["name"])
-        issue_data["Created"].append(
-            dateutil.parser.parse(issue.created_at).replace(tzinfo=None)
-        )
-        issue_data["Done"].append(
-            dateutil.parser.parse(issue.created_at).replace(tzinfo=None)
-            if issue.created_at
-            else NaT
-        )
+    def get_issue_data(self, issue):
+        #        issue_data["Key"].append(issue.id)
+        #        issue_data["Type"].append("issue")
+        #        issue_data["Creator"].append(issue.author["name"])
+        #        issue_data["Created"].append(
+        #            dateutil.parser.parse(issue.created_at).replace(tzinfo=None)
+        #        )
+        #        issue_data["Done"].append(
+        #            dateutil.parser.parse(issue.created_at).replace(tzinfo=None)
+        #            if issue.created_at
+        #            else NaT
+        #        )
+        issue_data = {
+            "Key": issue.id,
+            "Type": "issue",
+            "Creator": issue.author["name"],
+            "Created": dateutil.parser.parse(issue.created_at).replace(tzinfo=None),
+            "Done": (
+                dateutil.parser.parse(issue.created_at).replace(tzinfo=None)
+                if issue.created_at
+                else NaT
+            ),
+        }
+        return issue_data
 
     def get_issues(self):
         gl = self.get_gitlab_instance()
@@ -73,14 +85,13 @@ class Gitlab:
 
         issues = self.get_issues()
 
-        issue_data = {"Key": [], "Type": [], "Creator": [], "Created": [], "Done": []}
+        # issue_data = {"Key": [], "Type": [], "Creator": [], "Created": [], "Done": []}
+        issues_data = [self.get_issue_data(issue) for issue in issues]
 
-        for issue in issues:
-            self.get_issue_data(issue, issue_data)
-        df_issue_data = DataFrame(issue_data)
+        df_issues_data = DataFrame(issues_data)
 
         if self.gitlab_config["cache"]:
             logging.debug("Storing gitlab issue data in cache")
-            self.cache.write(df_issue_data)
+            self.cache.write(df_issues_data)
 
-        return df_issue_data
+        return df_issues_data
