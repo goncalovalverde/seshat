@@ -34,17 +34,17 @@ def throughput(cycle_data, end_column):
     return throughput
 
 
-def velocity(cycle_data):
+def velocity(cycle_data, end_column):
     table = pd.pivot_table(
         cycle_data,
         values="Story Points",
-        index=["Done"],
+        index=[end_column],
         columns="Type",
         fill_value=0,
         aggfunc="sum",
     )
     df = pd.DataFrame(table.to_records())
-    df = df.resample("D", on="Done").sum()
+    df = df.resample("D", on=end_column).sum()
     df["Total"] = df.sum(axis=1)
     return df
 
