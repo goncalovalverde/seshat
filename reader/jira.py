@@ -21,23 +21,28 @@ class Jira:
 
         self.cache = reader.cache.Cache(cache_name(self))
 
-    def get_issue_data(self, issue, issue_data):
+    def get_issue_data(self, issue):
         """Iterate over issue data and append it into issue_data array"""
         logging.debug("Getting data for issue " + issue.key)
-        issue_data["Key"].append(issue.key)
-        issue_data["Type"].append(issue.fields.issuetype.name)
-        issue_data["Creator"].append(issue.fields.creator.displayName)
-
-        issue_data["Created"].append(
-            dateutil.parser.parse(issue.fields.created).replace(tzinfo=None)
-        )
-        if self.jira_config.get("story_points_field"):
-            issue_data["Story Points"].append(
+        issue_data = {
+            "Key": issue.key,
+            "Type": issue.fields.issuetype.name,
+            "Creator": issue.fields.creator.displayName,
+            "Created": dateutil.parser.parse(issue.fields.created).replace(tzinfo=None),
+            "Story Points": (
                 getattr(issue.fields, self.jira_config["story_points_field"])
-            )
+                if self.jira_config.get("story_points_field")
+                else NaT
+            ),
+        }
 
         history_item = {}
 
+        if issue.changelog.total > issue.changelog.maxResults:
+            logging.debug(
+                f"WARNING: Changelog maxResults {issue.changelog.maxResults}, total {issue.changelog.total}"
+            )
+        # TODO: [SES-47] deal with pagination of issue if total > maxResults
         for history in issue.changelog.histories:
             items = filter(lambda item: item.field == "status", history.items)
             for item in items:
@@ -47,7 +52,8 @@ class Jira:
 
         for workflow_step in self.workflow:
             if workflow_step != "Created":
-                issue_data[workflow_step].append(history_item.get(workflow_step, NaT))
+                issue_data[workflow_step] = history_item.get(workflow_step, NaT)
+        return issue_data
 
     def get_issues(self):
         logging.debug("Getting chunk of issues")
@@ -81,28 +87,17 @@ class Jira:
             return df_issue_data
 
         logging.debug("Getting info from jira")
-        issue_data = {
-            "Key": [],
-            "Type": [],
-            "Story Points": [],
-            "Creator": [],
-            "Created": [],
-        }
-
-        for workflow_step in self.workflow:
-            issue_data[workflow_step] = []
 
         issues = self.get_issues()
 
-        for issue in issues:
-            self.get_issue_data(issue, issue_data)
+        issues_data = [self.get_issue_data(issue) for issue in issues]
 
-        df_issue_data = DataFrame(issue_data)
+        df_issues_data = DataFrame(issues_data)
         if self.jira_config["cache"]:
-            self.cache.write(df_issue_data)
+            self.cache.write(df_issues_data)
 
-        df_issue_data.fillna(NaT)
-        return df_issue_data
+        df_issues_data.fillna(NaT)
+        return df_issues_data
 
     def get_jira_instance(self):
         jira_url = self.jira_config["url"]

@@ -28,47 +28,28 @@ class Trello:
 
         return client
 
-    def get_cards(self) -> DataFrame:
-        """ Retrieve card info from Trello """
-        """ Returns results as a pandas DataFrame"""
-
-        if self.trello_config["cache"] and self.cache.is_valid():
-            logging.debug("Getting Trello info cached ")
-            df_issue_data = self.cache.read()
-            return df_issue_data
-
-        logging.debug("Getting trello cards info")
+    def get_cards(self):
         client = self.get_trello_instance()
-        all_boards = client.list_boards()
         board = client.get_board(self.trello_config["board_id"])
         cards = board.all_cards()
-        card_data = {"Key": [], "Name": [], "Type": [], "Created": []}
+        return cards
 
-        for workflow_step in self.workflow:
-            card_data[workflow_step] = []
-
-        for card in cards:
-            self.get_card_data(card, card_data)
-
-        df_card_data = DataFrame(card_data)
-
-        if self.trello_config["cache"]:
-            logging.debug("Writing card data to cache")
-            self.cache.write(df_card_data)
-
-        return df_card_data
-
-    def get_card_data(self, card, card_data):
-        """Read card data information and append it to card_data array"""
+    def get_card_data(
+        self,
+        card,
+    ):
+        """Read card data information and return it as a card_data dict"""
         if card.get_list().name in self.trello_config["ignore"]:
             logging.debug(f"Card in ignored list {card.get_list().name}")
             return
 
         logging.debug(f"Getting data for card {card.id} in list {card.get_list().name}")
-        card_data["Key"].append(card.id)
-        card_data["Name"].append(card.name)
-        card_data["Created"].append(card.created_date.replace(tzinfo=None))
-        card_data["Type"].append("Card")
+        card_data = {
+            "Key": card.id,
+            "Name": card.name,
+            "Created": card.created_date.replace(tzinfo=None),
+            "Type": "Card",
+        }
 
         movement_item = {}
 
@@ -89,4 +70,30 @@ class Trello:
 
         for workflow_step in self.workflow:
             if workflow_step != "Created":
-                card_data[workflow_step].append(movement_item.get(workflow_step, NaT))
+                card_data[workflow_step] = movement_item.get(workflow_step, NaT)
+        return card_data
+
+    def get_data(self) -> DataFrame:
+        """ Retrieve card info from Trello """
+        """ Returns results as a pandas DataFrame"""
+
+        if self.trello_config["cache"] and self.cache.is_valid():
+            logging.debug("Getting Trello info cached ")
+            df_issue_data = self.cache.read()
+            return df_issue_data
+
+        logging.debug("Getting trello cards info")
+        cards = self.get_cards()
+
+        cards_data = []
+        for card in cards:
+            if card_data := self.get_card_data(card):
+                cards_data.append(card_data)
+
+        df_cards_data = DataFrame(cards_data)
+
+        if self.trello_config["cache"]:
+            logging.debug("Writing card data to cache")
+            self.cache.write(df_cards_data)
+
+        return df_cards_data
