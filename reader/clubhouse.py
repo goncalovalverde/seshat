@@ -1,7 +1,6 @@
 import logging
 import reader.cache
 import hashlib
-import pprint as pp
 import dateutil.parser
 from pandas import DataFrame, NaT
 from clubhouse import ClubhouseClient
@@ -24,7 +23,7 @@ class Clubhouse:
 
         self.cache = reader.cache.Cache(cache_name(self))
 
-    def get_clubhouse_instance(self):
+    def get_clubhouse_instance(self) -> ClubhouseClient:
         clubhouse = ClubhouseClient(self.clubhouse_config["api_key"])
         return clubhouse
 
@@ -54,13 +53,13 @@ class Clubhouse:
         stories = clubhouse.get(f"projects/{self.project_id}/stories")
         return stories
 
-    def get_data(self):
+    def get_data(self) -> DataFrame:
         logging.debug("Getting stories from Clubhouse.io")
 
         if self.clubhouse_config["cache"] and self.cache.is_valid():
             logging.debug("Getting clubhouse.io data from cache")
-            df_issue_data = self.cache.read()
-            return df_issue_data
+            df_story_data = self.cache.read()
+            return df_story_data
 
         stories = self.get_stories()
         story_data = {
