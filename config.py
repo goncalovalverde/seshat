@@ -15,7 +15,7 @@ def get(type="all"):
 
 def get_input(config_dir):
     input = []
-    for file_name in glob.iglob(f"{config_dir}/*.yml"):
+    for file_name in sorted(glob.iglob(f"{config_dir}/*.yml")):
         logging.error(f"Reading input configuration from {file_name}")
         with open(file_name, "r") as f:
             config = yaml.load(f.read(), Loader=yaml.FullLoader)

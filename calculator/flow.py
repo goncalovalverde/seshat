@@ -2,6 +2,7 @@ from logging import exception
 import pandas as pd
 import logging
 import numpy as np
+from pandas.core.frame import DataFrame
 import calculator.tools
 
 
@@ -28,13 +29,25 @@ def cycle_data(data, config):
 
 
 # Productivity - How Much - "Do Lots"
-def throughput(cycle_data, end_column):
-    throughput = calculator.tools.group_by_date(cycle_data, end_column)
+def throughput(cycle_data: DataFrame, end_column: str) -> DataFrame:
+    """Create a new Data Frame with the throughput information
+
+    :param cycle_data: The cycle_data
+    :type cycle_data: DataFrame
+    :param end_column: The name of the end state of the work flow
+    :type end_column: str
+    :return: The DataFrame with the Throughput
+    :rtype: DataFrame
+    """
+
+    # Force int16 type to reduce memory consumption
+    throughput = calculator.tools.group_by_date(cycle_data, end_column).astype("int16")
     # throughput = throughput.set_index("Done")
+
     return throughput
 
 
-def velocity(cycle_data, end_column):
+def velocity(cycle_data: DataFrame, end_column: str) -> DataFrame:
     table = pd.pivot_table(
         cycle_data,
         values="Story Points",
@@ -49,33 +62,35 @@ def velocity(cycle_data, end_column):
     return df
 
 
-def story_points(cycle_data):
+def story_points(cycle_data: DataFrame, end_column: str) -> DataFrame:
     table = pd.pivot_table(
         cycle_data,
         values="Key",
-        index=["Done"],
+        index=end_column,
         columns="Story Points",
         fill_value=0,
         aggfunc="count",
     )
     df = pd.DataFrame(table.to_records())
-    df = df.resample("D", on="Done").sum()
+    df = df.resample("D", on=end_column).sum()
     df["Total"] = df.sum(axis=1)
     return df
 
 
 # Responsiveness - How Fast - "Do it Fast"
-def lead_time(cycle_data, start_column, end_column):
+def lead_time(cycle_data: DataFrame, start_column: str, end_column: str) -> DataFrame:
     logging.debug("Calculating lead time for " + start_column)
     cycle_data["Lead Time"] = cycle_data[end_column] - cycle_data[start_column]
     cycle_data["Lead Time"] = pd.to_numeric(
         cycle_data["Lead Time"].dt.days, downcast="integer"
     )
+    # Force int16 type to reduce memory consumption
+    # cycle_data["Lead Time"] = cycle_data["Lead Time"].astype(pd.Int16Dtype())
     return cycle_data
 
 
 # TODO: migrate this to multi header df (and apply it to all dataframe )
-def cycle_time(cycle_data, start, end):
+def cycle_time(cycle_data: DataFrame, start: str, end: str) -> DataFrame:
     logging.debug("Calculating cycle time for start:" + start + " and end:" + end)
     try:
         column = "Cycle Time " + start
@@ -83,6 +98,8 @@ def cycle_time(cycle_data, start, end):
         cycle_data[column] = pd.to_numeric(
             cycle_data[column].dt.days, downcast="integer"
         )
+        # Force int16 type to reduce memory consumption
+        cycle_data[column] = cycle_data[column].astype(pd.Int16Dtype())
         return cycle_data
     except KeyError as e:
         logging.error("No data found for " + str(e))
@@ -90,11 +107,11 @@ def cycle_time(cycle_data, start, end):
         return cycle_data
 
 
-def avg_lead_time(cycle_data, type, end_column):
+def avg_lead_time(cycle_data: DataFrame, pbi_type: str, end_column: str) -> DataFrame:
     lead_time = cycle_data[[end_column, "Type", "Lead Time"]].copy()
 
-    if type != "Total":
-        lead_time = lead_time.loc[lead_time["Type"] == type]
+    if pbi_type != "Total":
+        lead_time = lead_time.loc[lead_time["Type"] == pbi_type]
 
     lead_time = lead_time.groupby(end_column).mean()
 
@@ -105,17 +122,19 @@ def avg_lead_time(cycle_data, type, end_column):
 
 
 # Predictability - How Repeatable - "Do it Predictably"
-def net_flow(cycle_data, start, end, type) -> pd.DataFrame:
+def net_flow(cycle_data: DataFrame, start: str, end, pbi_type: str) -> pd.DataFrame:
     created = calculator.tools.group_by_date(cycle_data, start)
     done = calculator.tools.group_by_date(cycle_data, end)
 
     net_flow = pd.merge(created, done, left_index=True, right_index=True, how="outer")
     net_flow = net_flow.fillna(0)
     # Net Flow : Done items - Created items
-    net_flow["Net Flow"] = net_flow[type + "_y"] - net_flow[type + "_x"]
+    net_flow["Net Flow"] = net_flow[pbi_type + "_y"] - net_flow[pbi_type + "_x"]
     # WIP : Amount of items still in progress.
     # We calculate this using cumulative sum
-    net_flow["WIP"] = net_flow[type + "_x"].cumsum() - net_flow[type + "_y"].cumsum()
+    net_flow["WIP"] = (
+        net_flow[pbi_type + "_x"].cumsum() - net_flow[pbi_type + "_y"].cumsum()
+    )
     net_flow = net_flow.fillna(0)
 
     return net_flow
@@ -127,13 +146,13 @@ def wip(cfd_data) -> pd.DataFrame:
     )
 
 
-def cfd(cycle_data, workflow, type="Total"):
+def cfd(cycle_data: DataFrame, workflow: dict, pbi_type: str = "Total") -> DataFrame:
     cycle_names = [s for s in workflow]
     # cycle_names.insert(0, "Created")
     cfd_data = cycle_data
 
-    if type != "Total":
-        cfd_data = cfd_data.loc[cfd_data["Type"] == type]
+    if pbi_type != "Total":
+        cfd_data = cfd_data.loc[cfd_data["Type"] == pbi_type]
 
     cfd_data = cfd_data[cycle_names]
 
@@ -164,18 +183,18 @@ def cfd(cycle_data, workflow, type="Total"):
 
 
 # Quality - How Well - "Do it Right"
-def defect_percentage(throughput, type):
+def defect_percentage(throughput: DataFrame, pbi_type: str) -> DataFrame:
     throughput = throughput.resample("W").sum()
 
-    if type == "Total":
+    if pbi_type == "Total":
         total = throughput["Total"]
-    elif type == "Bug":
+    elif pbi_type == "Bug":
         total = throughput["Bug"]
     else:
         try:
-            total = throughput["Bug"] + throughput[type]
+            total = throughput["Bug"] + throughput[pbi_type]
         except KeyError:
-            total = throughput[type]
+            total = throughput[pbi_type]
 
     if "Bug" in throughput:
         throughput["Defect Percentage"] = round((throughput["Bug"] / (total)), 2)

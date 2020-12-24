@@ -4,7 +4,7 @@ import dateutil.parser
 import logging
 import reader.cache
 import hashlib
-from pandas import NaT, DataFrame
+from pandas import NaT, DataFrame, Int8Dtype
 
 
 class Jira:
@@ -93,10 +93,15 @@ class Jira:
         issues_data = [self.get_issue_data(issue) for issue in issues]
 
         df_issues_data = DataFrame(issues_data)
+
+        # If Story Points column exists, force Int8Dtype
+        if "Story Points" in df_issues_data:
+            df_issues_data["Story Points"] = df_issues_data["Story Points"].astype(
+                Int8Dtype()
+            )
         if self.jira_config["cache"]:
             self.cache.write(df_issues_data)
 
-        df_issues_data.fillna(NaT)
         return df_issues_data
 
     def get_jira_instance(self):
