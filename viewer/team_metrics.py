@@ -95,7 +95,9 @@ class Team_Metrics:
     def draw_story_points(self):
         try:
             story_points = (
-                calculator.flow.story_points(self.cycle_data).resample("W").sum()
+                calculator.flow.story_points(self.cycle_data, self.end_column)
+                .resample("W")
+                .sum()
             )
             fig = story_points.plot.line(
                 title="Velocity: Distribution of story points delivered",
