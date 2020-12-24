@@ -82,6 +82,8 @@ def lead_time(cycle_data: DataFrame, start_column: str, end_column: str) -> Data
     cycle_data["Lead Time"] = pd.to_numeric(
         cycle_data["Lead Time"].dt.days, downcast="integer"
     )
+    # Force int16 type to reduce memory consumption
+    # cycle_data["Lead Time"] = cycle_data["Lead Time"].astype(pd.Int16Dtype())
     return cycle_data
 
 
@@ -94,6 +96,8 @@ def cycle_time(cycle_data: DataFrame, start: str, end: str) -> DataFrame:
         cycle_data[column] = pd.to_numeric(
             cycle_data[column].dt.days, downcast="integer"
         )
+        # Force int16 type to reduce memory consumption
+        cycle_data[column] = cycle_data[column].astype(pd.Int16Dtype())
         return cycle_data
     except KeyError as e:
         logging.error("No data found for " + str(e))
