@@ -81,7 +81,7 @@ class Dash:
         layout = html.Div(
             children=[
                 html.H1(children="Team Metrics Main Dashboard"),
-                self.menu_issue_types("main", team),
+                self.menu_pbi_types("main", team),
                 html.Div(
                     children=[
                         dcc.Graph(id="throughput-graph", figure=fig_throughput),
@@ -113,7 +113,7 @@ class Dash:
         layout = html.Div(
             children=[
                 html.H1(children="Team Metrics Lead & Cycle Time"),
-                self.menu_issue_types("hist", team),
+                self.menu_pbi_types("hist", team),
                 html.Div(
                     children=[
                         dcc.Graph(id="lead-time-graph", figure=fig_lead_time_hist),
@@ -159,7 +159,7 @@ class Dash:
         layout = html.Div(
             children=[
                 html.H1(children="Team Metrics Work In Progress (WIP)"),
-                self.menu_issue_types("wip", team),
+                self.menu_pbi_types("wip", team),
                 html.Div(
                     children=[
                         dcc.Graph(id="wip-graph", figure=fig_wip),
@@ -235,31 +235,31 @@ class Dash:
         )
         return layout
 
-    def update_main_dash(self, type):
+    def update_main_dash(self, pbi_type):
         try:
             team = int(request.cookies["team_metrics_idx"])
         except BadRequestKeyError:
             team = 0
 
-        logging.debug("Updating main dashboard for type " + type)
+        logging.debug("Updating main dashboard for PBI type " + pbi_type)
         tm = self.projects[team]
-        fig_throughput = tm.draw_throughput(type)
-        fig_defect_percentage = tm.draw_defect_percentage(type)
-        fig_lead_time = tm.draw_lead_time(type)
-        fig_net_flow = tm.draw_net_flow(type)
+        fig_throughput = tm.draw_throughput(pbi_type)
+        fig_defect_percentage = tm.draw_defect_percentage(pbi_type)
+        fig_lead_time = tm.draw_lead_time(pbi_type)
+        fig_net_flow = tm.draw_net_flow(pbi_type)
         return fig_throughput, fig_defect_percentage, fig_lead_time, fig_net_flow
 
-    def update_hist_dash(self, type):
+    def update_hist_dash(self, pbi_type):
         try:
             team = int(request.cookies["team_metrics_idx"])
         except BadRequestKeyError:
             team = 0
 
-        logging.debug("Updating Histograms to type " + type)
+        logging.debug("Updating Histograms to PBI type " + pbi_type)
         tm = self.projects[team]
-        fig_lead_time_hist = tm.draw_lead_time_hist(type)
+        fig_lead_time_hist = tm.draw_lead_time_hist(pbi_type)
 
-        figures = tm.draw_all_cycle_time_hist(type)
+        figures = tm.draw_all_cycle_time_hist(pbi_type)
         cycle_time_fig = []
         i = 0
         for fig in figures:
@@ -268,15 +268,15 @@ class Dash:
 
         return fig_lead_time_hist, cycle_time_fig
 
-    def update_wip_dash(self, type):
+    def update_wip_dash(self, pbi_type):
         try:
             team = int(request.cookies["team_metrics_idx"])
         except BadRequestKeyError:
             team = 0
-        logging.debug("Updating wip dashboard for type " + type)
+        logging.debug("Updating wip dashboard for PBI type " + pbi_type)
         tm = self.projects[team]
-        fig_wip = tm.draw_wip(type)
-        fig_start_stop = tm.draw_start_stop(type)
+        fig_wip = tm.draw_wip(pbi_type)
+        fig_start_stop = tm.draw_start_stop(pbi_type)
 
         return fig_wip, fig_start_stop
 
@@ -352,25 +352,25 @@ class Dash:
 
         return navbar
 
-    def menu_issue_types(self, dashboard, team):
+    def menu_pbi_types(self, dashboard, team):
         tm = self.projects[team]
-        menu_issue_types = (
+        menu_pbi_types = (
             html.Div(
                 [
                     dcc.Dropdown(
                         id=f"issue-type-sel-{dashboard}",
-                        options=[{"label": i, "value": i} for i in tm.issue_types],
+                        options=[{"label": i, "value": i} for i in tm.pbi_types],
                         value="Total",
                         clearable=False,
                     )
                 ],
                 style={"width": "18%", "left": "right", "display": "inline-block"},
             )
-            if len(tm.issue_types) > 2
+            if len(tm.pbi_types) > 2
             else ""
         )
 
-        return menu_issue_types
+        return menu_pbi_types
 
     def export_to_csv(self, n_clicks):
         try:
