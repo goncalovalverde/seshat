@@ -15,7 +15,7 @@ import dash_pivottable
 
 
 class Dash:
-    def __init__(self, projects, config):
+    def __init__(self, projects, config: dict):
         super().__init__()
         self.config = config
         self.projects = projects
@@ -70,7 +70,7 @@ class Dash:
             [Input("issue-type-sel-wip", "value")],
         )(self.update_wip_dash)
 
-    def show_main_dash(self, team=0):
+    def show_main_dash(self, team: int = 0):
         logging.debug("Showing Main Team Metrics Dashboard")
         tm = self.projects[team]
         fig_throughput = tm.draw_throughput("Total")
@@ -98,7 +98,7 @@ class Dash:
 
         return layout
 
-    def show_hist_dash(self, team=0):
+    def show_hist_dash(self, team: int = 0):
         logging.debug("Showing Histogram Dashboard")
         tm = self.projects[team]
         fig_lead_time_hist = tm.draw_lead_time_hist("Total")
