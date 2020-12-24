@@ -40,8 +40,10 @@ def throughput(cycle_data: DataFrame, end_column: str) -> DataFrame:
     :rtype: DataFrame
     """
 
-    throughput = calculator.tools.group_by_date(cycle_data, end_column)
+    # Force int16 type to reduce memory consumption
+    throughput = calculator.tools.group_by_date(cycle_data, end_column).astype("int16")
     # throughput = throughput.set_index("Done")
+
     return throughput
 
 
@@ -60,17 +62,17 @@ def velocity(cycle_data: DataFrame, end_column: str) -> DataFrame:
     return df
 
 
-def story_points(cycle_data: DataFrame) -> DataFrame:
+def story_points(cycle_data: DataFrame, end_column: str) -> DataFrame:
     table = pd.pivot_table(
         cycle_data,
         values="Key",
-        index=["Done"],
+        index=end_column,
         columns="Story Points",
         fill_value=0,
         aggfunc="count",
     )
     df = pd.DataFrame(table.to_records())
-    df = df.resample("D", on="Done").sum()
+    df = df.resample("D", on=end_column).sum()
     df["Total"] = df.sum(axis=1)
     return df
 
