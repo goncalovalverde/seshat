@@ -47,8 +47,8 @@ class Trello:
         card_data = {
             "Key": card.id,
             "Name": card.name,
-            "Created": card.created_date.replace(tzinfo=None),
             "Type": "Card",
+            "Created": card.created_date.replace(tzinfo=None),
         }
 
         movement_item = {}
