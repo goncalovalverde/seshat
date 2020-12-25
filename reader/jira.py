@@ -2,6 +2,7 @@ from array import ArrayType
 from jira import JIRA
 import dateutil.parser
 import logging
+from numpy.core.numeric import NaN
 import reader.cache
 import hashlib
 from pandas import NaT, DataFrame, Int8Dtype
@@ -28,12 +29,12 @@ class Jira:
             "Key": issue.key,
             "Type": issue.fields.issuetype.name,
             "Creator": issue.fields.creator.displayName,
-            "Created": dateutil.parser.parse(issue.fields.created).replace(tzinfo=None),
             "Story Points": (
                 getattr(issue.fields, self.jira_config["story_points_field"])
                 if self.jira_config.get("story_points_field")
-                else NaT
+                else NaN
             ),
+            "Created": dateutil.parser.parse(issue.fields.created).replace(tzinfo=None),
         }
 
         history_item = {}
@@ -95,10 +96,10 @@ class Jira:
         df_issues_data = DataFrame(issues_data)
 
         # If Story Points column exists, force Int8Dtype
-        if "Story Points" in df_issues_data:
-            df_issues_data["Story Points"] = df_issues_data["Story Points"].astype(
-                Int8Dtype()
-            )
+        # if "Story Points" in df_issues_data:
+        #    df_issues_data["Story Points"] = df_issues_data["Story Points"].astype(
+        #        "Int64"
+        #    )
         if self.jira_config["cache"]:
             self.cache.write(df_issues_data)
 
