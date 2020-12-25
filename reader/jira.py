@@ -29,12 +29,12 @@ class Jira:
             "Key": issue.key,
             "Type": issue.fields.issuetype.name,
             "Creator": issue.fields.creator.displayName,
-            "Created": dateutil.parser.parse(issue.fields.created).replace(tzinfo=None),
             "Story Points": (
                 getattr(issue.fields, self.jira_config["story_points_field"])
                 if self.jira_config.get("story_points_field")
                 else NaN
             ),
+            "Created": dateutil.parser.parse(issue.fields.created).replace(tzinfo=None),
         }
 
         history_item = {}
