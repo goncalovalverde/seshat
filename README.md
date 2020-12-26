@@ -21,7 +21,9 @@ If you're using Windows, install Python from Anaconda distribution (https://www.
 
 Then run to install required modules:
 
-     $ pip install -r requirements.txt     
+     $ pip install -r requirements.txt   
+
+Caveat: if you have both python and python3 install you will need to run pip3 instead of pip  
 
 ## Configuration
 
