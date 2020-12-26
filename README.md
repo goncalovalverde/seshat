@@ -21,7 +21,9 @@ If you're using Windows, install Python from Anaconda distribution (https://www.
 
 Then run to install required modules:
 
-     $ pip install -r requirements.txt     
+     $ pip install -r requirements.txt   
+
+Caveat: if you have both python and python3 install you will need to run pip3 instead of pip  
 
 ## Configuration
 
@@ -49,6 +51,7 @@ Change this file to your needs. By default it writes to /tmp/seshat.log
 ### Project configuration files
 
 Sample files for each type of project have been provided. You can just copy them and rename it to .yml adding your own data
+The application can support multiple files/projects. If you add several files, you will be able to select which one to be used in the "projects" menu. This menu will only appear if you have more than one *.yml file.
 
 #### Jira
 ##### Jira passwords
@@ -80,6 +83,20 @@ You need to get a Clubouse API key
 #### Gitlab
 Only project issues are supported for now. You will need to get a Personal access token:
 https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html
+
+#### Workflow
+Configure here the workflow of your team/project. The Worklow provided in the example files are only examples and you will need to customized them to your needs.
+
+To configure the workflow make sure that the name in the right is the same as the one in the left.
+For example
+
+     To Do: To Do
+     Done: Done
+
+The reason for this is that I plan in the future to support mapping several states to the same step.
+
+There is a "special" state called "Created". This one will show the date the card was created. 
+In Jira, use this "Created" instead of the first status.
 
 ## Usage
 ### Starting
