@@ -36,17 +36,6 @@ class Gitlab:
         return gl
 
     def get_issue_data(self, issue):
-        #        issue_data["Key"].append(issue.id)
-        #        issue_data["Type"].append("issue")
-        #        issue_data["Creator"].append(issue.author["name"])
-        #        issue_data["Created"].append(
-        #            dateutil.parser.parse(issue.created_at).replace(tzinfo=None)
-        #        )
-        #        issue_data["Done"].append(
-        #            dateutil.parser.parse(issue.created_at).replace(tzinfo=None)
-        #            if issue.created_at
-        #            else NaT
-        #        )
         issue_data = {
             "Key": issue.id,
             "Type": "issue",
