@@ -106,7 +106,7 @@ To run the application just type
  
 (or just ./seshat.py in unix based OS).
 
-After loading the data and starting with success, use your browser of choice and access http://localhost:80i50/ 
+After loading the data and starting with success, use your browser of choice and access http://localhost:8050/ 
 
 
 ### Running in a server
