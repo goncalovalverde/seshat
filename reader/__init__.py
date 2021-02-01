@@ -7,8 +7,14 @@ import reader.gitlab
 import logging
 
 
+class Reader:
+    def __init__(self, config):
+        self.config = config
+        self.mode = config["mode"]
+
+
 def read_data(config):
-    """Based in 'config' decide if we need to import data from a csv file, trello or jira
+    """Based in 'config' decide if we need to import data from a csv file, trello, jira, clubhouse or gitlab
     and then invoke the right method.
     Read the information into a dataframe called 'cycle_data'
     """
@@ -17,7 +23,8 @@ def read_data(config):
     mode = config["mode"]
 
     if mode == "csv":
-        cycle_data = reader.csv.read(config["csv"], config["Workflow"])
+        csv = reader.csv.CSV(config["csv"], config["Workflow"])
+        cycle_data = csv.get_data()
     elif mode == "jira":
         jira = reader.jira.Jira(config["jira"], config["Workflow"])
         cycle_data = jira.get_data()

@@ -6,7 +6,6 @@ import viewer.team_metrics
 import viewer.dash
 import logging
 import logging.config
-import writer
 import config
 
 with open("log_config.yaml", "r") as f:
@@ -20,8 +19,8 @@ config = config.get()
 
 projects = []
 for source_config in config["input"]:
-    logging.debug(f"Reading data for {source_config['name']}")
-    data = reader.read_data(source_config)
+    logging.info(f"Reading data for {source_config['name']}")
+    data = reader.get_data(source_config)
     cycle_data = calculator.flow.cycle_data(data, source_config)
     team_metrics = viewer.team_metrics.Team_Metrics(cycle_data, source_config)
     projects.append(team_metrics)
