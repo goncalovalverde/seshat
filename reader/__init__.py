@@ -13,7 +13,7 @@ class Reader:
         self.mode = config["mode"]
 
 
-def read_data(config):
+def get_data(config):
     """Based in 'config' decide if we need to import data from a csv file, trello, jira, clubhouse or gitlab
     and then invoke the right method.
     Read the information into a dataframe called 'cycle_data'
@@ -38,7 +38,7 @@ def read_data(config):
         gitlab = reader.gitlab.Gitlab(config["gitlab"], config["Workflow"])
         cycle_data = gitlab.get_data()
     else:
-        logging.error("Don't know what to do for mode " + mode)
+        logging.error("Don't know what to do for mode %", mode)
         return {}
 
     return cycle_data
