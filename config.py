@@ -10,8 +10,8 @@ def get(type: str = "all") -> dict:
         if type == "all":
             config["input"] = get_input(config["config_dir"])
             return config
-        else:
-            return config[type]
+
+        return config[type]
 
 
 def get_input(config_dir: str) -> list:

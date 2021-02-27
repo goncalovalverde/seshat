@@ -126,8 +126,7 @@ class Jira:
 
             return df_issue_data
 
-        else:
-            return self.get_data()
+        return self.get_data()
 
     def get_jira_instance(self):
         jira_url = self.jira_config["url"]
