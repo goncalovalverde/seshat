@@ -11,16 +11,16 @@ class Cache:
         logging.info("Initializing Cache")
 
     def write(self, data):
-        logging.debug("Writing to cache " + self.file)
+        logging.debug("Writing to cache %s", self.file)
         data.to_pickle(self.file)
 
     def read(self):
-        logging.debug("Reading from cache " + self.file)
+        logging.debug("Reading from cache %s", self.file)
         data = pd.read_pickle(self.file)
         return data
 
     def clean(self):
-        logging.debug("Cleaning cache " + self.file)
+        logging.debug("Cleaning cache %s", self.file)
         os.remove(self.file)
 
     def is_valid(self):
