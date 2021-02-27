@@ -33,7 +33,7 @@ class Team_Metrics:
         pd.options.plotting.backend = "plotly"
 
     def draw_throughput(self, pbi_type: str):
-        logging.debug("Showing throughput graph for " + pbi_type)
+        logging.debug("Showing throughput graph for %s", pbi_type)
         throughput = self.throughput
         throughput = throughput.resample("W").sum()
 

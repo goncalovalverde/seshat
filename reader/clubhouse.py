@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 import reader.cache
 import hashlib
@@ -28,7 +29,7 @@ class Clubhouse:
         return clubhouse
 
     def get_story_data(self, story):
-        logging.debug("Reading data for story " + str(story["id"]))
+        logging.debug("Reading data for story %s", str(story["id"]))
         story_data = {
             "Key": story["id"],
             "Type": story["story_type"],
@@ -73,3 +74,10 @@ class Clubhouse:
             self.cache.write(df_stories_data)
 
         return df_stories_data
+
+    def refresh_data(self, date: datetime) -> DataFrame:
+        # TODO: [SES-56] implement search of new issues instead of just getting everything
+        if self.clubhouse_config["cache"] and self.cache.is_valid():
+            self.cache.clean()
+
+        return self.get_data()
