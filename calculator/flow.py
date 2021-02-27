@@ -40,7 +40,7 @@ def throughput(cycle_data: DataFrame, end_column: str) -> DataFrame:
     :rtype: DataFrame
     """
 
-    # Force int16 type to reduce memory consumption
+    # Force int16 type to reduce memory
     throughput = calculator.tools.group_by_date(cycle_data, end_column).astype("int16")
     # throughput = throughput.set_index("Done")
 
@@ -79,7 +79,7 @@ def story_points(cycle_data: DataFrame, end_column: str) -> DataFrame:
 
 # Responsiveness - How Fast - "Do it Fast"
 def lead_time(cycle_data: DataFrame, start_column: str, end_column: str) -> DataFrame:
-    logging.debug("Calculating lead time for " + start_column)
+    logging.debug("Calculating lead time for %s", start_column)
     cycle_data["Lead Time"] = cycle_data[end_column] - cycle_data[start_column]
     cycle_data["Lead Time"] = pd.to_numeric(
         cycle_data["Lead Time"].dt.days, downcast="integer"
@@ -99,10 +99,10 @@ def cycle_time(cycle_data: DataFrame, start: str, end: str) -> DataFrame:
             cycle_data[column].dt.days, downcast="integer"
         )
         # Force int16 type to reduce memory consumption
-        cycle_data[column] = cycle_data[column].astype(pd.Int16Dtype())
+        cycle_data[column] = cycle_data[column]  # .astype(pd.Int16Dtype())
         return cycle_data
     except KeyError as e:
-        logging.error("No data found for " + str(e))
+        logging.error("No data found for %s", str(e))
         logging.error("Are you sure you configured your workflow correctly?")
         return cycle_data
 
