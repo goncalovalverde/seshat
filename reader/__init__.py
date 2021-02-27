@@ -38,7 +38,7 @@ def get_data(config):
         gitlab = reader.gitlab.Gitlab(config["gitlab"], config["Workflow"])
         cycle_data = gitlab.get_data()
     else:
-        logging.error("Don't know what to do for mode %", mode)
+        logging.error("Don't know what to do for mode %s", mode)
         return {}
 
     return cycle_data
