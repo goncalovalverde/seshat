@@ -1,4 +1,5 @@
 from array import ArrayType
+from datetime import datetime
 from jira import JIRA
 import dateutil.parser
 import logging
@@ -24,7 +25,7 @@ class Jira:
 
     def get_issue_data(self, issue):
         """Iterate over issue data and append it into issue_data array"""
-        logging.debug("Getting data for issue " + issue.key)
+        logging.debug("Getting data for issue %s", issue.key)
         issue_data = {
             "Key": issue.key,
             "Type": issue.fields.issuetype.name,
@@ -56,7 +57,7 @@ class Jira:
                 issue_data[workflow_step] = history_item.get(workflow_step, NaT)
         return issue_data
 
-    def get_issues(self):
+    def get_issues(self, jql_query):
         logging.debug("Getting chunk of issues")
 
         jira = self.get_jira_instance()
@@ -66,7 +67,7 @@ class Jira:
         while True:
             logging.debug(f"Getting chunk {int(i/chunk_size)+1} of {chunk_size} issues")
             chunk = jira.search_issues(
-                self.jira_config["jql_query"],
+                jql_query,
                 expand="changelog",
                 maxResults=chunk_size,
                 startAt=i,
@@ -80,16 +81,16 @@ class Jira:
 
     def get_data(self) -> DataFrame:
         """Retrieve data from jira and return as a Data Frame"""
-        logging.debug("Getting data from jira")
+        logging.info("Getting data from jira")
 
         if self.jira_config["cache"] and self.cache.is_valid():
-            logging.debug("Getting jira data from cache")
+            logging.info("Returning jira data from cache")
             df_issue_data = self.cache.read()
             return df_issue_data
 
-        logging.debug("Getting info from jira")
+        logging.info("Getting info from jira")
 
-        issues = self.get_issues()
+        issues = self.get_issues(self.jira_config["jql_query"])
 
         issues_data = [self.get_issue_data(issue) for issue in issues]
 
@@ -105,16 +106,39 @@ class Jira:
 
         return df_issues_data
 
+    def refresh_data(self, date: datetime) -> DataFrame:
+        logging.info("Refreshing data from jira")
+        jql_query = f"{self.jira_config['jql_query']} AND UPDATED >= '{date.strftime('%Y/%m/%d')}'"  #
+
+        if self.jira_config["cache"] and self.cache.is_valid():
+            logging.info("Geting jira data from cache")
+            df_issue_data = self.cache.read()
+
+            issues = self.get_issues(jql_query)
+            issues_data = [self.get_issue_data(issue) for issue in issues]
+
+            df_issue_data.append(DataFrame(issues_data))
+
+            # remove duplicates and return only the latest values
+            df_issue_data.drop_duplicates(subset=["Key"], keep="last")
+
+            self.cache.write(df_issue_data)
+
+            return df_issue_data
+
+        else:
+            return self.get_data()
+
     def get_jira_instance(self):
         jira_url = self.jira_config["url"]
-        logging.debug("connecting to jira " + jira_url)
-        if self.jira_config["auth_method"] == "oauth":
+        auth_method = self.jira_config["auth_method"]
+        logging.debug("connecting to jira %s", jira_url)
+        if auth_method == "oauth":
             logging.debug("Connecting to jira via oauth")
 
             key_cert_data = None
             key_cert = self.jira_config["oauth"]["key_cert_file"]
-            logging.debug("Opening Key Cert File " + key_cert)
-
+            logging.debug("Opening Key Cert File %s", key_cert)
             with open(key_cert, "r") as key_cert_file:
                 key_cert_data = key_cert_file.read()
 
@@ -127,9 +151,16 @@ class Jira:
 
             logging.debug("Connecting to jira")
             jira = JIRA(jira_url, oauth=oauth_dict)
-        else:
+        elif auth_method == "token":
             jira = JIRA(
                 jira_url,
                 basic_auth=(self.jira_config["username"], self.jira_config["password"]),
             )
+        elif auth_method == "cookie":
+            jira = JIRA(
+                jira_url,
+                auth=(self.jira_config["username"], self.jira_config["password"]),
+            )
+        else:
+            raise ValueError("Unknown jira auth method " + auth_method)
         return jira

@@ -1,5 +1,4 @@
 import dash
-import pandas as pd
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_table
@@ -134,6 +133,7 @@ class Dash:
     def show_raw_data(self, team=0):
         tm = self.projects[team]
         df = tm.cycle_data
+
         layout = (
             html.Div(
                 [
@@ -241,7 +241,7 @@ class Dash:
         except BadRequestKeyError:
             team = 0
 
-        logging.debug("Updating main dashboard for PBI type " + pbi_type)
+        logging.debug("Updating main dashboard for PBI type %s", pbi_type)
         tm = self.projects[team]
         fig_throughput = tm.draw_throughput(pbi_type)
         fig_defect_percentage = tm.draw_defect_percentage(pbi_type)
@@ -255,7 +255,7 @@ class Dash:
         except BadRequestKeyError:
             team = 0
 
-        logging.debug("Updating Histograms to PBI type " + pbi_type)
+        logging.debug("Updating Histograms to PBI type %s", pbi_type)
         tm = self.projects[team]
         fig_lead_time_hist = tm.draw_lead_time_hist(pbi_type)
 
@@ -273,7 +273,7 @@ class Dash:
             team = int(request.cookies["team_metrics_idx"])
         except BadRequestKeyError:
             team = 0
-        logging.debug("Updating wip dashboard for PBI type " + pbi_type)
+        logging.debug("Updating wip dashboard for PBI type %s", pbi_type)
         tm = self.projects[team]
         fig_wip = tm.draw_wip(pbi_type)
         fig_start_stop = tm.draw_start_stop(pbi_type)
@@ -402,7 +402,7 @@ class Dash:
         title = f"{self.app.title} : {self.projects[team].name}"
 
         if pathname:
-            logging.debug("Changing page to " + pathname)
+            logging.debug("Changing page to %s", pathname)
         if pathname == "/lead_cycle_time":
             return self.show_hist_dash(team), title
         elif pathname == "/raw_data":
