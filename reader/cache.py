@@ -24,7 +24,4 @@ class Cache:
         os.remove(self.file)
 
     def is_valid(self):
-        if os.path.isfile(self.file):
-            return True
-        else:
-            return False
+        return bool(os.path.isfile(self.file))

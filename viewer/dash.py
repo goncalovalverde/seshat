@@ -405,18 +405,18 @@ class Dash:
             logging.debug("Changing page to %s", pathname)
         if pathname == "/lead_cycle_time":
             return self.show_hist_dash(team), title
-        elif pathname == "/raw_data":
+        if pathname == "/raw_data":
             return self.show_raw_data(team), title
-        elif pathname == "/wip":
+        if pathname == "/wip":
             return self.show_wip_dash(team), title
-        elif pathname == "/throughput":
+        if pathname == "/throughput":
             return self.show_throughput_dash(team), title
-        elif pathname == "/cfd":
+        if pathname == "/cfd":
             return self.show_cfd(team), title
-        elif pathname == "/pivot":
+        if pathname == "/pivot":
             return self.show_pivottable(team), title
-        else:
-            return self.show_main_dash(team), title
+
+        return self.show_main_dash(team), title
 
     def run(self):
         self.app.run_server(debug=self.debug)
