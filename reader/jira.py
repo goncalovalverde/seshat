@@ -31,7 +31,7 @@ class Jira:
             "Type": issue.fields.issuetype.name,
             "Creator": issue.fields.creator.displayName,
             "Story Points": (
-                getattr(issue.fields, self.jira_config["story_points_field"])
+                getattr(issue.fields, self.jira_config["story_points_field"], NaN)
                 if self.jira_config.get("story_points_field")
                 else NaN
             ),
