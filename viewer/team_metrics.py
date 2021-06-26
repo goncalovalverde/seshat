@@ -293,3 +293,6 @@ class Team_Metrics:
             fill="tozeroy",
         )
         return fig
+
+    def refresh(self):
+        return
