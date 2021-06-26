@@ -7,15 +7,23 @@ import calculator.flow
 import calculator.tools
 import logging
 import viewer.tools
+import reader
 
 
 # TODO: refactor to remove cycle_data and throughput to invocation of internal
 # methods and use the class properties instead
 class Team_Metrics:
-    def __init__(self, cycle_data, config):
-        self.cycle_data = cycle_data
+    # def __init__(self, cycle_data, config):
+    def __init__(self, data_reader):
 
-        self.workflow = config["Workflow"]
+        self.data_reader = data_reader
+        self.config = data_reader.config
+        self.cycle_data = calculator.flow.cycle_data(
+            data_reader.get_data(), self.config
+        )
+        # self.cycle_data = cycle_data
+
+        self.workflow = self.config["Workflow"]
 
         # Extract the beggining and end of the workflow
         self.start_column = list(self.workflow.keys())[0]
@@ -23,10 +31,10 @@ class Team_Metrics:
 
         self.throughput = calculator.flow.throughput(self.cycle_data, self.end_column)
 
-        self.name = config["name"]
-        self.has_story_points = True if "Story Points" in cycle_data else False
+        self.name = self.config["name"]
+        self.has_story_points = True if "Story Points" in self.cycle_data else False
 
-        self.pbi_types = cycle_data["Type"].unique().tolist()
+        self.pbi_types = self.cycle_data["Type"].unique().tolist()
         # Append pseudo issue type "Total"
         self.pbi_types.insert(0, "Total")
 
@@ -294,5 +302,8 @@ class Team_Metrics:
         )
         return fig
 
-    def refresh(self):
+    def refresh(self, mode: str = "all"):
+        self.cycle_data = calculator.flow.cycle_data(
+            self.data_reader.refresh_data(), self.config
+        )
         return

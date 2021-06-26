@@ -20,11 +20,8 @@ config = config.get()
 projects = []
 for source_config in config["input"]:
     logging.info(f"Reading data for {source_config['name']}")
-    data = reader.get_data(source_config)
-    # TODO: refactor team_metrics to process the data instead of receiving
-    # cycle_data. Needed for refresh_data
-    cycle_data = calculator.flow.cycle_data(data, source_config)
-    team_metrics = viewer.team_metrics.Team_Metrics(cycle_data, source_config)
+    data_reader = reader.Reader(source_config)
+    team_metrics = viewer.team_metrics.Team_Metrics(data_reader)
     projects.append(team_metrics)
 
 dash = viewer.dash.Dash(projects, config)
