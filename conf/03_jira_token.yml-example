@@ -10,6 +10,7 @@ jira:
   auth_method: token #can be token or oauth
   cache: true #can be true or false
 
+  # format of customfield is customfield_ID
   story_points_field: CUSTOM FIELD FOR STORY POINTS
   sprints_field: CUSTOM FIELD FOR SPRINTS
 
