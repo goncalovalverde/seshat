@@ -4,6 +4,7 @@ import reader.cache
 import hashlib
 import logging
 from pandas import DataFrame, NaT
+from datetime import datetime
 
 
 class Gitlab:
@@ -84,3 +85,9 @@ class Gitlab:
             self.cache.write(df_issues_data)
 
         return df_issues_data
+
+    def refresh_data(self, date: datetime) -> DataFrame:
+        if self.gitlab_config["cache"] and self.cache.is_valid():
+            self.cache.clean()
+
+        return self.get_data()

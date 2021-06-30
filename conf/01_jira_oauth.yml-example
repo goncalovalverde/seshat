@@ -13,6 +13,7 @@ jira:
     consumer_key: YOUR_KEY
     key_cert_file: path to certs (ex: certs/oauth.pem)
     
+  # format of customfield is customfield_ID
   story_points_field: CUSTOM FIELD FOR STORY POINTS
   sprints_field: CUSTOM FIELD FOR SPRINT
 
