@@ -307,3 +307,10 @@ class Team_Metrics:
             self.data_reader.refresh_data(), self.config
         )
         return
+
+    def reload_data(self):
+        logging.info(f"Reloading data for {self.name}")
+        self.data_reader.cache.clean()
+        self.cycle_data = calculator.flow.cycle_data(
+            self.data_reader.get_data(), self.config
+        )
