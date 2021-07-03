@@ -37,6 +37,9 @@ class Dash:
             ]
         )
 
+        # register callbacks
+
+        # callback for switching pages
         self.app.callback(
             [Output("page-content", "children"), Output("nav-bar-brand", "children")],
             [Input("url", "pathname")],
@@ -50,6 +53,7 @@ class Dash:
             [Input("issue-type-sel-hist", "value")],
         )(self.update_hist_dash)
 
+        # callback to update main dashboard with values from dropdown
         self.app.callback(
             [
                 Output("throughput-graph", "figure"),
@@ -60,10 +64,12 @@ class Dash:
             [Input("issue-type-sel-main", "value")],
         )(self.update_main_dash)
 
+        # callback to download raw data
         self.app.callback(
             Output("download", "data"), [Input("download_csv_btn", "n_clicks")]
         )(self.export_to_csv)
 
+        # callback to update WIP dashboard with value from dropdown
         self.app.callback(
             [Output("wip-graph", "figure"), Output("start_stop-graph", "figure")],
             [Input("issue-type-sel-wip", "value")],
@@ -236,10 +242,7 @@ class Dash:
         return layout
 
     def update_main_dash(self, pbi_type):
-        try:
-            team = int(request.cookies["team_metrics_idx"])
-        except BadRequestKeyError:
-            team = 0
+        team = self.get_team()
 
         logging.debug("Updating main dashboard for PBI type %s", pbi_type)
         tm = self.projects[team]
@@ -250,10 +253,7 @@ class Dash:
         return fig_throughput, fig_defect_percentage, fig_lead_time, fig_net_flow
 
     def update_hist_dash(self, pbi_type):
-        try:
-            team = int(request.cookies["team_metrics_idx"])
-        except BadRequestKeyError:
-            team = 0
+        team = self.get_team()
 
         logging.debug("Updating Histograms to PBI type %s", pbi_type)
         tm = self.projects[team]
@@ -269,16 +269,20 @@ class Dash:
         return fig_lead_time_hist, cycle_time_fig
 
     def update_wip_dash(self, pbi_type):
-        try:
-            team = int(request.cookies["team_metrics_idx"])
-        except BadRequestKeyError:
-            team = 0
+        team = self.get_team()
         logging.debug("Updating wip dashboard for PBI type %s", pbi_type)
         tm = self.projects[team]
         fig_wip = tm.draw_wip(pbi_type)
         fig_start_stop = tm.draw_start_stop(pbi_type)
 
         return fig_wip, fig_start_stop
+
+    def get_team(self):
+        try:
+            team = int(request.cookies["team_metrics_idx"])
+        except BadRequestKeyError:
+            team = 0
+        return team
 
     def navbar(self):
         dropdown = dbc.DropdownMenu(
