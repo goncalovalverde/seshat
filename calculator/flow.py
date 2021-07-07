@@ -99,7 +99,7 @@ def cycle_time(cycle_data: DataFrame, start: str, end: str) -> DataFrame:
             cycle_data[column].dt.days, downcast="integer"
         )
         # Force int16 type to reduce memory consumption
-        cycle_data[column] = cycle_data[column]  # .astype(pd.Int16Dtype())
+        # cycle_data[column] = cycle_data[column]  # .astype(pd.Int16Dtype())
         return cycle_data
     except KeyError as e:
         logging.error("No data found for %s", str(e))

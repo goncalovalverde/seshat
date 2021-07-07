@@ -15,13 +15,13 @@ class Gitlab:
             token = self.gitlab_config["token"]
             workflow = str(self.workflow)
             url = self.gitlab_config["url"]
-            id = (
+            project_id = (
                 self.gitlab_config.get("project_id")
                 if self.gitlab_config.get("project_id")
                 else self.gitlab_config.get("group_id")
             )
             name_hashed = hashlib.md5(
-                (token + url + workflow + str(id)).encode("utf-8")
+                (token + url + workflow + str(project_id)).encode("utf-8")
             )
             return name_hashed.hexdigest()
 
