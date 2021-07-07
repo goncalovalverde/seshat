@@ -284,6 +284,11 @@ class Dash:
             team = 0
         return team
 
+    def reload(self, team):
+        """Reload data"""
+        tm = self.projects[team]
+        tm.reload()
+
     def navbar(self):
         dropdown = dbc.DropdownMenu(
             children=[
