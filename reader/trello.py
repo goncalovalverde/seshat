@@ -3,6 +3,7 @@ from pandas import NaT, DataFrame, isnull
 import reader.cache
 import hashlib
 import logging
+from datetime import datetime
 
 
 class Trello:
@@ -97,3 +98,9 @@ class Trello:
             self.cache.write(df_cards_data)
 
         return df_cards_data
+
+    def refresh_data(self, date: datetime) -> DataFrame:
+        if self.trello_config["cache"] and self.cache.is_valid():
+            self.cache.clean()
+
+        return self.get_data()

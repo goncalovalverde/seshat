@@ -6,7 +6,8 @@ cache_dir: /tmp
 config_dir: conf
 
 # Run in debug mode?
-debug: False
+# This applies to the web interface
+debug: True
 
 # What will be the webroot ?
 # This is to allow reverse proxy. Not yet implemented

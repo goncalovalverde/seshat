@@ -1,0 +1,17 @@
+name: Agile Enablers
+mode: trello
+trello:
+  api_key: 9ba2e001c03c3dc13f2a959fd9d5ffe1
+  api_secret: 0e742b447f42845e9fd9a8d9cf45137df95737c850cd59e41156333782046332
+  board_id: 5c94cc31ddd33420980ca40e
+  cache: true
+  ignore: 
+    - Pinned / Guidelines 📌
+
+Workflow:
+  Created: Created
+  To Do ⭐️: To Do ⭐️
+  Doing 💪: Doing 💪
+  Demo 👀: Demo 👀
+  Done 🏆: Done 🏆
+

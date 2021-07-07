@@ -9,39 +9,35 @@ import logging
 
 class Reader:
     def __init__(self, config):
+        """Based in 'config' decide if we need to import data from a csv file, trello, jira, clubhouse or gitlab
+        and then invoke the right method.
+        """
         self.config = config
         self.mode = config["mode"]
 
+        if self.mode == "csv":
+            self.reader = reader.csv.CSV(config["csv"], config["Workflow"])
+        elif self.mode == "jira":
+            self.reader = reader.jira.Jira(config["jira"], config["Workflow"])
+        elif self.mode == "trello":
+            self.reader = reader.trello.Trello(config["trello"], config["Workflow"])
+        elif self.mode == "clubhouse":
+            self.reader = reader.clubhouse.Clubhouse(
+                config["clubhouse"], config["Workflow"]
+            )
+        elif self.mode == "gitlab":
+            self.reader = reader.gitlab.Gitlab(config["gitlab"], config["Workflow"])
+        else:
+            raise ValueError(f"Invalid mode {self.mode}")
 
-def get_data(config):
-    """Based in 'config' decide if we need to import data from a csv file, trello, jira, clubhouse or gitlab
-    and then invoke the right method.
-    Read the information into a dataframe called 'cycle_data'
-    """
-    cycle_data = None
+    def get_data(self) -> DataFrame:
+        """
+        Read the information into a dataframe
+        """
+        return self.reader.get_data()
 
-    mode = config["mode"]
-
-    if mode == "csv":
-        csv = reader.csv.CSV(config["csv"], config["Workflow"])
-        cycle_data = csv.get_data()
-    elif mode == "jira":
-        jira = reader.jira.Jira(config["jira"], config["Workflow"])
-        cycle_data = jira.get_data()
-    elif mode == "trello":
-        trello = reader.trello.Trello(config["trello"], config["Workflow"])
-        cycle_data = trello.get_data()
-    elif mode == "clubhouse":
-        clubhouse = reader.clubhouse.Clubhouse(config["clubhouse"], config["Workflow"])
-        cycle_data = clubhouse.get_data()
-    elif mode == "gitlab":
-        gitlab = reader.gitlab.Gitlab(config["gitlab"], config["Workflow"])
-        cycle_data = gitlab.get_data()
-    else:
-        logging.error("Don't know what to do for mode %s", mode)
-        return {}
-
-    return cycle_data
+    def refresh_data(self) -> DataFrame:
+        return self.reader.refresh_data()
 
 
 def validate_data(cycle_data, config):
