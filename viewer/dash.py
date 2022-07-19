@@ -1,11 +1,12 @@
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
-import dash_table
+from dash import dcc
+from dash import html
+from dash import dash_table
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
-from dash_extensions import Download
-from dash_extensions.snippets import send_data_frame
+
+# from dash_extensions import Download
+# from dash_extensions.snippets import send_data_frame
 import logging
 from flask.globals import request
 import regex as re
@@ -140,7 +141,7 @@ class Dash:
                     html.Button(
                         "Download data as CSV file", id="download_csv_btn", n_clicks=0
                     ),
-                    Download(id="download"),
+                    dcc.Download(id="download"),
                 ]
             ),
             dash_table.DataTable(
@@ -331,7 +332,7 @@ class Dash:
                                 ),
                             ],
                             align="center",
-                            no_gutters=True,
+                            className="g-0",
                         ),
                         href="/home",
                     ),
@@ -382,7 +383,7 @@ class Dash:
 
         if n_clicks > 0:
             logging.debug("Downloading CSV file")
-            return send_data_frame(
+            return dcc.send_data_frame(
                 tm.cycle_data.to_csv,
                 filename=f"{tm.name}.csv",
             )
