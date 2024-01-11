@@ -13,26 +13,25 @@ class Reader:
         and then invoke the right method.
         """
         self.config = config
-        self.mode = config["mode"]
+        self.mode = config.get("mode")
 
-        if self.mode == "csv":
-            self.reader = reader.csv.CSV(config["csv"], config["Workflow"])
-        elif self.mode == "jira":
-            self.reader = reader.jira.Jira(config["jira"], config["Workflow"])
-        elif self.mode == "trello":
-            self.reader = reader.trello.Trello(config["trello"], config["Workflow"])
-        elif self.mode == "clubhouse":
-            self.reader = reader.clubhouse.Clubhouse(
-                config["clubhouse"], config["Workflow"]
-            )
-        elif self.mode == "gitlab":
-            self.reader = reader.gitlab.Gitlab(config["gitlab"], config["Workflow"])
-        else:
+        reader_classes = {
+            "csv": reader.csv.CSV,
+            "jira": reader.jira.Jira,
+            "trello": reader.trello.Trello,
+            "clubhouse": reader.clubhouse.Clubhouse,
+            "gitlab": reader.gitlab.Gitlab,
+        }
+
+        try:
+            ReaderClass = reader_classes[self.mode]
+            self.reader = ReaderClass(config[self.mode], config["Workflow"])
+        except KeyError:
             raise ValueError(f"Invalid mode {self.mode}")
 
     def get_data(self) -> DataFrame:
         """
-        Read the information into a dataframe
+        Read the information into a dataframe and return it
         """
         return self.reader.get_data()
 
