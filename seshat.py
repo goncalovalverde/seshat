@@ -6,27 +6,36 @@ import viewer.team_metrics
 import viewer.dash
 import logging
 import logging.config
-import config
+import config as cfg
 
-with open("log_config.yaml", "r") as f:
-    log_config = yaml.safe_load(f.read())
-    logging.config.dictConfig(log_config)
+def setup_logging():
+    with open("log_config.yaml", "r") as f:
+        log_config = yaml.safe_load(f.read())
+        logging.config.dictConfig(log_config)
 
-logger = logging.getLogger(__name__)
-logger.info("Starting seshat. Let's do team magic!")
+def read_data(config):
+    projects = []
+    for source_config in config["input"]:
+        logging.info(f"Reading data for {source_config['name']}")
+        data_reader = reader.Reader(source_config)
+        team_metrics = viewer.team_metrics.Team_Metrics(data_reader)
+        projects.append(team_metrics)
+    return projects
 
-config = config.get()
 
-projects = []
-for source_config in config["input"]:
-    logging.info(f"Reading data for {source_config['name']}")
-    data_reader = reader.Reader(source_config)
-    team_metrics = viewer.team_metrics.Team_Metrics(data_reader)
-    projects.append(team_metrics)
+def main():
+    setup_logging()
+    logger = logging.getLogger(__name__)
+    logger.info("Starting seshat. Let's do team magic!")
 
-dash = viewer.dash.Dash(projects, config)
+    config = cfg.get()
 
-server = dash.server
+    projects = read_data(config)
+
+    dash = viewer.dash.Dash(projects, config)
+
+    server = dash.server
+    dash.run()
 
 if __name__ == "__main__":
-    dash.run()
+    main()
