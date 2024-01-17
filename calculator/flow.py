@@ -6,7 +6,17 @@ from pandas.core.frame import DataFrame
 import calculator.tools
 
 
-def cycle_data(data, config):
+def cycle_data(data: DataFrame, config: dict) -> DataFrame:
+    """
+    Calculate the lead time and cycle time for the given data and configuration.
+
+    :param data: The input data
+    :type data: DataFrame
+    :param config: The configuration dictionary
+    :type config: dict
+    :return: The DataFrame with added lead time and cycle time
+    :rtype: DataFrame
+    """
     # get the first element of the workflow
     # to know where to start calculating the lead time
     workflow_keys = list(config["Workflow"].keys())
@@ -19,10 +29,8 @@ def cycle_data(data, config):
     cycle_data = lead_time(data, start_column, end_column)
 
     # adding cycle_time (between workflow steps) to cycle_data
-    for i in range(len(workflow_keys) - 1):
-        start = workflow_keys[i]
+    for i, start in enumerate(workflow_keys[:-1]):
         end = workflow_keys[i + 1]
-        # adding cycle_time to cycle_data
         cycle_time(cycle_data, start, end)
 
     return cycle_data
@@ -30,7 +38,8 @@ def cycle_data(data, config):
 
 # Productivity - How Much - "Do Lots"
 def throughput(cycle_data: DataFrame, end_column: str) -> DataFrame:
-    """Create a new Data Frame with the throughput information
+    """Create a new Data Frame with the throughput information. The throughput is calculated
+    by grouping the cycle data by date for the specified end column.
 
     :param cycle_data: The cycle_data
     :type cycle_data: DataFrame
@@ -48,6 +57,18 @@ def throughput(cycle_data: DataFrame, end_column: str) -> DataFrame:
 
 
 def velocity(cycle_data: DataFrame, end_column: str) -> DataFrame:
+    """
+    Calculate the velocity of the cycle data. The velocity is calculated
+    by summing the story points for each type of work item per day.
+
+    :param cycle_data: The cycle data
+    :type cycle_data: DataFrame
+    :param end_column: The name of the end state of the work flow
+    :type end_column: str
+    :return: The DataFrame with the velocity
+    :rtype: DataFrame
+    """
+
     table = pd.pivot_table(
         cycle_data,
         values="Story Points",
@@ -63,6 +84,17 @@ def velocity(cycle_data: DataFrame, end_column: str) -> DataFrame:
 
 
 def story_points(cycle_data: DataFrame, end_column: str) -> DataFrame:
+    """
+    Calculate the story points of the cycle data. The story points are calculated
+    by counting the number of keys for each type of story point per day.
+
+    :param cycle_data: The cycle data
+    :type cycle_data: DataFrame
+    :param end_column: The name of the end state of the work flow
+    :type end_column: str
+    :return: The DataFrame with the story points
+    :rtype: DataFrame
+    """
     table = pd.pivot_table(
         cycle_data,
         values="Key",
@@ -79,18 +111,49 @@ def story_points(cycle_data: DataFrame, end_column: str) -> DataFrame:
 
 # Responsiveness - How Fast - "Do it Fast"
 def lead_time(cycle_data: DataFrame, start_column: str, end_column: str) -> DataFrame:
+    """
+    Calculate the lead time of the cycle data. The lead time is calculated
+    by subtracting the start column from the end column.
+
+    :param cycle_data: The cycle data
+    :type cycle_data: DataFrame
+    :param start_column: The name of the start state of the work flow
+    :type start_column: str
+    :param end_column: The name of the end state of the work flow
+    :type end_column: str
+    :return: The DataFrame with the lead time
+    :rtype: DataFrame
+    """
     logging.debug("Calculating lead time for %s", start_column)
-    cycle_data["Lead Time"] = cycle_data[end_column] - cycle_data[start_column]
-    cycle_data["Lead Time"] = pd.to_numeric(
-        cycle_data["Lead Time"].dt.days, downcast="integer"
-    )
-    # Force int16 type to reduce memory consumption
-    # cycle_data["Lead Time"] = cycle_data["Lead Time"].astype(pd.Int16Dtype())
-    return cycle_data
+    try:
+        cycle_data["Lead Time"] = cycle_data[end_column] - cycle_data[start_column]
+        cycle_data["Lead Time"] = pd.to_numeric(
+            cycle_data["Lead Time"].dt.days, downcast="integer"
+        )
+        # Force int16 type to reduce memory consumption
+        # cycle_data["Lead Time"] = cycle_data["Lead Time"].astype(pd.Int16Dtype())
+        return cycle_data
+    except KeyError as e:
+        logging.error("No data found for %s", str(e))
+        logging.error("Are you sure you configured your workflow correctly?")
+        return cycle_data
 
 
 # TODO: migrate this to multi header df (and apply it to all dataframe )
 def cycle_time(cycle_data: DataFrame, start: str, end: str) -> DataFrame:
+    """
+    Calculate the cycle time of the cycle data. The cycle time is calculated
+    by subtracting the start column from the end column.
+
+    :param cycle_data: The cycle data
+    :type cycle_data: DataFrame
+    :param start: The name of the start state of the work flow
+    :type start: str
+    :param end: The name of the end state of the work flow
+    :type end: str
+    :return: The DataFrame with the cycle time
+    :rtype: DataFrame
+    """
     logging.debug("Calculating cycle time for start:" + start + " and end:" + end)
     try:
         column = "Cycle Time " + start
@@ -108,36 +171,72 @@ def cycle_time(cycle_data: DataFrame, start: str, end: str) -> DataFrame:
 
 
 def avg_lead_time(cycle_data: DataFrame, pbi_type: str, end_column: str) -> DataFrame:
-    lead_time = cycle_data[[end_column, "Type", "Lead Time"]].copy()
+    """
+    Calculate the average lead time of the cycle data. The average lead time is calculated
+    by grouping the data by the end column and taking the mean.
 
-    if pbi_type != "Total":
-        lead_time = lead_time.loc[lead_time["Type"] == pbi_type]
+    :param cycle_data: The cycle data
+    :type cycle_data: DataFrame
+    :param pbi_type: The type of PBI to filter by
+    :type pbi_type: str
+    :param end_column: The name of the end state of the work flow
+    :type end_column: str
+    :return: The DataFrame with the average lead time
+    :rtype: DataFrame
+    """    
+    try:
+        lead_time = cycle_data[[end_column, "Type", "Lead Time"]].copy()
 
-    lead_time = lead_time.groupby(end_column).mean()
+        if pbi_type != "Total":
+            lead_time = lead_time.loc[lead_time["Type"] == pbi_type]
 
-    # TODO: check if using mean here is correct
-    lead_time = lead_time.resample("W").mean()
-    lead_time = lead_time.fillna(0)
-    return lead_time
+        lead_time = lead_time.groupby(end_column).mean()
+        lead_time = lead_time.resample("W").mean()
+        lead_time = lead_time.fillna(0)
+        return lead_time
+    except KeyError as e:
+        logging.error("No data found for %s", str(e))
+        logging.error("Are you sure you configured your workflow correctly?")
+        return cycle_data
 
 
 # Predictability - How Repeatable - "Do it Predictably"
 def net_flow(cycle_data: DataFrame, start: str, end, pbi_type: str) -> pd.DataFrame:
-    created = calculator.tools.group_by_date(cycle_data, start)
-    done = calculator.tools.group_by_date(cycle_data, end)
+    """
+    Calculate the net flow of the cycle data. The net flow is calculated
+    by subtracting the number of created items from the number of done items.
 
-    net_flow = pd.merge(created, done, left_index=True, right_index=True, how="outer")
-    net_flow = net_flow.fillna(0)
-    # Net Flow : Done items - Created items
-    net_flow["Net Flow"] = net_flow[pbi_type + "_y"] - net_flow[pbi_type + "_x"]
-    # WIP : Amount of items still in progress.
-    # We calculate this using cumulative sum
-    net_flow["WIP"] = (
-        net_flow[pbi_type + "_x"].cumsum() - net_flow[pbi_type + "_y"].cumsum()
-    )
-    net_flow = net_flow.fillna(0)
+    :param cycle_data: The cycle data
+    :type cycle_data: DataFrame
+    :param start: The name of the start state of the work flow
+    :type start: str
+    :param end: The name of the end state of the work flow
+    :type end: str
+    :param pbi_type: The type of PBI to filter by
+    :type pbi_type: str
+    :return: The DataFrame with the net flow
+    :rtype: DataFrame
+    """
+    try:
+        created = calculator.tools.group_by_date(cycle_data, start)
+        done = calculator.tools.group_by_date(cycle_data, end)
 
-    return net_flow
+        net_flow_data = pd.merge(created, done, left_index=True, right_index=True, how="outer")
+        net_flow_data = net_flow_data.fillna(0)
+        # Net Flow : Done items - Created items
+        net_flow_data["Net Flow"] = net_flow_data[pbi_type + "_y"] - net_flow_data[pbi_type + "_x"]
+        # WIP : Amount of items still in progress.
+        # We calculate this using cumulative sum
+        net_flow_data["WIP"] = (
+            net_flow_data[pbi_type + "_x"].cumsum() - net_flow_data[pbi_type + "_y"].cumsum()
+        )
+        net_flow_data = net_flow_data.fillna(0)
+
+        return net_flow_data
+    except KeyError as e:
+        logging.error("No data found for %s", str(e))
+        logging.error("Are you sure you configured your workflow correctly?")
+        return cycle_data
 
 
 def wip(cfd_data) -> pd.DataFrame:
