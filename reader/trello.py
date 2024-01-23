@@ -7,6 +7,14 @@ from datetime import datetime
 
 
 class Trello:
+    """
+    A class to interact with Trello.
+
+    :param trello_config: The Trello configuration
+    :type trello_config: dict
+    :param workflow: The workflow dictionary
+    :type workflow: dict
+    """
     def __init__(self, trello_config, workflow):
         self.trello_config = trello_config
         self.workflow = workflow
@@ -21,6 +29,12 @@ class Trello:
         self.cache = reader.cache.Cache(cache_name(self))
 
     def get_trello_instance(self) -> TrelloClient:
+        """
+        Get a Trello client instance.
+
+        :return: The Trello client
+        :rtype: TrelloClient
+        """
         logging.info("Getting Trello client info")
         client = TrelloClient(
             api_key=self.trello_config["api_key"],
@@ -30,6 +44,12 @@ class Trello:
         return client
 
     def get_cards(self):
+        """
+        Get all cards from the Trello board.
+
+        :return: The list of cards
+        :rtype: list
+        """
         client = self.get_trello_instance()
         board = client.get_board(self.trello_config["board_id"])
         cards = board.all_cards()
