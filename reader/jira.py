@@ -150,37 +150,41 @@ class Jira:
         return self.get_data()
 
     def get_jira_instance(self):
-        jira_url = self.jira_config["url"]
-        auth_method = self.jira_config["auth_method"]
-        logging.debug("connecting to jira %s", jira_url)
-        if auth_method == "oauth":
-            logging.debug("Connecting to jira via oauth")
+        try:
+            jira_url = self.jira_config["url"]
+            auth_method = self.jira_config["auth_method"]
+            logging.debug("connecting to jira %s", jira_url)
+            if auth_method == "oauth":
+                logging.debug("Connecting to jira via oauth")
 
-            key_cert_data = None
-            key_cert = self.jira_config["oauth"]["key_cert_file"]
-            logging.debug("Opening Key Cert File %s", key_cert)
-            with open(key_cert, "r") as key_cert_file:
-                key_cert_data = key_cert_file.read()
+                key_cert_data = None
+                key_cert = self.jira_config["oauth"]["key_cert_file"]
+                logging.debug("Opening Key Cert File %s", key_cert)
+                with open(key_cert, "r") as key_cert_file:
+                    key_cert_data = key_cert_file.read()
 
-            oauth_dict = {
-                "access_token": self.jira_config["oauth"]["token"],
-                "access_token_secret": self.jira_config["oauth"]["token_secret"],
-                "consumer_key": self.jira_config["oauth"]["consumer_key"],
-                "key_cert": key_cert_data,
-            }
+                oauth_dict = {
+                    "access_token": self.jira_config["oauth"]["token"],
+                    "access_token_secret": self.jira_config["oauth"]["token_secret"],
+                    "consumer_key": self.jira_config["oauth"]["consumer_key"],
+                    "key_cert": key_cert_data,
+                }
 
-            logging.debug("Connecting to jira")
-            jira = JIRA(jira_url, oauth=oauth_dict)
-        elif auth_method == "token":
-            jira = JIRA(
-                jira_url,
-                basic_auth=(self.jira_config["username"], self.jira_config["password"]),
-            )
-        elif auth_method == "cookie":
-            jira = JIRA(
-                jira_url,
-                auth=(self.jira_config["username"], self.jira_config["password"]),
-            )
-        else:
-            raise ValueError("Unknown jira auth method " + auth_method)
-        return jira
+                logging.debug("Connecting to jira")
+                jira = JIRA(jira_url, oauth=oauth_dict)
+            elif auth_method == "token":
+                jira = JIRA(
+                    jira_url,
+                    basic_auth=(self.jira_config["username"], self.jira_config["password"]),
+                )
+            elif auth_method == "cookie":
+                jira = JIRA(
+                    jira_url,
+                    auth=(self.jira_config["username"], self.jira_config["password"]),
+                )
+            else:
+                raise ValueError("Unknown jira auth method " + auth_method)
+            return jira
+        except Exception as e:
+            logging.error(f"Failed to connect to Jira: {e}")
+            raise
