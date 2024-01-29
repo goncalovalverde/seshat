@@ -17,7 +17,7 @@ class CSV:
         self.workflow = workflow
 
     def get_data(self) -> DataFrame:
-       """
+        """
         Read information from 'csv_file' into dataframe 'cycle_data'
         Interact over 'workflow' and convert the date into datetime
 
