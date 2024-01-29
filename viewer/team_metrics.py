@@ -43,6 +43,8 @@ class Team_Metrics:
     def draw_throughput(self, pbi_type: str):
         logging.debug("Showing throughput graph for %s", pbi_type)
         throughput = self.throughput
+
+
         throughput = throughput.resample("W").sum()
 
         if pbi_type == "all":
@@ -120,18 +122,37 @@ class Team_Metrics:
             return {}
 
     def draw_lead_time(self, pbi_type: str):
-        lead_time = calculator.flow.avg_lead_time(
-            self.cycle_data, pbi_type, self.end_column
-        )
-        fig = lead_time.plot.line()
-        fig.update_layout(
-            title='Responsiveness - How Fast - "Do it Fast"',
-            showlegend=False,
-            yaxis={"title": "Lead Time Avg"},
-        )
-        fig = viewer.tools.add_trendline(lead_time, fig, "Lead Time")
-        return fig
+        """
+        Draw the lead time graph for a given pbi_type.
 
+        :param pbi_type: The type of PBI to draw the lead time graph for
+        :type pbi_type: str
+        :return: The figure with the lead time graph
+        :rtype: plotly.graph_objs._figure.Figure
+        """
+        try:
+            logging.debug("Showing lead time graph for %s", pbi_type)
+            lead_time = calculator.flow.avg_lead_time(
+                self.cycle_data, pbi_type, self.end_column
+            )
+
+            if lead_time.empty:
+                logging.warning("No lead time data to plot for %s", pbi_type)
+                return None
+
+            fig = lead_time.plot.line()
+            fig.update_layout(
+                title='Responsiveness - How Fast - "Do it Fast"',
+                showlegend=False,
+                yaxis={"title": "Lead Time Avg"},
+            )
+            logging.debug("Adding trendline")
+            fig = viewer.tools.add_trendline(lead_time, fig, "Lead Time")
+            return fig
+        except Exception as e:
+            logging.error("Error drawing lead time graph for %s: %s", pbi_type, str(e))
+            return None
+        
     def draw_defect_percentage(self, pbi_type: str):
         """Generate chart with the defect percentage (total done PBI's vs total done bugs)
 
@@ -140,6 +161,7 @@ class Team_Metrics:
         :return: [description]
         :rtype: [type]
         """
+        logging.debug("Showing defect percentage graph for %s", pbi_type)
         throughput = self.throughput
         throughput = calculator.flow.defect_percentage(throughput, pbi_type)
         fig = throughput["Defect Percentage"].plot.line(
@@ -163,21 +185,28 @@ class Team_Metrics:
         :return: Plotly chart with the PBI
         :rtype: Plotly Figure
         """
-        logging.debug("Drawing Net Flow")
+        try:
+            logging.debug("Drawing Net Flow")
 
-        net_flow = calculator.flow.net_flow(
-            self.cycle_data, self.start_column, self.end_column, pbi_type
-        )
-        net_flow = net_flow.resample("W").sum()
-        net_flow["Color"] = np.where(net_flow["Net Flow"] < 0, "red", "blue")
-        fig = net_flow["Net Flow"].plot.bar(color=net_flow["Color"])
-        fig.update_layout(
-            title='Predictability - How Repeatable - "Do it Predictably"',
-            showlegend=False,
-            yaxis={"title": "Net Flow"},
-        )
-        fig = viewer.tools.add_trendline(net_flow, fig, "Net Flow")
-        return fig
+            net_flow = calculator.flow.net_flow(
+                self.cycle_data, self.start_column, self.end_column, pbi_type
+            )
+
+            net_flow = net_flow.resample("W").sum()
+
+
+            net_flow["Color"] = np.where(net_flow["Net Flow"] < 0, "red", "blue")
+            fig = net_flow["Net Flow"].plot.bar(color=net_flow["Color"])
+            fig.update_layout(
+                title='Predictability - How Repeatable - "Do it Predictably"',
+                showlegend=False,
+                yaxis={"title": "Net Flow"},
+            )
+            fig = viewer.tools.add_trendline(net_flow, fig, "Net Flow")
+            return fig
+        except Exception as e:
+            logging.error("Error drawing net flow graph for %s: %s", pbi_type, str(e))
+            return None
 
     def draw_wip(self, pbi_type: str):
         """Generate Chart with the WIP for a specific PBI type or the total

@@ -185,12 +185,16 @@ def avg_lead_time(cycle_data: DataFrame, pbi_type: str, end_column: str) -> Data
     :rtype: DataFrame
     """    
     try:
+        logging.debug("Calculating avg lead time")
         lead_time = cycle_data[[end_column, "Type", "Lead Time"]].copy()
 
         if pbi_type != "Total":
             lead_time = lead_time.loc[lead_time["Type"] == pbi_type]
 
+        #filter out "type" object
+        lead_time = lead_time.loc[:, ['Lead Time', end_column]]
         lead_time = lead_time.groupby(end_column).mean()
+        logging.debug("Resampling")
         lead_time = lead_time.resample("W").mean()
         lead_time = lead_time.fillna(0)
         return lead_time
@@ -263,7 +267,10 @@ def cfd(cycle_data: DataFrame, workflow: dict, pbi_type: str = "Total") -> DataF
     )
 
     # Replace missing NaT values (happens if a status is skipped) with the subsequent timestamp
-    cfd_data = cfd_data.fillna(method="bfill", axis=1)
+    #cfd_data = cfd_data.fillna(method="bfill", axis=1)
+    #replaced due to change in dataframe
+    cfd_data = cfd_data.bfill(axis=1)
+
 
     # Count number of times each date occurs, preserving column order
     cfd_data = pd.concat(
