@@ -10,11 +10,25 @@ from pandas import NaT, DataFrame, Int8Dtype
 
 
 class Jira:
+    """
+    A class to interact with Jira.
+
+    :param jira_config: The Jira configuration
+    :type jira_config: dict
+    :param workflow: The workflow dictionary
+    :type workflow: dict
+    """
     def __init__(self, jira_config: dict, workflow: dict):
         self.jira_config = jira_config
         self.workflow = workflow
 
         def cache_name(self):
+            """
+            Generate a cache name based on the Jira configuration and workflow.
+
+            :return: The hashed cache name
+            :rtype: str
+            """
             url = self.jira_config["url"]
             jql_query = self.jira_config["jql_query"]
             workflow = str(self.workflow)
@@ -24,7 +38,14 @@ class Jira:
         self.cache = reader.cache.Cache(cache_name(self))
 
     def get_issue_data(self, issue):
-        """Iterate over issue data and append it into issue_data array"""
+        """
+        Iterate over issue data and append it into issue_data array.
+
+        :param issue: The issue to get data from
+        :type issue: jira.resources.Issue
+        :return: The issue data
+        :rtype: dict
+        """
         logging.debug("Getting data for issue %s", issue.key)
         issue_data = {
             "Key": issue.key,
