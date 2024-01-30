@@ -149,25 +149,12 @@ class Jira:
         try:
             jira_url = self.jira_config["url"]
             auth_method = self.jira_config["auth_method"]
-            logging.debug("connecting to jira %s", jira_url)
-            if auth_method == "oauth":
-                logging.debug("Connecting to jira via oauth")
-
-                key_cert_data = None
-                key_cert = self.jira_config["oauth"]["key_cert_file"]
-                logging.debug("Opening Key Cert File %s", key_cert)
-                with open(key_cert, "r") as key_cert_file:
-                    key_cert_data = key_cert_file.read()
-
-                oauth_dict = {
-                    "access_token": self.jira_config["oauth"]["token"],
-                    "access_token_secret": self.jira_config["oauth"]["token_secret"],
-                    "consumer_key": self.jira_config["oauth"]["consumer_key"],
-                    "key_cert": key_cert_data,
-                }
-
-                logging.debug("Connecting to jira")
+            logging.debug("Connecting to JIRA %s using %s authentication", jira_url, auth_method)
+ 
+            if auth_method == "oauth": 
+                oauth_dict = self.__get_oauth_dict()
                 jira = JIRA(jira_url, oauth=oauth_dict)
+
             elif auth_method == "token":
                 jira = JIRA(
                     jira_url,
@@ -181,6 +168,23 @@ class Jira:
             else:
                 raise ValueError("Unknown jira auth method " + auth_method)
             return jira
+        
+        except KeyError as e:
+            logging.error(f"Missing configuration key: {e}")
+            raise
         except Exception as e:
             logging.error(f"Failed to connect to Jira: {e}")
             raise
+
+    def __get_oauth_dict(self):
+        key_cert = self.jira_config["oauth"]["key_cert_file"]
+        logging.debug("Opening Key Cert File %s", key_cert)
+        with open(key_cert, "r") as key_cert_file:
+            key_cert_data = key_cert_file.read()
+
+        return {
+            "access_token": self.jira_config["oauth"]["token"],
+            "access_token_secret": self.jira_config["oauth"]["token_secret"],
+            "consumer_key": self.jira_config["oauth"]["consumer_key"],
+            "key_cert": key_cert_data,
+        }
