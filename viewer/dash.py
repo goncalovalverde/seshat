@@ -13,6 +13,7 @@ import regex as re
 from werkzeug.exceptions import BadRequestKeyError
 import dash_pivottable
 
+TOTAL = "Total"
 
 class Dash:
     def __init__(self, projects, config: dict):
@@ -73,10 +74,10 @@ class Dash:
     def show_main_dash(self, team: int = 0):
         logging.debug("Showing Main Team Metrics Dashboard")
         tm = self.projects[team]
-        fig_throughput = tm.draw_throughput("Total")
-        fig_defect_percentage = tm.draw_defect_percentage("Total")
-        fig_lead_time = tm.draw_lead_time("Total")
-        fig_net_flow = tm.draw_net_flow("Total")
+        fig_throughput = tm.draw_throughput(TOTAL)
+        fig_defect_percentage = tm.draw_defect_percentage(TOTAL)
+        fig_lead_time = tm.draw_lead_time(TOTAL)
+        fig_net_flow = tm.draw_net_flow(TOTAL)
 
         layout = html.Div(
             children=[
@@ -101,9 +102,9 @@ class Dash:
     def show_hist_dash(self, team: int = 0):
         logging.debug("Showing Histogram Dashboard")
         tm = self.projects[team]
-        fig_lead_time_hist = tm.draw_lead_time_hist("Total")
+        fig_lead_time_hist = tm.draw_lead_time_hist(TOTAL)
 
-        figures = tm.draw_all_cycle_time_hist("Total")
+        figures = tm.draw_all_cycle_time_hist(TOTAL)
         cycle_time_fig = []
         i = 0
         for fig in figures:
@@ -154,8 +155,8 @@ class Dash:
 
     def show_wip_dash(self, team=0):
         tm = self.projects[team]
-        fig_wip = tm.draw_wip("Total")
-        fig_start_stop = tm.draw_start_stop("Total")
+        fig_wip = tm.draw_wip(TOTAL)
+        fig_start_stop = tm.draw_start_stop(TOTAL)
 
         layout = html.Div(
             children=[
@@ -177,7 +178,7 @@ class Dash:
         fig_throughput = tm.draw_throughput("all")
         # TODO: improve this logic
         if tm.has_story_points:
-            fig_velocity = tm.draw_velocity("Total")
+            fig_velocity = tm.draw_velocity(TOTAL)
             fig_spoints_throughput = tm.draw_story_points()
         else:
             fig_velocity = {}
@@ -203,7 +204,7 @@ class Dash:
     def show_cfd(self, team=0):
         logging.debug("Showing CFD")
         tm = self.projects[team]
-        fig_cfd = tm.draw_cfd("Total")
+        fig_cfd = tm.draw_cfd(TOTAL)
 
         layout = html.Div(
             children=[
@@ -236,11 +237,14 @@ class Dash:
         )
         return layout
 
-    def update_main_dash(self, pbi_type):
+    def __get_team_index(self):
         try:
-            team = int(request.cookies["team_metrics_idx"])
+            return int(request.cookies["team_metrics_idx"])
         except BadRequestKeyError:
-            team = 0
+            return 0    
+
+    def update_main_dash(self, pbi_type):
+        team = self.__get_team_index()
 
         logging.debug("Updating main dashboard for PBI type %s", pbi_type)
         tm = self.projects[team]
@@ -251,10 +255,7 @@ class Dash:
         return fig_throughput, fig_defect_percentage, fig_lead_time, fig_net_flow
 
     def update_hist_dash(self, pbi_type):
-        try:
-            team = int(request.cookies["team_metrics_idx"])
-        except BadRequestKeyError:
-            team = 0
+        team = self.__get_team_index()
 
         logging.debug("Updating Histograms to PBI type %s", pbi_type)
         tm = self.projects[team]
@@ -270,10 +271,8 @@ class Dash:
         return fig_lead_time_hist, cycle_time_fig
 
     def update_wip_dash(self, pbi_type):
-        try:
-            team = int(request.cookies["team_metrics_idx"])
-        except BadRequestKeyError:
-            team = 0
+        team = self.__get_team_index()
+
         logging.debug("Updating wip dashboard for PBI type %s", pbi_type)
         tm = self.projects[team]
         fig_wip = tm.draw_wip(pbi_type)
@@ -361,7 +360,7 @@ class Dash:
                     dcc.Dropdown(
                         id=f"issue-type-sel-{dashboard}",
                         options=[{"label": i, "value": i} for i in tm.pbi_types],
-                        value="Total",
+                        value=TOTAL,
                         clearable=False,
                     )
                 ],
@@ -374,10 +373,7 @@ class Dash:
         return menu_pbi_types
 
     def export_to_csv(self, n_clicks):
-        try:
-            team = int(request.cookies["team_metrics_idx"])
-        except BadRequestKeyError:
-            team = 0
+        team = self.__get_team_index()
 
         tm = self.projects[team]
 
@@ -395,10 +391,7 @@ class Dash:
             team = int(idx.group(1))
             dash.callback_context.response.set_cookie("team_metrics_idx", str(team))
         else:
-            try:
-                team = int(request.cookies["team_metrics_idx"])
-            except BadRequestKeyError:
-                team = 0
+            self.__get_team_index()
 
         title = f"{self.app.title} : {self.projects[team].name}"
 
