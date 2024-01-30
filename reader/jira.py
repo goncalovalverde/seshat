@@ -37,6 +37,9 @@ class Jira:
 
         self.cache = reader.cache.Cache(cache_name(self))
 
+    def get_story_points(self, issue):
+        return getattr(issue.fields, self.jira_config["story_points_field"], NaN) if self.jira_config.get("story_points_field") else NaN
+
     def get_issue_data(self, issue):
         """
         Iterate over issue data and append it into issue_data array.
@@ -51,11 +54,7 @@ class Jira:
             "Key": issue.key,
             "Type": issue.fields.issuetype.name,
             "Creator": issue.fields.creator.displayName,
-            "Story Points": (
-                getattr(issue.fields, self.jira_config["story_points_field"], NaN)
-                if self.jira_config.get("story_points_field")
-                else NaN
-            ),
+            "Story Points": self.get_story_points(issue),
             "Created": dateutil.parser.parse(issue.fields.created).replace(tzinfo=None),
         }
 
@@ -83,9 +82,8 @@ class Jira:
 
         jira = self.get_jira_instance()
         issues = []
-        i = 0
         chunk_size = 100
-        while True:
+        for i in range(0, jira.search_issues(jql_query, maxResults=0).total, chunk_size):
             logging.debug(f"Getting chunk {int(i/chunk_size)+1} of {chunk_size} issues")
             chunk = jira.search_issues(
                 jql_query,
@@ -93,12 +91,16 @@ class Jira:
                 maxResults=chunk_size,
                 startAt=i,
             )
-            i += chunk_size
-            issues += chunk.iterable
-            if i >= chunk.total:
-                break
+        issues += chunk.iterable
 
         return issues
+    
+
+    def get_data_from_jira(self,jql_query):
+        issues = self.get_issues(jql_query)
+        issues_data = [self.get_issue_data(issue) for issue in issues]
+        df_issues_data = DataFrame(issues_data)
+        return df_issues_data
 
     def get_data(self) -> DataFrame:
         """Retrieve data from jira and return as a Data Frame"""
@@ -111,11 +113,7 @@ class Jira:
 
         logging.info("Getting info from jira")
 
-        issues = self.get_issues(self.jira_config["jql_query"])
-
-        issues_data = [self.get_issue_data(issue) for issue in issues]
-
-        df_issues_data = DataFrame(issues_data)
+        df_issues_data = self.get_data_from_jira(self.jira_config["jql_query"])
 
         # If Story Points column exists, force Int8Dtype
         # if "Story Points" in df_issues_data:
@@ -135,13 +133,11 @@ class Jira:
             logging.info("Geting jira data from cache")
             df_issue_data = self.cache.read()
 
-            issues = self.get_issues(jql_query)
-            issues_data = [self.get_issue_data(issue) for issue in issues]
-
-            df_issue_data.append(DataFrame(issues_data))
+            df_new_issue_data = self.get_data_from_jira(jql_query)
+            df_issue_data = df_issue_data.append(df_new_issue_data)
 
             # remove duplicates and return only the latest values
-            df_issue_data.drop_duplicates(subset=["Key"], keep="last")
+            df_issue_data = df_issue_data.drop_duplicates(subset=["Key"], keep="last")
 
             self.cache.write(df_issue_data)
 
