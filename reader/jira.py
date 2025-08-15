@@ -3,7 +3,8 @@ from datetime import datetime
 from jira import JIRA
 import dateutil.parser
 import logging
-from numpy.core.numeric import NaN
+import numpy as np
+NaN = np.nan
 import reader.cache
 import hashlib
 from pandas import NaT, DataFrame, Int8Dtype
